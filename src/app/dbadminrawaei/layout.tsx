@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="admin-light min-h-screen flex bg-[#FAF8F5] text-[#171717]" dir="rtl">
+    <div className="admin-light min-h-screen flex bg-[#FAF8F5] text-black" dir="rtl">
       {/* 1. Sidebar for Desktop (Light Luxury Design) */}
       <aside className="hidden lg:flex w-72 flex-col justify-between bg-white border-l border-[#C49A45]/20 shadow-md z-30">
         <div>
@@ -85,8 +85,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               />
             </div>
             <div>
-              <h2 className="text-lg font-black text-[#171717]">روائع للعطور</h2>
-              <p className="text-[11px] tracking-wider text-[#98702B] uppercase font-bold">
+              <h2 className="text-lg font-black text-black">روائع للعطور</h2>
+              <p className="text-[11px] tracking-wider text-black uppercase font-black">
                 لوحة التحكم الإدارية
               </p>
             </div>
@@ -101,14 +101,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#DFC27A] via-[#C49A45] to-[#98702B] text-black shadow-md font-bold'
-                      : 'text-neutral-600 hover:text-[#98702B] hover:bg-[#FAF7F2]'
+                      ? 'bg-gradient-to-r from-[#DFC27A] via-[#C49A45] to-[#98702B] text-black shadow-md'
+                      : 'text-black hover:bg-[#FAF7F2] hover:text-black'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-[#98702B]'}`} />
-                  <span>{item.label}</span>
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-black'}`} />
+                  <span className="text-black">{item.label}</span>
                 </Link>
               );
             })}
@@ -120,10 +120,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link
             href="/"
             target="_blank"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-[#C49A45]/10 border border-[#C49A45]/30 text-xs font-bold text-[#98702B] transition-colors shadow-sm"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-[#C49A45]/10 border border-[#C49A45]/30 text-xs font-bold text-black transition-colors shadow-sm"
           >
-            <ExternalLink className="w-4 h-4 text-[#98702B]" />
-            <span>معاينة المتجر المباشر</span>
+            <ExternalLink className="w-4 h-4 text-black" />
+            <span className="text-black">معاينة المتجر المباشر</span>
           </Link>
 
           <button
@@ -143,11 +143,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-neutral-600 hover:text-[#171717] rounded-lg hover:bg-neutral-100"
+              className="lg:hidden p-2 text-black hover:bg-neutral-100 rounded-lg"
             >
               <Menu className="w-6 h-6" />
             </button>
-            <span className="text-xs font-bold text-[#98702B] px-3 py-1 rounded-full bg-[#C49A45]/10 border border-[#C49A45]/30">
+            <span className="text-xs font-bold text-black px-3 py-1 rounded-full bg-[#C49A45]/15 border border-[#C49A45]/30">
               نظام إدارة التجارة الإلكترونية الملكية
             </span>
           </div>
@@ -155,17 +155,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 text-xs">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-neutral-500">المدير:</span>
-              <span className="font-bold text-[#171717]">admin@rawaei.com</span>
+              <span className="text-black font-semibold">المدير:</span>
+              <span className="font-bold text-black">admin@rawaei.com</span>
             </div>
 
             <Link
               href="/"
               target="_blank"
-              className="gold-button px-4 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm"
+              className="gold-button px-4 py-1.5 rounded-xl text-xs font-black text-black flex items-center gap-1.5 shadow-sm"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">زيارة المتجر</span>
+              <ExternalLink className="w-3.5 h-3.5 text-black" />
+              <span className="hidden sm:inline text-black">زيارة المتجر</span>
             </Link>
           </div>
         </header>
@@ -184,10 +184,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="fixed top-0 bottom-0 right-0 w-4/5 max-w-xs bg-white border-l border-[#C49A45]/30 p-6 flex flex-col justify-between overflow-y-auto shadow-2xl">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-[#C49A45]/20 mb-4">
-                <span className="font-black text-[#171717] text-sm">لوحة التحكم</span>
+                <span className="font-black text-black text-sm">لوحة التحكم</span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1 text-neutral-500 hover:text-black rounded-lg hover:bg-neutral-100"
+                  className="p-1 text-black hover:bg-neutral-100 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -199,10 +199,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`block px-3 py-2 rounded-xl text-xs font-semibold ${
+                    className={`block px-3 py-2 rounded-xl text-xs font-bold ${
                       pathname === item.href
-                        ? 'bg-gradient-to-r from-[#DFC27A] via-[#C49A45] to-[#98702B] text-black font-bold shadow-sm'
-                        : 'text-neutral-600 hover:text-[#98702B] hover:bg-[#FAF7F2]'
+                        ? 'bg-gradient-to-r from-[#DFC27A] via-[#C49A45] to-[#98702B] text-black shadow-sm'
+                        : 'text-black hover:bg-[#FAF7F2]'
                     }`}
                   >
                     {item.label}

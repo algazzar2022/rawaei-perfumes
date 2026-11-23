@@ -222,23 +222,74 @@ body {
 }
 
 /* ============================================================ */
-/* Luxury Light Dashboard Theme                                 */
+/* Luxury Light Dashboard Theme - Complete Black Typography     */
 /* ============================================================ */
 .admin-light {
   background-color: #FAF8F5;
-  color: #171717;
+  color: #000000 !important;
+}
+
+/* Force pure black on all typography elements */
+.admin-light h1,
+.admin-light h2,
+.admin-light h3,
+.admin-light h4,
+.admin-light h5,
+.admin-light h6,
+.admin-light p,
+.admin-light label,
+.admin-light th,
+.admin-light td,
+.admin-light li,
+.admin-light dt,
+.admin-light dd,
+.admin-light b,
+.admin-light strong,
+.admin-light input,
+.admin-light select,
+.admin-light textarea,
+.admin-light button:not([class*="bg-red"]):not([class*="text-red"]),
+.admin-light a:not([class*="bg-red"]):not([class*="text-red"]) {
+  color: #000000 !important;
+}
+
+/* Tailwind text color overrides within .admin-light */
+.admin-light .text-white,
+.admin-light .text-gray-100,
+.admin-light .text-gray-200,
+.admin-light .text-gray-300,
+.admin-light .text-gray-400,
+.admin-light .text-gray-500,
+.admin-light .text-gray-600,
+.admin-light .text-gray-700,
+.admin-light .text-neutral-300,
+.admin-light .text-neutral-400,
+.admin-light .text-neutral-500,
+.admin-light .text-neutral-600,
+.admin-light .text-neutral-700,
+.admin-light .text-\[\#DFC27A\],
+.admin-light .text-\[\#98702B\],
+.admin-light .text-\[\#C49A45\],
+.admin-light .text-\[\#171717\],
+.admin-light .text-\[\#1E1B18\],
+.admin-light .text-\[\#6B6357\],
+.admin-light .text-\[\#7A7368\],
+.admin-light .text-\[\#8C8377\],
+.admin-light .text-\[\#555555\],
+.admin-light .text-\[\#4A453E\] {
+  color: #000000 !important;
 }
 
 .admin-light .glass-card {
   background: #FFFFFF !important;
-  border-color: rgba(196, 154, 69, 0.22) !important;
-  box-shadow: 0 4px 20px -2px rgba(152, 112, 43, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
-  color: #171717 !important;
+  border-color: rgba(196, 154, 69, 0.28) !important;
+  box-shadow: 0 4px 20px -2px rgba(152, 112, 43, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  color: #000000 !important;
 }
 
 .admin-light .glass-card:hover {
-  border-color: rgba(196, 154, 69, 0.45) !important;
-  box-shadow: 0 10px 30px -4px rgba(152, 112, 43, 0.12) !important;
+  border-color: rgba(196, 154, 69, 0.5) !important;
+  box-shadow: 0 10px 30px -4px rgba(152, 112, 43, 0.14) !important;
 }
 
 /* Light Card & Container Overrides */
@@ -252,27 +303,8 @@ body {
 .admin-light .bg-neutral-900,
 .admin-light .bg-neutral-950 {
   background-color: #FFFFFF !important;
-  border-color: rgba(196, 154, 69, 0.25) !important;
-  color: #171717 !important;
-}
-
-/* Typography contrast */
-.admin-light h1.text-white,
-.admin-light h2.text-white,
-.admin-light h3.text-white,
-.admin-light h4.text-white,
-.admin-light .font-bold.text-white,
-.admin-light .font-black.text-white,
-.admin-light span.text-white,
-.admin-light div.text-white,
-.admin-light p.text-white {
-  color: #171717 !important;
-}
-
-.admin-light .text-gray-400,
-.admin-light .text-gray-300,
-.admin-light .text-gray-200 {
-  color: #555555 !important;
+  border-color: rgba(196, 154, 69, 0.28) !important;
+  color: #000000 !important;
 }
 
 /* Form Inputs, Selects & Textareas */
@@ -280,8 +312,9 @@ body {
 .admin-light select,
 .admin-light textarea {
   background-color: #FAF8F5 !important;
-  color: #171717 !important;
-  border: 1px solid rgba(196, 154, 69, 0.35) !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border: 1px solid rgba(196, 154, 69, 0.4) !important;
   border-radius: 0.75rem !important;
 }
 
@@ -290,24 +323,30 @@ body {
 .admin-light textarea:focus {
   background-color: #FFFFFF !important;
   border-color: #C49A45 !important;
+  color: #000000 !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(196, 154, 69, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(196, 154, 69, 0.25) !important;
 }
 
 .admin-light input::placeholder,
 .admin-light textarea::placeholder {
-  color: #9CA3AF !important;
+  color: #555555 !important;
+}
+
+.admin-light select option {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
 }
 
 /* Table Light Styling */
 .admin-light table thead {
   background-color: #F5EFE6 !important;
-  border-bottom: 1px solid rgba(196, 154, 69, 0.25) !important;
+  border-bottom: 2px solid rgba(196, 154, 69, 0.3) !important;
 }
 
 .admin-light table thead th {
-  color: #6B7280 !important;
-  font-weight: 700 !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
 }
 
 .admin-light table tbody {
@@ -315,16 +354,17 @@ body {
 }
 
 .admin-light table tbody tr {
-  border-color: rgba(196, 154, 69, 0.12) !important;
+  border-color: rgba(196, 154, 69, 0.15) !important;
   transition: background-color 0.15s ease !important;
 }
 
 .admin-light table tbody tr:hover {
-  background-color: rgba(196, 154, 69, 0.05) !important;
+  background-color: rgba(196, 154, 69, 0.06) !important;
 }
 
 .admin-light table tbody td {
-  color: #1F2937 !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
 }
 
 /* Borders & Dividers */
@@ -335,19 +375,19 @@ body {
 .admin-light .border-white\/25,
 .admin-light .divide-white\/5,
 .admin-light .divide-white\/10 {
-  border-color: rgba(196, 154, 69, 0.18) !important;
+  border-color: rgba(196, 154, 69, 0.22) !important;
 }
 
 .admin-light .bg-white\/5,
 .admin-light .bg-white\/10 {
-  background-color: rgba(196, 154, 69, 0.08) !important;
-  color: #98702B !important;
+  background-color: rgba(196, 154, 69, 0.1) !important;
+  color: #000000 !important;
 }
 
 /* Gold Buttons */
 .admin-light .gold-button {
   background: linear-gradient(135deg, #DFC27A 0%, #C49A45 50%, #98702B 100%) !important;
-  color: #121212 !important;
+  color: #000000 !important;
   font-weight: 800 !important;
   box-shadow: 0 4px 14px rgba(152, 112, 43, 0.22) !important;
 }
@@ -358,17 +398,12 @@ body {
 }
 
 .admin-light .gold-button * {
-  color: #121212 !important;
+  color: #000000 !important;
 }
 
 .admin-light label {
-  color: #374151 !important;
-  font-weight: 600;
-}
-
-.admin-light select option {
-  background-color: #FFFFFF !important;
-  color: #171717 !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
 }
 
 .admin-light .fixed.inset-0.bg-black\/80,
