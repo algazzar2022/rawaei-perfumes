@@ -12,7 +12,7 @@ import {
   Play,
   Star,
   Sparkles,
-  ExternalLink,
+  ArrowRight,
 } from 'lucide-react';
 import { VideoReviewDto } from '@/lib/types';
 import MediaUploader from '@/components/admin/MediaUploader';
@@ -23,9 +23,11 @@ export default function AdminVideoReviewsPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Modal / Form state
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // View Mode: 'LIST' or 'FORM' (no popups)
+  const [viewMode, setViewMode] = useState<'LIST' | 'FORM'>('LIST');
   const [editingReview, setEditingReview] = useState<VideoReviewDto | null>(null);
+  const [saving, setSaving] = useState(false);
+
   const [formData, setFormData] = useState({
     authorName: '',
     authorHandle: '',
@@ -60,7 +62,7 @@ export default function AdminVideoReviewsPage() {
     fetchReviews();
   }, []);
 
-  const openAddModal = () => {
+  const openAddForm = () => {
     setEditingReview(null);
     setFormData({
       authorName: '',
@@ -76,10 +78,12 @@ export default function AdminVideoReviewsPage() {
       sortOrder: reviews.length + 1,
       isActive: true,
     });
-    setIsModalOpen(true);
+    setError(null);
+    setSuccessMsg(null);
+    setViewMode('FORM');
   };
 
-  const openEditModal = (rev: VideoReviewDto) => {
+  const openEditForm = (rev: VideoReviewDto) => {
     setEditingReview(rev);
     setFormData({
       authorName: rev.authorName,
@@ -95,13 +99,16 @@ export default function AdminVideoReviewsPage() {
       sortOrder: rev.sortOrder || 0,
       isActive: rev.isActive,
     });
-    setIsModalOpen(true);
+    setError(null);
+    setSuccessMsg(null);
+    setViewMode('FORM');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccessMsg(null);
+    setSaving(true);
 
     try {
       if (editingReview) {
@@ -126,10 +133,12 @@ export default function AdminVideoReviewsPage() {
         setSuccessMsg('تمت إضافة مراجعة الفيديو بنجاح');
       }
 
-      setIsModalOpen(false);
+      setViewMode('LIST');
       fetchReviews();
     } catch (err: any) {
-      setError(err.message || 'حدث خطأ');
+      setError(err.message || 'حدث خطأ أثناء الحفظ');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -159,175 +168,91 @@ export default function AdminVideoReviewsPage() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C49A45]/15 border border-[#C49A45]/30 text-xs font-bold text-[#DFC27A] mb-2">
-            <Video className="w-3.5 h-3.5 text-[#C49A45]" />
-            <span>قسم المؤثرين وتجارب العملاء</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white">
-            إدارة فيديوهات المؤثرين وتجارب العملاء
-          </h1>
-          <p className="text-xs text-gray-400 mt-1">
-            التحكم في قسم الفيديوهات والتجارب الواقعية التي تظهر في الصفحة الرئيسية قبل الفوتر
-          </p>
-        </div>
-
-        <button
-          onClick={openAddModal}
-          className="gold-button px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 self-start sm:self-auto shadow-md"
-        >
-          <Plus className="w-4 h-4" />
-          <span>إضافة فيديو جديد</span>
-        </button>
-      </div>
-
-      {error && (
-        <div className="p-4 rounded-xl bg-red-950/60 border border-red-500/50 text-red-200 text-xs font-semibold">
-          {error}
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-semibold">
-          {successMsg}
-        </div>
-      )}
-
-      {/* Reviews Grid */}
-      {loading ? (
-        <div className="p-12 text-center text-gray-400 text-xs">جاري تحميل الفيديوهات...</div>
-      ) : reviews.length === 0 ? (
-        <div className="bg-[#121212] border border-white/10 rounded-2xl p-12 text-center space-y-3">
-          <Video className="w-10 h-10 text-gray-500 mx-auto" />
-          <h3 className="text-base font-bold text-white">لا توجد مراجعات فيديو مسجلة</h3>
-          <p className="text-xs text-gray-400">انقر على زر "إضافة فيديو جديد" لإضافة أول مراجعة</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {reviews.map((rev) => (
-            <div
-              key={rev.id}
-              className="bg-[#141414] border border-[#C49A45]/20 hover:border-[#C49A45] rounded-2xl overflow-hidden flex flex-col justify-between shadow-lg transition-all"
-            >
-              {/* Poster Thumbnail */}
-              <div className="relative aspect-[9/14] w-full bg-black overflow-hidden group">
-                <Image
-                  src={rev.posterImage}
-                  alt={rev.authorName}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40" />
-
-                <div className="absolute top-3 right-3">
-                  <span className="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[10px] font-bold text-[#DFC27A]">
-                    {rev.badgeText || 'REAL REVIEW'}
-                  </span>
-                </div>
-
-                <div className="absolute top-3 left-3">
-                  <button
-                    onClick={() => toggleActive(rev)}
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-md ${
-                      rev.isActive
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-red-600 text-white'
-                    }`}
-                  >
-                    {rev.isActive ? 'مفعل' : 'معطل'}
-                  </button>
-                </div>
-
-                {/* Bottom details inside poster */}
-                <div className="absolute bottom-3 right-3 left-3 space-y-1">
-                  <h4 className="text-sm font-bold text-white line-clamp-1">{rev.authorName}</h4>
-                  <span className="text-[11px] text-[#DFC27A] font-semibold block" dir="ltr">
-                    {rev.authorHandle}
-                  </span>
-                  <p className="text-xs text-gray-300 line-clamp-2 mt-1">
-                    "{rev.quoteAr}"
-                  </p>
-                </div>
-              </div>
-
-              {/* Actions Footer */}
-              <div className="p-3 bg-white border-t border-[#DFC27A]/20 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-black font-bold">
-                  <span>الترتيب:</span>
-                  <span className="font-black text-black">{rev.sortOrder}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => openEditModal(rev)}
-                    className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm"
-                    title="تعديل الفيديو"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(rev.id)}
-                    className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm"
-                    title="حذف الفيديو"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Add / Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-          <div className="w-full max-w-lg bg-[#141414] border border-[#C49A45]/40 rounded-3xl p-6 sm:p-8 space-y-5 my-8 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <h3 className="text-lg font-bold text-white">
-                {editingReview ? 'تعديل مراجعة الفيديو' : 'إضافة فيديو تجربة جديد'}
-              </h3>
+    <div className="space-y-6 pb-12">
+      {/* ============================================================== */}
+      {/* 1. FORM VIEW (Create / Edit Video Review)                      */}
+      {/* ============================================================== */}
+      {viewMode === 'FORM' ? (
+        <div className="space-y-6">
+          {/* Header Bar */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-white"
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="inline-flex items-center gap-2 text-xs font-black text-black hover:text-[#98702B] mb-2 transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 text-black" />
+                <span>العودة إلى قائمة الفيديوهات</span>
+              </button>
+              <h1 className="text-2xl font-black text-black flex items-center gap-2">
+                <Video className="w-6 h-6 text-[#98702B]" />
+                <span>{editingReview ? `تعديل فيديو: ${editingReview.authorName}` : 'إضافة فيديو تجربة واقعية جديد'}</span>
+              </h1>
+              <p className="text-xs text-neutral-600 mt-1">
+                ارفع الفيديو وصورة الغلاف عبر Cloudinary ليظهر في سيكشن الريلز بالصفحة الرئيسية
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="px-5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-neutral-200 border border-neutral-300 text-xs font-bold text-black transition-colors cursor-pointer"
+              >
+                إلغاء والرجوع
+              </button>
+              <button
+                type="submit"
+                form="review-form"
+                disabled={saving}
+                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? 'جاري الحفظ...' : editingReview ? 'حفظ التعديلات' : 'نشر الفيديو'}
               </button>
             </div>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-gray-300 font-semibold">اسم المؤثر / العميل *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="مثال: Menna Ehab"
-                    value={formData.authorName}
-                    onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
-                    className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
+          {error && (
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-300 text-red-900 text-xs font-bold">
+              {error}
+            </div>
+          )}
 
-                <div className="space-y-1.5">
-                  <label className="text-gray-300 font-semibold">حساب إنستجرام / تيك توك</label>
-                  <input
-                    type="text"
-                    placeholder="@mennaehab23"
-                    value={formData.authorHandle}
-                    onChange={(e) => setFormData({ ...formData, authorHandle: e.target.value })}
-                    className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                    dir="ltr"
-                  />
-                </div>
+          {/* Form Content */}
+          <form
+            id="review-form"
+            onSubmit={handleSubmit}
+            className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6 text-xs"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">اسم المؤثر / العميل *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="مثال: منة إيهاب"
+                  value={formData.authorName}
+                  onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
               </div>
 
               <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">حساب السوشيال ميديا</label>
+                <input
+                  type="text"
+                  placeholder="@mennaehab23"
+                  value={formData.authorHandle}
+                  onChange={(e) => setFormData({ ...formData, authorHandle: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
                 <MediaUploader
-                  label="صورة غلاف الفيديو (Poster Image)"
+                  label="صورة غلاف الفيديو (Poster Image - يتم ضغطها ورفعها لكلاوديناري)"
                   value={formData.posterImage}
                   onChange={(url) => setFormData({ ...formData, posterImage: url })}
                   acceptType="image"
@@ -336,9 +261,9 @@ export default function AdminVideoReviewsPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-2">
                 <MediaUploader
-                  label="ملف الفيديو (MP4 / WebM)"
+                  label="ملف الفيديو (MP4 / WebM - يرفع مباشرة لكلاوديناري)"
                   value={formData.videoUrl}
                   onChange={(url) => setFormData({ ...formData, videoUrl: url })}
                   acceptType="video"
@@ -347,71 +272,201 @@ export default function AdminVideoReviewsPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-gray-300 font-semibold">اقتباس العميل / رأيه في العطر (بالعربية) *</label>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black text-xs block">اقتباس العميل / رأيه في العطر (بالعربية) *</label>
                 <textarea
                   required
                   rows={3}
-                  placeholder="رأيه في ثبات العطر، التغليف، والفوحان..."
+                  placeholder="رأيه في ثبات العطر، التغليف، والفوحان المميز..."
                   value={formData.quoteAr}
                   onChange={(e) => setFormData({ ...formData, quoteAr: e.target.value })}
-                  className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-gray-300 font-semibold">وسم المنتج / البوكس</label>
-                  <input
-                    type="text"
-                    placeholder="مثال: بوكس 3 عطور"
-                    value={formData.productTag}
-                    onChange={(e) => setFormData({ ...formData, productTag: e.target.value })}
-                    className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-gray-300 font-semibold">ترتيب الظهور</label>
-                  <input
-                    type="number"
-                    value={formData.sortOrder}
-                    onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
-                    className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-gray-300 font-semibold">الحالة</label>
-                  <select
-                    value={formData.isActive ? 'true' : 'false'}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'true' })}
-                    className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  >
-                    <option value="true">مفعل</option>
-                    <option value="false">معطل</option>
-                  </select>
-                </div>
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">وسم المنتج / البوكس</label>
+                <input
+                  type="text"
+                  placeholder="مثال: بوكس عطور روائع جولد"
+                  value={formData.productTag}
+                  onChange={(e) => setFormData({ ...formData, productTag: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
               </div>
 
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-white/10 text-gray-300 hover:text-white"
-                >
-                  إلغاء
-                </button>
-                <button
-                  type="submit"
-                  className="gold-button px-6 py-2 rounded-xl font-bold"
-                >
-                  {editingReview ? 'حفظ التعديلات' : 'إضافة الفيديو'}
-                </button>
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">شارة الفيديو (Badge)</label>
+                <input
+                  type="text"
+                  placeholder="REAL REVIEW"
+                  value={formData.badgeText}
+                  onChange={(e) => setFormData({ ...formData, badgeText: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
               </div>
-            </form>
-          </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">ترتيب الظهور</label>
+                <input
+                  type="number"
+                  value={formData.sortOrder}
+                  onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 pt-2 sm:col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer text-black font-bold">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="w-4 h-4 accent-[#C49A45]"
+                  />
+                  <span>تفعيل ظهور الفيديو في الصفحة الرئيسية للمتجر</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-6 border-t border-[#DFC27A]/30 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="px-5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-neutral-200 border border-neutral-300 text-xs font-bold text-black transition-colors cursor-pointer"
+              >
+                إلغاء والرجوع
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? 'جاري الحفظ...' : editingReview ? 'حفظ التعديلات' : 'نشر الفيديو'}
+              </button>
+            </div>
+          </form>
         </div>
+      ) : (
+        /* ============================================================== */
+        /* 2. REVIEWS LIST VIEW (Cards Grid)                              */
+        /* ============================================================== */
+        <>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-black text-black">إدارة فيديوهات المؤثرين وتجارب العملاء</h1>
+              <p className="text-xs text-neutral-600 mt-1">
+                التحكم في قسم الفيديوهات والتجارب الواقعية التي تظهر في الصفحة الرئيسية
+              </p>
+            </div>
+
+            <button
+              onClick={openAddForm}
+              className="gold-button px-5 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 self-start sm:self-auto shadow-md hover:brightness-105 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-black" />
+              <span>إضافة فيديو جديد</span>
+            </button>
+          </div>
+
+          {error && (
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-300 text-red-900 text-xs font-bold">
+              {error}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-bold">
+              {successMsg}
+            </div>
+          )}
+
+          {loading ? (
+            <div className="p-12 text-center text-neutral-500 text-xs font-bold">جاري تحميل الفيديوهات...</div>
+          ) : reviews.length === 0 ? (
+            <div className="bg-white border border-[#DFC27A]/40 rounded-3xl p-12 text-center space-y-3 shadow-sm">
+              <Video className="w-10 h-10 text-neutral-400 mx-auto" />
+              <h3 className="text-base font-black text-black">لا توجد مراجعات فيديو مسجلة حالياً</h3>
+              <p className="text-xs text-neutral-600 font-bold">انقر على زر "إضافة فيديو جديد" لرفع أول فيديو ومشاركته مع الزوار</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {reviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="bg-white border border-[#DFC27A]/40 hover:border-[#98702B] rounded-3xl overflow-hidden flex flex-col justify-between shadow-sm hover:shadow-md transition-all"
+                >
+                  {/* Poster Thumbnail */}
+                  <div className="relative aspect-[9/13] w-full bg-neutral-900 overflow-hidden">
+                    <Image
+                      src={rev.posterImage || '/logo.png'}
+                      alt={rev.authorName}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30" />
+
+                    <div className="absolute top-3 right-3">
+                      <span className="px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-[#DFC27A]/50 text-[10px] font-black text-[#DFC27A]">
+                        {rev.badgeText || 'REAL REVIEW'}
+                      </span>
+                    </div>
+
+                    <div className="absolute top-3 left-3">
+                      <button
+                        onClick={() => toggleActive(rev)}
+                        className={`px-3 py-1 rounded-full text-[10px] font-black shadow-md cursor-pointer ${
+                          rev.isActive
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-red-600 text-white'
+                        }`}
+                      >
+                        {rev.isActive ? 'مفعل ✓' : 'معطل ✕'}
+                      </button>
+                    </div>
+
+                    {/* Bottom details inside poster */}
+                    <div className="absolute bottom-3 right-3 left-3 space-y-1">
+                      <h4 className="text-sm font-black text-white line-clamp-1">{rev.authorName}</h4>
+                      <span className="text-[11px] text-[#DFC27A] font-mono font-bold block" dir="ltr">
+                        {rev.authorHandle}
+                      </span>
+                      <p className="text-xs text-neutral-200 line-clamp-2 mt-1 leading-relaxed">
+                        "{rev.quoteAr}"
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions Footer */}
+                  <div className="p-4 bg-white border-t border-[#DFC27A]/20 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 text-black font-bold">
+                      <span>الترتيب:</span>
+                      <span className="font-black text-black">{rev.sortOrder}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openEditForm(rev)}
+                        className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm cursor-pointer"
+                        title="تعديل الفيديو"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(rev.id)}
+                        className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm cursor-pointer"
+                        title="حذف الفيديو"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Plus, Edit2, Trash2, Check, X, Layers, Sparkles } from 'lucide-react';
+import { Plus, Edit2, Trash2, ArrowRight, Layers, Sparkles } from 'lucide-react';
 import { CategoryDto } from '@/lib/types';
 import MediaUploader from '@/components/admin/MediaUploader';
 
@@ -10,10 +10,12 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Edit Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // View Mode: 'LIST' | 'FORM' (no popups)
+  const [viewMode, setViewMode] = useState<'LIST' | 'FORM'>('LIST');
   const [editingCategory, setEditingCategory] = useState<CategoryDto | null>(null);
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     nameAr: '',
     nameEn: '',
@@ -43,7 +45,7 @@ export default function AdminCategoriesPage() {
     fetchCategories();
   }, []);
 
-  const openCreateModal = () => {
+  const openCreateForm = () => {
     setEditingCategory(null);
     setFormData({
       nameAr: '',
@@ -56,10 +58,11 @@ export default function AdminCategoriesPage() {
       sortOrder: categories.length + 1,
       isActive: true,
     });
-    setIsModalOpen(true);
+    setFormError(null);
+    setViewMode('FORM');
   };
 
-  const openEditModal = (c: CategoryDto) => {
+  const openEditForm = (c: CategoryDto) => {
     setEditingCategory(c);
     setFormData({
       nameAr: c.nameAr,
@@ -72,12 +75,15 @@ export default function AdminCategoriesPage() {
       sortOrder: c.sortOrder,
       isActive: c.isActive,
     });
-    setIsModalOpen(true);
+    setFormError(null);
+    setViewMode('FORM');
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError(null);
+
     try {
       const url = editingCategory
         ? `/api/categories/${editingCategory.id}`
@@ -90,11 +96,13 @@ export default function AdminCategoriesPage() {
         body: JSON.stringify(formData),
       });
 
-      if (!res.ok) throw new Error('فشل الحفظ');
-      setIsModalOpen(false);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'فشل حفظ التصنيف');
+
+      setViewMode('LIST');
       fetchCategories();
-    } catch {
-      alert('حدث خطأ أثناء حفظ التصنيف');
+    } catch (err: any) {
+      setFormError(err.message || 'حدث خطأ أثناء حفظ التصنيف');
     } finally {
       setSaving(false);
     }
@@ -117,146 +125,115 @@ export default function AdminCategoriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-white">إدارة التصنيفات الرئيسية الستة</h1>
-          <p className="text-xs text-gray-400 mt-1">
-            التحكم في تصنيفات المتجر (العطور، البخور والعود، الهدايا، معطرات المنزل، البادي سبلاش، والمخمريات)
-          </p>
-        </div>
-
-        <button
-          onClick={openCreateModal}
-          className="gold-button px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 self-start sm:self-auto shadow-gold-glow"
-        >
-          <Plus className="w-4 h-4" />
-          <span>إضافة تصنيف جديد</span>
-        </button>
-      </div>
-
-      {/* Categories Cards / Table */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((cat) => (
-          <div
-            key={cat.id}
-            className="glass-card rounded-3xl p-6 border border-[#C49A45]/20 flex flex-col justify-between space-y-4"
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="w-8 h-8 rounded-xl bg-[#C49A45]/20 text-[#DFC27A] flex items-center justify-center font-bold text-xs">
-                  {cat.sortOrder}
-                </span>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                    cat.isActive
-                      ? 'bg-emerald-500/20 text-emerald-300'
-                      : 'bg-red-500/20 text-red-300'
-                  }`}
-                >
-                  {cat.isActive ? 'مفعل' : 'معطل'}
-                </span>
-              </div>
-
-              {cat.image && (
-                <div className="relative h-36 w-full rounded-2xl overflow-hidden bg-neutral-900 border border-white/5">
-                  <Image src={cat.image} alt={cat.nameAr} fill className="object-cover" />
-                </div>
-              )}
-
-              <div>
-                <h3 className="text-lg font-bold text-white">{cat.nameAr}</h3>
-                <p className="text-xs text-[#DFC27A] font-semibold">{cat.nameEn}</p>
-                <p className="text-[11px] text-gray-400 mt-1 font-mono">
-                  Slug: /{cat.slug}
-                </p>
-                {cat.descriptionAr && (
-                  <p className="text-xs text-gray-300 line-clamp-2 mt-2 leading-relaxed">
-                    {cat.descriptionAr}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-              <span className="text-xs font-bold text-black">
-                المنتجات: {cat._count?.products || 0}
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => openEditModal(cat)}
-                  className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm"
-                  title="تعديل التصنيف"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(cat.id, cat.nameAr)}
-                  className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm"
-                  title="حذف التصنيف"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-[#141414] border border-[#C49A45]/30 rounded-3xl w-full max-w-lg p-6 sm:p-8 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <h2 className="text-base font-bold text-white">
-                {editingCategory ? 'تعديل التصنيف' : 'إضافة تصنيف جديد'}
-              </h2>
+      {/* ============================================================== */}
+      {/* 1. FORM VIEW (Create / Edit Category)                          */}
+      {/* ============================================================== */}
+      {viewMode === 'FORM' ? (
+        <div className="space-y-6">
+          {/* Header Bar */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-white"
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="inline-flex items-center gap-2 text-xs font-black text-black hover:text-[#98702B] mb-2 transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 text-black" />
+                <span>العودة إلى قائمة التصنيفات</span>
+              </button>
+              <h1 className="text-2xl font-black text-black">
+                {editingCategory ? `تعديل التصنيف: ${editingCategory.nameAr}` : 'إضافة تصنيف رئيسي جديد'}
+              </h1>
+              <p className="text-xs text-neutral-600 mt-1">
+                املأ بيانات التصنيف ثم اضغط حفظ لتحديث المتجر فورياً
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="px-5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-neutral-200 border border-neutral-300 text-xs font-bold text-black transition-colors cursor-pointer"
+              >
+                إلغاء والرجوع
+              </button>
+              <button
+                type="submit"
+                form="category-form"
+                disabled={saving}
+                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? 'جاري الحفظ...' : editingCategory ? 'حفظ التعديلات' : 'إنشاء التصنيف'}
               </button>
             </div>
+          </div>
 
-            <form onSubmit={handleSave} className="space-y-4 text-xs">
-              <div className="space-y-1">
-                <label className="text-gray-300 font-semibold">الاسم بالعربية *</label>
+          {formError && (
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-300 text-red-900 text-xs font-bold">
+              {formError}
+            </div>
+          )}
+
+          {/* Form Content */}
+          <form
+            id="category-form"
+            onSubmit={handleSave}
+            className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6 text-xs"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">الاسم بالعربية *</label>
                 <input
                   type="text"
                   required
+                  placeholder="مثال: عطور رجالية فاخرة"
                   value={formData.nameAr}
                   onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-gray-300 font-semibold">الاسم بالإنجليزية *</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">الاسم بالإنجليزية *</label>
                 <input
                   type="text"
                   required
+                  placeholder="Men Perfumes"
                   value={formData.nameEn}
                   onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                   dir="ltr"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-gray-300 font-semibold">المعرف اللطيف (Slug) *</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">المعرف اللطيف (Slug) *</label>
                 <input
                   type="text"
                   required
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
+                  placeholder="men-perfumes"
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                   dir="ltr"
                 />
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">ترتيب الظهور</label>
+                <input
+                  type="number"
+                  value={formData.sortOrder}
+                  onChange={(e) =>
+                    setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })
+                  }
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
                 <MediaUploader
-                  label="صورة التصنيف (يتم ضغط الحجم فورياً ورفعها إلى Cloudinary)"
+                  label="صورة التصنيف (يتم ضغطها فورياً ورفعها إلى Cloudinary)"
                   value={formData.image}
                   onChange={(url) => setFormData({ ...formData, image: url })}
                   acceptType="image"
@@ -265,60 +242,143 @@ export default function AdminCategoriesPage() {
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-gray-300 font-semibold">ترتيب الظهور</label>
-                <input
-                  type="number"
-                  value={formData.sortOrder}
-                  onChange={(e) =>
-                    setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })
-                  }
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-gray-300 font-semibold">الوصف بالعربية</label>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black text-xs block">الوصف بالعربية</label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={formData.descriptionAr}
                   onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
+                  placeholder="وصف مختصر للتصنيف ومحتواه العطري..."
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="catActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="accent-[#C49A45]"
-                />
-                <label htmlFor="catActive" className="text-white cursor-pointer font-medium">
-                  تفعيل ظهور التصنيف في المتجر
+              <div className="flex items-center gap-2 pt-2 sm:col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer text-black font-bold">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="w-4 h-4 accent-[#C49A45]"
+                  />
+                  <span>تفعيل ظهور التصنيف في المتجر الرئيسي</span>
                 </label>
               </div>
+            </div>
 
-              <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:text-white"
-                >
-                  إلغاء
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="gold-button px-6 py-2 rounded-xl font-bold"
-                >
-                  {saving ? 'جاري الحفظ...' : 'حفظ التصنيف'}
-                </button>
-              </div>
-            </form>
-          </div>
+            {/* Bottom Form Actions */}
+            <div className="pt-6 border-t border-[#DFC27A]/30 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="px-5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-neutral-200 border border-neutral-300 text-xs font-bold text-black transition-colors cursor-pointer"
+              >
+                إلغاء والرجوع
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? 'جاري الحفظ...' : editingCategory ? 'حفظ التعديلات' : 'إنشاء التصنيف'}
+              </button>
+            </div>
+          </form>
         </div>
+      ) : (
+        /* ============================================================== */
+        /* 2. LIST VIEW (Categories Grid)                                 */
+        /* ============================================================== */
+        <>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-black text-black">إدارة التصنيفات الرئيسية الستة</h1>
+              <p className="text-xs text-neutral-600 mt-1">
+                التحكم في تصنيفات المتجر (العطور، البخور والعود، الهدايا، معطرات المنزل، البادي سبلاش، والمخمريات)
+              </p>
+            </div>
+
+            <button
+              onClick={openCreateForm}
+              className="gold-button px-5 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 self-start sm:self-auto shadow-md hover:brightness-105 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-black" />
+              <span>إضافة تصنيف جديد</span>
+            </button>
+          </div>
+
+          {/* Categories Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="bg-white rounded-3xl p-6 border border-[#DFC27A]/40 shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition-shadow"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="w-8 h-8 rounded-xl bg-[#FAF6EE] text-[#98702B] border border-[#DFC27A]/30 flex items-center justify-center font-black text-xs">
+                      {cat.sortOrder}
+                    </span>
+                    <span
+                      className={`px-3 py-1 rounded-full text-[11px] font-black ${
+                        cat.isActive
+                          ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
+                          : 'bg-red-100 text-red-950 border border-red-300'
+                      }`}
+                    >
+                      {cat.isActive ? 'مفعل ✓' : 'معطل ✕'}
+                    </span>
+                  </div>
+
+                  {cat.image ? (
+                    <div className="relative h-40 w-full rounded-2xl overflow-hidden bg-[#FAF8F5] border border-[#DFC27A]/30">
+                      <Image src={cat.image} alt={cat.nameAr} fill className="object-cover" />
+                    </div>
+                  ) : (
+                    <div className="h-28 w-full rounded-2xl bg-[#FAF8F5] border border-dashed border-[#DFC27A]/40 flex items-center justify-center text-neutral-400 text-xs font-bold">
+                      لا توجد صورة
+                    </div>
+                  )}
+
+                  <div>
+                    <h3 className="text-lg font-black text-black">{cat.nameAr}</h3>
+                    <p className="text-xs text-[#98702B] font-bold">{cat.nameEn}</p>
+                    <p className="text-[11px] text-neutral-500 mt-1 font-mono font-bold">
+                      Slug: /{cat.slug}
+                    </p>
+                    {cat.descriptionAr && (
+                      <p className="text-xs text-neutral-700 line-clamp-2 mt-2 leading-relaxed font-medium">
+                        {cat.descriptionAr}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-[#DFC27A]/20 flex items-center justify-between">
+                  <span className="text-xs font-black text-black">
+                    عدد العطور: {cat._count?.products || 0}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => openEditForm(cat)}
+                      className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm cursor-pointer"
+                      title="تعديل التصنيف"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(cat.id, cat.nameAr)}
+                      className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm cursor-pointer"
+                      title="حذف التصنيف"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

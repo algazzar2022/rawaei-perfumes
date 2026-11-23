@@ -56,69 +56,69 @@ export default function AdminVisualIdentityPage() {
   return (
     <div className="space-y-8 pb-12">
       <div>
-        <h1 className="text-2xl font-black text-white">إعدادات الهوية البصرية والتصميم</h1>
-        <p className="text-xs text-gray-400 mt-1">
+        <h1 className="text-2xl font-black text-black">إعدادات الهوية البصرية والتصميم</h1>
+        <p className="text-xs text-neutral-600 mt-1">
           ألوان العلامة الفاخرة، شريط الإعلانات العلوي، ونظام Luxury Glassmorphism
         </p>
       </div>
 
       {message && (
-        <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-black">
           {message}
         </div>
       )}
 
       {/* Palette Preview */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-6">
-        <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-white/10 pb-4">
-          <Palette className="w-5 h-5 text-[#C49A45]" />
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6">
+        <h2 className="text-base font-black text-black flex items-center gap-2 border-b border-[#DFC27A]/20 pb-4">
+          <Palette className="w-5 h-5 text-[#98702B]" />
           <span>لوحة الألوان الملكية المعتمدة (Luxury Palette)</span>
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-center text-xs">
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
             <div
-              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-white/10"
+              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-[#DFC27A]/40"
               style={{ backgroundColor: settings.primary_gold }}
             />
-            <span className="font-bold text-white block">Primary Gold</span>
-            <span className="font-mono text-gray-400 block">{settings.primary_gold}</span>
+            <span className="font-black text-black block">Primary Gold</span>
+            <span className="font-mono text-neutral-700 font-bold block">{settings.primary_gold}</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
             <div
-              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-white/10"
+              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-[#DFC27A]/40"
               style={{ backgroundColor: settings.dark_gold }}
             />
-            <span className="font-bold text-white block">Dark Gold</span>
-            <span className="font-mono text-gray-400 block">{settings.dark_gold}</span>
+            <span className="font-black text-black block">Dark Gold</span>
+            <span className="font-mono text-neutral-700 font-bold block">{settings.dark_gold}</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
             <div
-              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-white/10"
+              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-neutral-300"
               style={{ backgroundColor: settings.white }}
             />
-            <span className="font-bold text-white block">White</span>
-            <span className="font-mono text-gray-400 block">{settings.white}</span>
+            <span className="font-black text-black block">White</span>
+            <span className="font-mono text-neutral-700 font-bold block">{settings.white}</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
             <div
-              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-white/10"
+              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-neutral-800"
               style={{ backgroundColor: settings.black }}
             />
-            <span className="font-bold text-white block">Black</span>
-            <span className="font-mono text-gray-400 block">{settings.black}</span>
+            <span className="font-black text-black block">Black</span>
+            <span className="font-mono text-neutral-700 font-bold block">{settings.black}</span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+          <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
             <div
-              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-white/10"
+              className="w-16 h-16 rounded-2xl mx-auto shadow-md border border-[#DFC27A]/30"
               style={{ backgroundColor: settings.ivory }}
             />
-            <span className="font-bold text-white block">Ivory</span>
-            <span className="font-mono text-gray-400 block">{settings.ivory}</span>
+            <span className="font-black text-black block">Ivory</span>
+            <span className="font-mono text-neutral-700 font-bold block">{settings.ivory}</span>
           </div>
         </div>
       </div>
@@ -126,37 +126,37 @@ export default function AdminVisualIdentityPage() {
       {/* Announcement Bar Form */}
       <form
         onSubmit={handleSave}
-        className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-5"
+        className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-5"
       >
-        <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-white/10 pb-4">
-          <Sparkles className="w-5 h-5 text-[#C49A45]" />
+        <h2 className="text-base font-black text-black flex items-center gap-2 border-b border-[#DFC27A]/20 pb-4">
+          <Sparkles className="w-5 h-5 text-[#98702B]" />
           <span>شريط الإعلانات العلوي في المتجر (Announcement Bar)</span>
         </h2>
 
         <div className="space-y-4 text-xs">
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">نص الشريط بالعربية</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">نص الشريط بالعربية</label>
             <input
               type="text"
               value={settings.announcement_bar_ar}
               onChange={(e) => setSettings({ ...settings, announcement_bar_ar: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">نص الشريط بالإنجليزية</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">نص الشريط بالإنجليزية</label>
             <input
               type="text"
               value={settings.announcement_bar_en}
               onChange={(e) => setSettings({ ...settings, announcement_bar_en: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
               dir="ltr"
             />
           </div>
 
           <div className="pt-2">
-            <label className="flex items-center gap-2 cursor-pointer text-white font-bold">
+            <label className="flex items-center gap-2.5 cursor-pointer text-black font-bold">
               <input
                 type="checkbox"
                 checked={settings.announcement_active === 'true'}
@@ -166,21 +166,21 @@ export default function AdminVisualIdentityPage() {
                     announcement_active: e.target.checked ? 'true' : 'false',
                   })
                 }
-                className="accent-[#C49A45]"
+                className="w-4 h-4 accent-[#C49A45] rounded"
               />
               <span>تفعيل وإظهار شريط الإعلانات في أعلى المتجر</span>
             </label>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/10 flex justify-end">
+        <div className="pt-4 border-t border-[#DFC27A]/20 flex justify-end">
           <button
             type="submit"
             disabled={saving}
-            className="gold-button px-8 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-gold-glow"
+            className="gold-button px-8 py-3 rounded-xl font-black text-black text-xs flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
-            <span>{saving ? 'جاري الحفظ...' : 'حفظ إعدادات الهوية والشريط'}</span>
+            <Save className="w-4 h-4 text-black" />
+            <span>{saving ? 'جاري الحفظ...' : 'حفظ إعدادات الهوية والتصميم'}</span>
           </button>
         </div>
       </form>

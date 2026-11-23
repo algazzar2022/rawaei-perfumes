@@ -124,14 +124,12 @@ export default function AdminFeaturedProductsPage() {
     }
   };
 
-  // Map selected IDs to product objects for ordering view
   const selectedProducts = useMemo(() => {
     return selectedProductIds
       .map((id) => allProducts.find((p) => p.id === id))
       .filter(Boolean) as ProductDto[];
   }, [selectedProductIds, allProducts]);
 
-  // Filtered products for selection grid
   const filteredProducts = useMemo(() => {
     return allProducts.filter((p) => {
       const matchesCategory =
@@ -152,74 +150,74 @@ export default function AdminFeaturedProductsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C49A45]/20 text-[#DFC27A] text-xs font-bold mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#C49A45]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-[#98702B] text-xs font-black mb-2 border border-[#DFC27A]/40">
+            <Sparkles className="w-3.5 h-3.5 text-[#98702B]" />
             <span>إدارة قسم مختارات حصرية</span>
           </div>
-          <h1 className="text-2xl font-black text-white">المنتجات المميزة (من جميع التصنيفات)</h1>
-          <p className="text-xs text-gray-400 mt-1">
-            اختر المنتجات يدوياً من أي تصنيف (عطور، بخور وعود، هدايا، معطرات منزل، بادي سبلاش، مخمريات) ورتّبها حسب رغبتك
+          <h1 className="text-2xl font-black text-black">المنتجات المميزة (من جميع التصنيفات)</h1>
+          <p className="text-xs text-neutral-600 mt-1">
+            اختر المنتجات يدوياً من أي تصنيف ورتّبها حسب رغبتك لتظهر في واجهة المتجر
           </p>
         </div>
 
         <button
           onClick={handleSave}
           disabled={saving}
-          className="gold-button px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 self-start sm:self-auto shadow-gold-glow"
+          className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 self-start sm:self-auto shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
         >
-          <Save className="w-4 h-4" />
+          <Save className="w-4 h-4 text-black" />
           <span>{saving ? 'جاري الحفظ...' : 'حفظ التغييرات بالكامل'}</span>
         </button>
       </div>
 
       {message && (
-        <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold flex items-center gap-2">
-          <Check className="w-4 h-4 text-emerald-400" />
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-black flex items-center gap-2">
+          <Check className="w-4 h-4 text-emerald-600" />
           <span>{message}</span>
         </div>
       )}
 
       {/* 1. Section Settings */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-4">
-        <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
-          <Sparkles className="w-4 h-4 text-[#C49A45]" />
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-4">
+        <h2 className="text-base font-black text-black flex items-center gap-2 border-b border-[#DFC27A]/20 pb-3">
+          <Sparkles className="w-4 h-4 text-[#98702B]" />
           <span>إعدادات وعنوان القسم في الصفحة الرئيسية</span>
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">عنوان القسم بالعربية</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">عنوان القسم بالعربية</label>
             <input
               type="text"
               value={settings.titleAr}
               onChange={(e) => setSettings({ ...settings, titleAr: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[#C49A45] outline-none"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:border-[#C49A45] focus:bg-white outline-none"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">عنوان القسم بالإنجليزية</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">عنوان القسم بالإنجليزية</label>
             <input
               type="text"
               value={settings.titleEn}
               onChange={(e) => setSettings({ ...settings, titleEn: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[#C49A45] outline-none"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:border-[#C49A45] focus:bg-white outline-none"
               dir="ltr"
             />
           </div>
 
-          <div className="space-y-1 sm:col-span-2">
-            <label className="text-gray-300 font-semibold">الوصف الترويجي بالعربية</label>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label className="text-black font-black block">الوصف الترويجي بالعربية</label>
             <input
               type="text"
               value={settings.subtitleAr}
               onChange={(e) => setSettings({ ...settings, subtitleAr: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[#C49A45] outline-none"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:border-[#C49A45] focus:bg-white outline-none"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">الحد الأقصى لعدد المنتجات المعروضة في الصفحة الرئيسية</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">الحد الأقصى لعدد المنتجات المعروضة</label>
             <input
               type="number"
               min="1"
@@ -228,12 +226,12 @@ export default function AdminFeaturedProductsPage() {
               onChange={(e) =>
                 setSettings({ ...settings, limit: parseInt(e.target.value) || 8 })
               }
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[#C49A45] outline-none"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:border-[#C49A45] focus:bg-white outline-none"
             />
           </div>
 
           <div className="pt-6">
-            <label className="flex items-center gap-2.5 cursor-pointer text-white font-bold">
+            <label className="flex items-center gap-2.5 cursor-pointer text-black font-bold">
               <input
                 type="checkbox"
                 checked={settings.isActive}
@@ -247,20 +245,20 @@ export default function AdminFeaturedProductsPage() {
       </div>
 
       {/* 2. Order of Selected Products */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2">
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#C49A45]" />
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#DFC27A]/20 pb-3 gap-2">
+          <h2 className="text-base font-black text-black flex items-center gap-2">
+            <Layers className="w-4 h-4 text-[#98702B]" />
             <span>الترتيب الفعلي للمنتجات المختارة ({selectedProducts.length})</span>
           </h2>
-          <span className="text-xs text-[#DFC27A]">
+          <span className="text-xs text-[#98702B] font-bold">
             استخدم الأسهم ⬆ ⬇ لتحديد ترتيب ظهور المنتجات أمام العملاء
           </span>
         </div>
 
         {selectedProducts.length === 0 ? (
-          <div className="p-8 text-center border border-dashed border-white/10 rounded-2xl">
-            <p className="text-xs text-gray-400">
+          <div className="p-8 text-center border border-dashed border-[#DFC27A]/40 rounded-2xl bg-[#FAF8F5]">
+            <p className="text-xs text-neutral-600 font-bold">
               لم تختر أي منتجات بعد. انقر على أي منتج من القائمة بالأسفل لإضافته إلى المختارات الحصرية.
             </p>
           </div>
@@ -269,30 +267,30 @@ export default function AdminFeaturedProductsPage() {
             {selectedProducts.map((p, index) => (
               <div
                 key={p.id}
-                className="p-3 rounded-2xl bg-white/5 border border-white/10 hover:border-[#C49A45]/40 flex items-center justify-between text-xs transition-colors"
+                className="p-3 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 hover:border-[#98702B] flex items-center justify-between text-xs transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className="w-7 h-7 rounded-xl bg-[#C49A45]/20 border border-[#C49A45]/40 text-[#DFC27A] font-black flex items-center justify-center flex-shrink-0 text-xs">
+                  <span className="w-7 h-7 rounded-xl bg-amber-100 border border-[#DFC27A]/40 text-[#98702B] font-black flex items-center justify-center flex-shrink-0 text-xs">
                     {index + 1}
                   </span>
-                  <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-neutral-900 flex-shrink-0 border border-white/10">
+                  <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-white flex-shrink-0 border border-[#DFC27A]/30">
                     <Image
-                      src={p.images?.[0]?.url || 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=200'}
+                      src={p.images?.[0]?.url || '/logo.png'}
                       alt={p.nameAr}
                       fill
-                      className="object-cover"
+                      className="object-contain p-1"
                     />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white truncate block">{p.nameAr}</span>
+                      <span className="font-black text-black truncate block">{p.nameAr}</span>
                       {p.category && (
-                        <span className="px-2 py-0.5 rounded-md bg-[#C49A45]/20 text-[#DFC27A] text-[10px] font-bold flex-shrink-0">
+                        <span className="px-2 py-0.5 rounded-md bg-white border border-[#DFC27A]/30 text-[#98702B] text-[10px] font-bold flex-shrink-0">
                           {p.category.nameAr}
                         </span>
                       )}
                     </div>
-                    <span className="text-[#DFC27A] text-[11px] font-extrabold">{formatPrice(p.price, 'ar')}</span>
+                    <span className="text-black text-[11px] font-black">{formatPrice(p.price, 'ar')}</span>
                   </div>
                 </div>
 
@@ -301,7 +299,7 @@ export default function AdminFeaturedProductsPage() {
                     type="button"
                     onClick={() => moveUp(index)}
                     disabled={index === 0}
-                    className="p-2 rounded-xl bg-white/5 hover:bg-[#C49A45]/20 text-gray-300 hover:text-white disabled:opacity-20 transition-colors"
+                    className="p-2 rounded-xl bg-white hover:bg-neutral-200 border border-neutral-300 text-black disabled:opacity-20 transition-colors cursor-pointer"
                     title="تحريك للأعلى"
                   >
                     <ArrowUp className="w-4 h-4" />
@@ -310,7 +308,7 @@ export default function AdminFeaturedProductsPage() {
                     type="button"
                     onClick={() => moveDown(index)}
                     disabled={index === selectedProducts.length - 1}
-                    className="p-2 rounded-xl bg-white/5 hover:bg-[#C49A45]/20 text-gray-300 hover:text-white disabled:opacity-20 transition-colors"
+                    className="p-2 rounded-xl bg-white hover:bg-neutral-200 border border-neutral-300 text-black disabled:opacity-20 transition-colors cursor-pointer"
                     title="تحريك للأسفل"
                   >
                     <ArrowDown className="w-4 h-4" />
@@ -318,7 +316,7 @@ export default function AdminFeaturedProductsPage() {
                   <button
                     type="button"
                     onClick={() => removeProduct(p.id)}
-                    className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors"
+                    className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-colors cursor-pointer"
                     title="إزالة من المختارات"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -331,40 +329,40 @@ export default function AdminFeaturedProductsPage() {
       </div>
 
       {/* 3. Manual Products Selector Grid from ALL Categories */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-white/10 space-y-5">
-        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-white/10 pb-4 gap-4">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-[#DFC27A]/20 pb-4 gap-4">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Filter className="w-4 h-4 text-[#C49A45]" />
+            <h2 className="text-base font-black text-black flex items-center gap-2">
+              <Filter className="w-4 h-4 text-[#98702B]" />
               <span>اختر يدوياً من جميع تصنيفات المتجر ({allProducts.length} منتج متوفر)</span>
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-neutral-600 mt-0.5">
               انقر على أي منتج لتحديده أو إلغاء اختياره. المنتجات المحددة تظهر بإطار وإضاءة ذهبية.
             </p>
           </div>
 
           {/* Search Box */}
           <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-gray-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-neutral-500 absolute right-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="ابحث بالاسم أو الكود أو التصنيف..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl pr-10 pl-4 py-2 text-xs text-white placeholder-gray-500 focus:border-[#C49A45] outline-none"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl pr-10 pl-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:border-[#C49A45] focus:bg-white outline-none"
             />
           </div>
         </div>
 
         {/* Category Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
           <button
             type="button"
             onClick={() => setActiveCategorySlug('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
               activeCategorySlug === 'all'
-                ? 'bg-[#C49A45] text-black shadow-gold-glow'
-                : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                ? 'gold-button text-black shadow-sm'
+                : 'bg-[#FAF8F5] border border-neutral-300 text-neutral-800 hover:bg-neutral-100'
             }`}
           >
             <span>جميع التصنيفات</span>
@@ -379,10 +377,10 @@ export default function AdminFeaturedProductsPage() {
                 key={cat.id}
                 type="button"
                 onClick={() => setActiveCategorySlug(cat.slug)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-xl text-xs font-black transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                   isCurrent
-                    ? 'bg-[#C49A45] text-black shadow-gold-glow'
-                    : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                    ? 'gold-button text-black shadow-sm'
+                    : 'bg-[#FAF8F5] border border-neutral-300 text-neutral-800 hover:bg-neutral-100'
                 }`}
               >
                 <span>{cat.nameAr}</span>
@@ -402,37 +400,37 @@ export default function AdminFeaturedProductsPage() {
                 onClick={() => toggleProduct(p.id)}
                 className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex items-center gap-3.5 select-none ${
                   isSelected
-                    ? 'bg-[#C49A45]/20 border-[#C49A45] shadow-gold-glow ring-1 ring-[#C49A45]/50'
-                    : 'bg-white/5 border-white/5 hover:border-white/20'
+                    ? 'bg-amber-50 border-[#DFC27A] shadow-sm ring-1 ring-[#DFC27A]'
+                    : 'bg-[#FAF8F5] border-neutral-200 hover:border-[#DFC27A]/50'
                 }`}
               >
-                <div className="relative w-14 h-16 rounded-xl overflow-hidden bg-neutral-900 flex-shrink-0 border border-white/10">
+                <div className="relative w-14 h-16 rounded-xl overflow-hidden bg-white flex-shrink-0 border border-[#DFC27A]/30">
                   <Image
-                    src={p.images?.[0]?.url || 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=200'}
+                    src={p.images?.[0]?.url || '/logo.png'}
                     alt={p.nameAr}
                     fill
-                    className="object-cover"
+                    className="object-contain p-1"
                   />
                 </div>
 
                 <div className="flex-1 min-w-0 text-xs space-y-1">
-                  <h4 className="font-bold text-white truncate">{p.nameAr}</h4>
+                  <h4 className="font-black text-black truncate">{p.nameAr}</h4>
                   <div className="flex items-center gap-2">
-                    <span className="text-[#DFC27A] font-extrabold">{formatPrice(p.price, 'ar')}</span>
+                    <span className="text-black font-black">{formatPrice(p.price, 'ar')}</span>
                     {p.category && (
-                      <span className="px-2 py-0.5 rounded-md bg-white/10 text-gray-300 text-[10px] font-semibold">
+                      <span className="px-2 py-0.5 rounded-md bg-white border border-[#DFC27A]/30 text-[#98702B] text-[10px] font-bold">
                         {p.category.nameAr}
                       </span>
                     )}
                   </div>
-                  <p className="text-[10px] text-gray-400">SKU: {p.sku}</p>
+                  <p className="text-[10px] text-neutral-500 font-mono font-bold">SKU: {p.sku}</p>
                 </div>
 
                 <div
                   className={`w-7 h-7 rounded-xl border flex items-center justify-center transition-all flex-shrink-0 ${
                     isSelected
-                      ? 'bg-[#C49A45] border-[#C49A45] text-black shadow-md'
-                      : 'border-white/20 text-transparent'
+                      ? 'gold-button text-black shadow-sm font-black'
+                      : 'border-neutral-300 text-transparent bg-white'
                   }`}
                 >
                   <Check className="w-4 h-4 font-black" />
@@ -443,7 +441,7 @@ export default function AdminFeaturedProductsPage() {
         </div>
 
         {filteredProducts.length === 0 && (
-          <div className="p-8 text-center text-xs text-gray-400">
+          <div className="p-8 text-center text-xs text-neutral-500 font-bold">
             لا توجد منتجات مطابقة لهذا التصنيف أو البحث.
           </div>
         )}

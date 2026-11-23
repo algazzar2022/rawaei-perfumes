@@ -13,6 +13,8 @@ import {
   Sparkles,
   Layers,
   Filter,
+  ArrowRight,
+  ArrowLeft,
 } from 'lucide-react';
 import { ProductDto, CategoryDto } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
@@ -26,8 +28,8 @@ export default function AdminProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedGender, setSelectedGender] = useState('ALL');
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Page View Mode: 'LIST' (table) or 'FORM' (create/edit)
+  const [viewMode, setViewMode] = useState<'LIST' | 'FORM'>('LIST');
   const [editingProduct, setEditingProduct] = useState<ProductDto | null>(null);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -63,15 +65,14 @@ export default function AdminProductsPage() {
         fetch('/api/products'),
         fetch('/api/categories'),
       ]);
+
       const prodData = await prodRes.json();
       const catData = await catRes.json();
-      setProducts(prodData.products || []);
-      setCategories(catData.categories || []);
-      if (catData.categories?.length > 0 && !formData.categoryId) {
-        setFormData((prev) => ({ ...prev, categoryId: catData.categories[0].id }));
-      }
-    } catch (e) {
-      console.error('Error fetching admin products', e);
+
+      if (prodData.products) setProducts(prodData.products);
+      if (catData.categories) setCategories(catData.categories);
+    } catch (err) {
+      console.error('Failed to load products/categories', err);
     } finally {
       setLoading(false);
     }
@@ -81,7 +82,7 @@ export default function AdminProductsPage() {
     fetchData();
   }, []);
 
-  const openCreateModal = () => {
+  const openCreateForm = () => {
     setEditingProduct(null);
     setFormData({
       nameAr: '',
@@ -106,10 +107,10 @@ export default function AdminProductsPage() {
       imageUrl: '',
     });
     setFormError(null);
-    setIsModalOpen(true);
+    setViewMode('FORM');
   };
 
-  const openEditModal = (p: ProductDto) => {
+  const openEditForm = (p: ProductDto) => {
     setEditingProduct(p);
     setFormData({
       nameAr: p.nameAr,
@@ -134,7 +135,7 @@ export default function AdminProductsPage() {
       imageUrl: p.images?.[0]?.url || '',
     });
     setFormError(null);
-    setIsModalOpen(true);
+    setViewMode('FORM');
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -144,10 +145,24 @@ export default function AdminProductsPage() {
 
     try {
       const payload = {
-        ...formData,
-        price: parseFloat(formData.price),
+        nameAr: formData.nameAr,
+        nameEn: formData.nameEn,
+        slug: formData.slug || formData.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        descriptionAr: formData.descriptionAr,
+        descriptionEn: formData.descriptionEn,
+        price: parseFloat(formData.price) || 0,
         compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : null,
         stock: parseInt(formData.stock) || 0,
+        gender: formData.gender,
+        scentFamily: formData.scentFamily,
+        topNotes: formData.topNotes,
+        heartNotes: formData.heartNotes,
+        baseNotes: formData.baseNotes,
+        longevity: formData.longevity,
+        sillage: formData.sillage,
+        isFeatured: formData.isFeatured,
+        isActive: formData.isActive,
+        categoryId: formData.categoryId,
         volumeMl: parseInt(formData.volumeMl) || 100,
         images: formData.imageUrl ? [{ url: formData.imageUrl }] : undefined,
       };
@@ -168,7 +183,7 @@ export default function AdminProductsPage() {
         throw new Error(data.error || 'فشل حفظ بيانات المنتج');
       }
 
-      setIsModalOpen(false);
+      setViewMode('LIST');
       fetchData();
     } catch (err: any) {
       setFormError(err.message || 'حدث خطأ أثناء الحفظ');
@@ -212,393 +227,437 @@ export default function AdminProductsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Top Controls Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-white">إدارة المنتجات والعطور</h1>
-          <p className="text-xs text-gray-400 mt-1">
-            إضافة وتعديل وحذف العطور، تحديد الأسعار، الأحجام، والنوتات العطرية
-          </p>
-        </div>
-
-        <button
-          onClick={openCreateModal}
-          className="gold-button px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 self-start sm:self-auto shadow-gold-glow"
-        >
-          <Plus className="w-4 h-4" />
-          <span>إضافة عطر جديد</span>
-        </button>
-      </div>
-
-      {/* Filter and Search Bar */}
-      <div className="bg-white rounded-2xl p-4 border border-[#DFC27A]/40 shadow-sm flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="absolute top-1/2 -translate-y-1/2 right-3 w-4 h-4 text-neutral-500" />
-          <input
-            type="text"
-            placeholder="بحث بالاسم أو SKU..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl pr-10 pl-3 py-2.5 text-xs text-black font-bold placeholder-[#666666] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-          />
-        </div>
-
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
-        >
-          <option value="ALL">جميع التصنيفات</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nameAr}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={selectedGender}
-          onChange={(e) => setSelectedGender(e.target.value)}
-          className="bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
-        >
-          <option value="ALL">جميع الأقسام (الجنس)</option>
-          <option value="HIM">For Him (رجالي)</option>
-          <option value="HER">For Her (نسائي)</option>
-          <option value="UNISEX">Unisex (للجنسين)</option>
-        </select>
-      </div>
-
-      {/* Products Table */}
-      <div className="bg-white rounded-3xl border border-[#DFC27A]/40 overflow-hidden shadow-md">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-right">
-            <thead className="bg-[#FAF6EE] border-b-2 border-[#DFC27A]/30 text-black">
-              <tr>
-                <th className="p-4 font-black text-black">الصورة</th>
-                <th className="p-4 font-black text-black">اسم العطر</th>
-                <th className="p-4 font-black text-black">التصنيف</th>
-                <th className="p-4 font-black text-black text-center">القسم</th>
-                <th className="p-4 font-black text-black">السعر</th>
-                <th className="p-4 font-black text-black text-center">المخزون</th>
-                <th className="p-4 font-black text-black text-center">مميز؟</th>
-                <th className="p-4 font-black text-black text-center">الحالة</th>
-                <th className="p-4 font-black text-black text-center">إجراءات</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#DFC27A]/15 text-black">
-              {filteredProducts.map((p) => {
-                const img = p.images?.[0]?.url || '/logo.png';
-                return (
-                  <tr key={p.id} className="hover:bg-[#FAF8F5] transition-colors">
-                    <td className="p-4">
-                      <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-[#FAF8F5] border border-[#DFC27A]/30">
-                        <Image src={img} alt={p.nameAr} fill className="object-contain p-1" sizes="50px" />
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="font-black text-black text-sm">{p.nameAr}</div>
-                      <div className="text-[11px] text-neutral-600 font-semibold">{p.nameEn}</div>
-                      <div className="text-[10px] text-[#98702B] font-mono font-bold">SKU: {p.sku}</div>
-                    </td>
-                    <td className="p-4 text-black font-bold">
-                      {p.category?.nameAr || '-'}
-                    </td>
-                    <td className="p-4 text-center">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-[11px] font-black ${
-                          p.gender === 'HER'
-                            ? 'bg-pink-100 text-pink-900 border border-pink-300'
-                            : p.gender === 'HIM'
-                            ? 'bg-blue-100 text-blue-900 border border-blue-300'
-                            : 'bg-amber-100 text-amber-950 border border-amber-300'
-                        }`}
-                      >
-                        {p.gender === 'HIM' ? 'رجالي' : p.gender === 'HER' ? 'نسائي' : 'للجنسين'}
-                      </span>
-                    </td>
-                    <td className="p-4 font-black text-black text-sm">
-                      {formatPrice(p.price, 'ar')}
-                    </td>
-                    <td className="p-4 text-center">
-                      <span
-                        className={`inline-block px-2.5 py-1 rounded-lg text-xs font-black ${
-                          p.stock <= 5
-                            ? 'bg-red-100 text-red-900 border border-red-300'
-                            : 'bg-emerald-100 text-emerald-950 border border-emerald-300'
-                        }`}
-                      >
-                        {p.stock} قطعة
-                      </span>
-                    </td>
-                    <td className="p-4 text-center">
-                      {p.isFeatured ? (
-                        <span className="inline-block px-2.5 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs">
-                          نعم ⭐
-                        </span>
-                      ) : (
-                        <span className="text-neutral-500 font-bold text-xs">لا</span>
-                      )}
-                    </td>
-                    <td className="p-4 text-center">
-                      <span
-                        className={`inline-block px-2.5 py-1 rounded-full text-xs font-black ${
-                          p.isActive
-                            ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
-                            : 'bg-neutral-100 text-neutral-800 border border-neutral-300'
-                        }`}
-                      >
-                        {p.isActive ? 'نشط ✓' : 'معطل ✕'}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          onClick={() => openEditModal(p)}
-                          className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm"
-                          title="تعديل العطر"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id, p.nameAr)}
-                          className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm"
-                          title="حذف العطر"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Create / Edit Product Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-          <div className="bg-[#141414] border border-[#C49A45]/30 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <h2 className="text-lg font-bold text-white">
-                {editingProduct ? 'تعديل بيانات العطر' : 'إضافة عطر فاخر جديد'}
-              </h2>
+      {/* ============================================================== */}
+      {/* 1. FULL PAGE FORM VIEW (Create / Edit Product)                */}
+      {/* ============================================================== */}
+      {viewMode === 'FORM' ? (
+        <div className="space-y-6">
+          {/* Top Bar for Form */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
               <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-1 text-gray-400 hover:text-white"
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="inline-flex items-center gap-2 text-xs font-black text-black hover:text-[#98702B] mb-2 transition-colors cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 text-black" />
+                <span>العودة إلى جدول المنتجات</span>
               </button>
+              <h1 className="text-2xl font-black text-black">
+                {editingProduct ? `تعديل بيانات العطر: ${editingProduct.nameAr}` : 'إضافة عطر فاخر جديد'}
+              </h1>
+              <p className="text-xs text-neutral-600 mt-1">
+                املأ البيانات والمواصفات العطرية أدناه، ثم اضغط حفظ لتحديث المتجر مباشرة
+              </p>
             </div>
 
-            {formError && (
-              <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-red-200 text-xs">
-                {formError}
-              </div>
-            )}
-
-            <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">اسم العطر بالعربية *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.nameAr}
-                    onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">اسم العطر بالإنجليزية *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.nameEn}
-                    onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">المعرف اللطيف (Slug) *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.slug}
-                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                    placeholder="royal-black-perfume"
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">التصنيف *</label>
-                  <select
-                    value={formData.categoryId}
-                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.nameAr}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">القسم (الجنس)</label>
-                  <select
-                    value={formData.gender}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  >
-                    <option value="HIM">For Him (رجال)</option>
-                    <option value="HER">For Her (نساء)</option>
-                    <option value="UNISEX">Unisex (للجنسين)</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">السعر الحالي (ج.م) *</label>
-                  <input
-                    type="number"
-                    required
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">السعر قبل الخصم (اختياري)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.compareAtPrice}
-                    onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300 font-semibold">كمية المخزون *</label>
-                  <input
-                    type="number"
-                    required
-                    value={formData.stock}
-                    onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                  <MediaUploader
-                    label="صورة المنتج (يتم ضغط الحجم فورياً ورفعها إلى Cloudinary)"
-                    value={formData.imageUrl}
-                    onChange={(url) => setFormData({ ...formData, imageUrl: url })}
-                    acceptType="image"
-                    folder="products"
-                    placeholder="https://res.cloudinary.com/..."
-                  />
-                </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="text-gray-300 font-semibold">الوصف بالعربية</label>
-                  <textarea
-                    rows={2}
-                    value={formData.descriptionAr}
-                    onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  />
-                </div>
-
-                {/* Fragrance Pyramid */}
-                <div className="space-y-1 sm:col-span-2 border-t border-white/5 pt-3">
-                  <span className="text-[#DFC27A] font-bold block mb-2">الهرم العطري:</span>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300">الافتتاحية (Top Notes)</label>
-                  <input
-                    type="text"
-                    value={formData.topNotes}
-                    onChange={(e) => setFormData({ ...formData, topNotes: e.target.value })}
-                    placeholder="البرغموت، الهيل..."
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-gray-300">قلب العطر (Heart Notes)</label>
-                  <input
-                    type="text"
-                    value={formData.heartNotes}
-                    onChange={(e) => setFormData({ ...formData, heartNotes: e.target.value })}
-                    placeholder="الورد، اللافندر..."
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="text-gray-300">القاعدة (Base Notes)</label>
-                  <input
-                    type="text"
-                    value={formData.baseNotes}
-                    onChange={(e) => setFormData({ ...formData, baseNotes: e.target.value })}
-                    placeholder="خشب العود، العنبر، المسك..."
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex items-center gap-6 sm:col-span-2 pt-2">
-                  <label className="flex items-center gap-2 cursor-pointer text-white font-medium">
-                    <input
-                      type="checkbox"
-                      checked={formData.isFeatured}
-                      onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                      className="accent-[#C49A45]"
-                    />
-                    <span>إظهار في قسم المنتجات المميزة (Featured)</span>
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer text-white font-medium">
-                    <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="accent-[#C49A45]"
-                    />
-                    <span>تفعيل المنتج</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-white/10 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white"
-                >
-                  إلغاء
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="gold-button px-6 py-2.5 rounded-xl font-bold"
-                >
-                  {saving ? 'جاري الحفظ...' : 'حفظ بيانات العطر'}
-                </button>
-              </div>
-            </form>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="px-5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-neutral-200 border border-neutral-300 text-xs font-bold text-black transition-colors cursor-pointer"
+              >
+                إلغاء والرجوع
+              </button>
+              <button
+                type="submit"
+                form="product-form"
+                disabled={saving}
+                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? 'جاري الحفظ...' : editingProduct ? 'حفظ التعديلات' : 'نشر العطر الجديد'}
+              </button>
+            </div>
           </div>
+
+          {formError && (
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-300 text-red-900 text-xs font-bold">
+              {formError}
+            </div>
+          )}
+
+          {/* Full Width White Form */}
+          <form
+            id="product-form"
+            onSubmit={handleSaveProduct}
+            className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6 text-xs"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">اسم العطر بالعربية *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="مثال: عطر سوفرين ليذر الملكي"
+                  value={formData.nameAr}
+                  onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">اسم العطر بالإنجليزية *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Sovereign Leather Royal Perfume"
+                  value={formData.nameEn}
+                  onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">المعرف اللطيف (Slug) *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="sovereign-leather"
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">التصنيف *</label>
+                <select
+                  value={formData.categoryId}
+                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nameAr}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">القسم (الجنس)</label>
+                <select
+                  value={formData.gender}
+                  onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                >
+                  <option value="HIM">For Him (رجالي)</option>
+                  <option value="HER">For Her (نسائي)</option>
+                  <option value="UNISEX">Unisex (للجنسين)</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">السعر الحالي (ج.م) *</label>
+                <input
+                  type="number"
+                  required
+                  step="0.01"
+                  placeholder="850"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">السعر قبل الخصم (اختياري)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="1100"
+                  value={formData.compareAtPrice}
+                  onChange={(e) => setFormData({ ...formData, compareAtPrice: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black text-xs block">كمية المخزون *</label>
+                <input
+                  type="number"
+                  required
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <MediaUploader
+                  label="صورة المنتج (يتم ضغط الحجم فورياً ورفعها إلى Cloudinary)"
+                  value={formData.imageUrl}
+                  onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                  acceptType="image"
+                  folder="products"
+                  placeholder="https://res.cloudinary.com/..."
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black text-xs block">الوصف بالعربية</label>
+                <textarea
+                  rows={3}
+                  placeholder="عطر فاخر يمزج بين عبق العود المعتّق والنفحات الخشبية والجلدية الساحرة..."
+                  value={formData.descriptionAr}
+                  onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              {/* Fragrance Pyramid Section */}
+              <div className="sm:col-span-2 border-t border-[#DFC27A]/30 pt-4 space-y-3">
+                <span className="text-black font-black text-sm block">الهرم العطري والمواصفات:</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-black font-black">الافتتاحية (Top Notes)</label>
+                    <input
+                      type="text"
+                      value={formData.topNotes}
+                      onChange={(e) => setFormData({ ...formData, topNotes: e.target.value })}
+                      placeholder="البرغموت، الهيل..."
+                      className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-black font-black">قلب العطر (Heart Notes)</label>
+                    <input
+                      type="text"
+                      value={formData.heartNotes}
+                      onChange={(e) => setFormData({ ...formData, heartNotes: e.target.value })}
+                      placeholder="الورد الدمشقي، اللافندر..."
+                      className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-black font-black">القاعدة (Base Notes)</label>
+                    <input
+                      type="text"
+                      value={formData.baseNotes}
+                      onChange={(e) => setFormData({ ...formData, baseNotes: e.target.value })}
+                      placeholder="خشب العود، العنبر، المسك..."
+                      className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Toggles */}
+              <div className="flex flex-wrap items-center gap-6 sm:col-span-2 pt-2 border-t border-[#DFC27A]/20">
+                <label className="flex items-center gap-2 cursor-pointer text-black font-bold">
+                  <input
+                    type="checkbox"
+                    checked={formData.isFeatured}
+                    onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                    className="w-4 h-4 accent-[#C49A45]"
+                  />
+                  <span>إظهار في قسم المنتجات المميزة (Featured)</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer text-black font-bold">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="w-4 h-4 accent-[#C49A45]"
+                  />
+                  <span>تفعيل المنتج وعرضه في المتجر</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-6 border-t border-[#DFC27A]/30 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setViewMode('LIST')}
+                className="px-5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-neutral-200 border border-neutral-300 text-xs font-bold text-black transition-colors cursor-pointer"
+              >
+                إلغاء والرجوع
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+              >
+                {saving ? 'جاري الحفظ...' : editingProduct ? 'حفظ التعديلات' : 'نشر العطر الجديد'}
+              </button>
+            </div>
+          </form>
         </div>
+      ) : (
+        /* ============================================================== */
+        /* 2. TABLE VIEW (List of Products)                               */
+        /* ============================================================== */
+        <>
+          {/* Top Controls Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-black text-black">إدارة المنتجات والعطور</h1>
+              <p className="text-xs text-neutral-600 mt-1">
+                إضافة وتعديل وحذف العطور، تحديد الأسعار، الأحجام، والنوتات العطرية
+              </p>
+            </div>
+
+            <button
+              onClick={openCreateForm}
+              className="gold-button px-5 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 self-start sm:self-auto shadow-md hover:brightness-105 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-black" />
+              <span>إضافة عطر جديد</span>
+            </button>
+          </div>
+
+          {/* Filter and Search Bar */}
+          <div className="bg-white rounded-2xl p-4 border border-[#DFC27A]/40 shadow-sm flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[220px]">
+              <Search className="absolute top-1/2 -translate-y-1/2 right-3 w-4 h-4 text-neutral-500" />
+              <input
+                type="text"
+                placeholder="بحث بالاسم أو SKU..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl pr-10 pl-3 py-2.5 text-xs text-black font-bold placeholder-[#666666] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+              />
+            </div>
+
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+            >
+              <option value="ALL">جميع التصنيفات</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nameAr}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedGender}
+              onChange={(e) => setSelectedGender(e.target.value)}
+              className="bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+            >
+              <option value="ALL">جميع الأقسام (الجنس)</option>
+              <option value="HIM">For Him (رجالي)</option>
+              <option value="HER">For Her (نسائي)</option>
+              <option value="UNISEX">Unisex (للجنسين)</option>
+            </select>
+          </div>
+
+          {/* Products Table */}
+          <div className="bg-white rounded-3xl border border-[#DFC27A]/40 overflow-hidden shadow-md">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-right">
+                <thead className="bg-[#FAF6EE] border-b-2 border-[#DFC27A]/30 text-black">
+                  <tr>
+                    <th className="p-4 font-black text-black">الصورة</th>
+                    <th className="p-4 font-black text-black">اسم العطر</th>
+                    <th className="p-4 font-black text-black">التصنيف</th>
+                    <th className="p-4 font-black text-black text-center">القسم</th>
+                    <th className="p-4 font-black text-black">السعر</th>
+                    <th className="p-4 font-black text-black text-center">المخزون</th>
+                    <th className="p-4 font-black text-black text-center">مميز؟</th>
+                    <th className="p-4 font-black text-black text-center">الحالة</th>
+                    <th className="p-4 font-black text-black text-center">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#DFC27A]/15 text-black">
+                  {filteredProducts.map((p) => {
+                    const img = p.images?.[0]?.url || '/logo.png';
+                    return (
+                      <tr key={p.id} className="hover:bg-[#FAF8F5] transition-colors">
+                        <td className="p-4">
+                          <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-[#FAF8F5] border border-[#DFC27A]/30">
+                            <Image src={img} alt={p.nameAr} fill className="object-contain p-1" sizes="50px" />
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="font-black text-black text-sm">{p.nameAr}</div>
+                          <div className="text-[11px] text-neutral-600 font-semibold">{p.nameEn}</div>
+                          <div className="text-[10px] text-[#98702B] font-mono font-bold">SKU: {p.sku}</div>
+                        </td>
+                        <td className="p-4 text-black font-bold">
+                          {p.category?.nameAr || '-'}
+                        </td>
+                        <td className="p-4 text-center">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-[11px] font-black ${
+                              p.gender === 'HER'
+                                ? 'bg-pink-100 text-pink-900 border border-pink-300'
+                                : p.gender === 'HIM'
+                                ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                                : 'bg-amber-100 text-amber-950 border border-amber-300'
+                            }`}
+                          >
+                            {p.gender === 'HIM' ? 'رجالي' : p.gender === 'HER' ? 'نسائي' : 'للجنسين'}
+                          </span>
+                        </td>
+                        <td className="p-4 font-black text-black text-sm">
+                          {formatPrice(p.price, 'ar')}
+                        </td>
+                        <td className="p-4 text-center">
+                          <span
+                            className={`inline-block px-2.5 py-1 rounded-lg text-xs font-black ${
+                              p.stock <= 5
+                                ? 'bg-red-100 text-red-900 border border-red-300'
+                                : 'bg-emerald-100 text-emerald-950 border border-emerald-300'
+                            }`}
+                          >
+                            {p.stock} قطعة
+                          </span>
+                        </td>
+                        <td className="p-4 text-center">
+                          {p.isFeatured ? (
+                            <span className="inline-block px-2.5 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs">
+                              نعم ⭐
+                            </span>
+                          ) : (
+                            <span className="text-neutral-500 font-bold text-xs">لا</span>
+                          )}
+                        </td>
+                        <td className="p-4 text-center">
+                          <span
+                            className={`inline-block px-2.5 py-1 rounded-full text-xs font-black ${
+                              p.isActive
+                                ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
+                                : 'bg-neutral-100 text-neutral-800 border border-neutral-300'
+                            }`}
+                          >
+                            {p.isActive ? 'نشط ✓' : 'معطل ✕'}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => openEditForm(p)}
+                              className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm cursor-pointer"
+                              title="تعديل العطر"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(p.id, p.nameAr)}
+                              className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm cursor-pointer"
+                              title="حذف العطر"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

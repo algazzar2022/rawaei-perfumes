@@ -18,49 +18,51 @@ export default async function AdminCustomersPage() {
   return (
     <div className="space-y-6 pb-12">
       <div>
-        <h1 className="text-2xl font-black text-white">إدارة العملاء والزبائن</h1>
-        <p className="text-xs text-gray-400 mt-1">
+        <h1 className="text-2xl font-black text-black">إدارة العملاء والزبائن</h1>
+        <p className="text-xs text-neutral-600 mt-1">
           قائمة العملاء، إجمالي مشترياتهم، وعدد طلباتهم في متجر روائع للعطور
         </p>
       </div>
 
-      <div className="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+      <div className="bg-white rounded-3xl border border-[#DFC27A]/40 overflow-hidden shadow-md">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-right">
-            <thead className="bg-[#151515] border-b border-white/5 text-gray-400">
+            <thead className="bg-[#FAF6EE] border-b-2 border-[#DFC27A]/30 text-black">
               <tr>
-                <th className="p-4 font-semibold">اسم العميل</th>
-                <th className="p-4 font-semibold">رقم الجوال</th>
-                <th className="p-4 font-semibold">البريد الإلكتروني</th>
-                <th className="p-4 font-semibold">المدينة</th>
-                <th className="p-4 font-semibold">عدد الطلبات</th>
-                <th className="p-4 font-semibold">إجمالي المشتريات</th>
-                <th className="p-4 font-semibold">تاريخ التسجيل</th>
+                <th className="p-4 font-black text-black">اسم العميل</th>
+                <th className="p-4 font-black text-black">رقم الجوال</th>
+                <th className="p-4 font-black text-black">البريد الإلكتروني</th>
+                <th className="p-4 font-black text-black">المدينة</th>
+                <th className="p-4 font-black text-black text-center">عدد الطلبات</th>
+                <th className="p-4 font-black text-black">إجمالي المشتريات</th>
+                <th className="p-4 font-black text-black">تاريخ التسجيل</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-gray-200">
+            <tbody className="divide-y divide-[#DFC27A]/15 text-black">
               {customers.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-gray-400">
+                  <td colSpan={7} className="py-12 text-center text-neutral-500 font-bold">
                     لا يوجد عملاء مسجلين بعد. عند إتمام أول عملية شراء سيتم حفظ بيانات العميل هنا تلقائياً.
                   </td>
                 </tr>
               ) : (
                 customers.map((c) => (
-                  <tr key={c.id} className="hover:bg-white/5 transition-colors">
-                    <td className="p-4 font-bold text-white text-sm">{c.name}</td>
-                    <td className="p-4 text-gray-300 font-mono" dir="ltr">
+                  <tr key={c.id} className="hover:bg-[#FAF8F5] transition-colors">
+                    <td className="p-4 font-black text-black text-sm">{c.name}</td>
+                    <td className="p-4 text-neutral-700 font-mono font-bold" dir="ltr">
                       {c.phone}
                     </td>
-                    <td className="p-4 text-gray-400">{c.email}</td>
-                    <td className="p-4 text-gray-300">{c.city || '-'}</td>
-                    <td className="p-4 font-bold text-white">
-                      {c.totalOrders} {c.totalOrders === 1 ? 'طلب' : 'طلبات'}
+                    <td className="p-4 text-neutral-600 font-bold">{c.email}</td>
+                    <td className="p-4 text-neutral-800 font-bold">{c.city || '-'}</td>
+                    <td className="p-4 text-center">
+                      <span className="inline-block px-3 py-1 rounded-full bg-[#FAF6EE] border border-[#DFC27A]/40 font-black text-black text-xs">
+                        {c.totalOrders} {c.totalOrders === 1 ? 'طلب' : 'طلبات'}
+                      </span>
                     </td>
-                    <td className="p-4 font-black text-[#DFC27A] text-sm">
+                    <td className="p-4 font-black text-black text-sm">
                       {formatPrice(c.totalSpent, 'ar')}
                     </td>
-                    <td className="p-4 text-gray-400">{formatDate(c.createdAt, 'ar')}</td>
+                    <td className="p-4 text-neutral-600 font-semibold">{formatDate(c.createdAt, 'ar')}</td>
                   </tr>
                 ))
               )}

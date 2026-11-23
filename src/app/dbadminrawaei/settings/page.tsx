@@ -64,180 +64,181 @@ export default function AdminGeneralSettingsPage() {
   return (
     <div className="space-y-6 pb-12">
       <div>
-        <h1 className="text-2xl font-black text-white">إعدادات الموقع العامة</h1>
-        <p className="text-xs text-gray-400 mt-1">
+        <h1 className="text-2xl font-black text-black">إعدادات الموقع العامة</h1>
+        <p className="text-xs text-neutral-600 mt-1">
           بيانات المتجر الرسمية، أرقام التواصل، العملة، الضريبة، وروابط التواصل الاجتماعي
         </p>
       </div>
 
       {message && (
-        <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-black">
           {message}
         </div>
       )}
 
       <form
         onSubmit={handleSave}
-        className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-6"
+        className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6"
       >
         {/* Basic Store Info */}
         <div className="space-y-4">
-          <h2 className="text-base font-bold text-white border-b border-white/10 pb-3">
+          <h2 className="text-base font-black text-black border-b border-[#DFC27A]/20 pb-3">
             المعلومات الأساسية للمتجر
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="space-y-1">
-              <label className="text-gray-300 font-semibold">اسم المتجر بالعربية</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">اسم المتجر بالعربية</label>
               <input
                 type="text"
                 value={settings.site_name_ar}
                 onChange={(e) => setSettings({ ...settings, site_name_ar: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-gray-300 font-semibold">اسم المتجر بالإنجليزية</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">اسم المتجر بالإنجليزية</label>
               <input
                 type="text"
                 value={settings.site_name_en}
                 onChange={(e) => setSettings({ ...settings, site_name_en: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 dir="ltr"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-gray-300 font-semibold">شعار المتجر (Tagline) بالعربية</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">شعار المتجر (Tagline) بالعربية</label>
               <input
                 type="text"
                 value={settings.tagline_ar}
                 onChange={(e) => setSettings({ ...settings, tagline_ar: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-gray-300 font-semibold">نسبة ضريبة القيمة المضافة (%)</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">نسبة ضريبة القيمة المضافة (%)</label>
               <input
                 type="number"
                 value={settings.tax_rate_percent}
                 onChange={(e) => setSettings({ ...settings, tax_rate_percent: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-black focus:outline-none focus:border-[#C49A45] focus:bg-white"
               />
             </div>
           </div>
         </div>
 
         {/* Contact Info */}
-        <div className="space-y-4 pt-4 border-t border-white/10">
-          <h2 className="text-base font-bold text-white border-b border-white/10 pb-3">
+        <div className="space-y-4 pt-4 border-t border-[#DFC27A]/20">
+          <h2 className="text-base font-black text-black border-b border-[#DFC27A]/20 pb-3">
             بيانات الاتصال والتواصل
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="space-y-1">
-              <label className="text-gray-300 font-semibold">رقم الهاتف الرسمي</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">رقم الهاتف الرسمي</label>
               <input
                 type="text"
                 value={settings.contact_phone}
                 onChange={(e) => setSettings({ ...settings, contact_phone: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 dir="ltr"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-gray-300 font-semibold">رقم خدمة العملاء (واتساب)</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">رقم خدمة العملاء (واتساب)</label>
               <input
                 type="text"
                 value={settings.contact_whatsapp}
                 onChange={(e) => setSettings({ ...settings, contact_whatsapp: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 dir="ltr"
               />
             </div>
 
-            <div className="space-y-1 sm:col-span-2">
-              <label className="text-gray-300 font-semibold">البريد الإلكتروني الرسمي</label>
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-black font-black block">البريد الإلكتروني الرسمي</label>
               <input
                 type="email"
                 value={settings.contact_email}
                 onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                dir="ltr"
               />
             </div>
 
-            <div className="space-y-1 sm:col-span-2">
-              <label className="text-gray-300 font-semibold">عنوان المعرض أو المقر الرئيسي</label>
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-black font-black block">عنوان المعرض أو المقر الرئيسي</label>
               <input
                 type="text"
                 value={settings.contact_address_ar}
                 onChange={(e) => setSettings({ ...settings, contact_address_ar: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
               />
             </div>
           </div>
         </div>
 
         {/* Social Media Links */}
-        <div className="space-y-4 pt-4 border-t border-white/10">
-          <h2 className="text-base font-bold text-white border-b border-white/10 pb-3">
+        <div className="space-y-4 pt-4 border-t border-[#DFC27A]/20">
+          <h2 className="text-base font-black text-black border-b border-[#DFC27A]/20 pb-3">
             روابط منصات التواصل الاجتماعي
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="space-y-1">
-              <label className="text-gray-300">Instagram</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">Instagram</label>
               <input
                 type="url"
                 value={settings.social_instagram}
                 onChange={(e) => setSettings({ ...settings, social_instagram: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 dir="ltr"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-gray-300">Facebook</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">Facebook</label>
               <input
                 type="url"
                 value={settings.social_facebook}
                 onChange={(e) => setSettings({ ...settings, social_facebook: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 dir="ltr"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-gray-300">TikTok</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">TikTok</label>
               <input
                 type="url"
                 value={settings.social_tiktok}
                 onChange={(e) => setSettings({ ...settings, social_tiktok: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 dir="ltr"
               />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-gray-300">Snapchat</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">Snapchat</label>
               <input
                 type="url"
                 value={settings.social_snapchat}
                 onChange={(e) => setSettings({ ...settings, social_snapchat: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 dir="ltr"
               />
             </div>
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/10 flex justify-end">
+        <div className="pt-4 border-t border-[#DFC27A]/20 flex justify-end">
           <button
             type="submit"
             disabled={saving}
-            className="gold-button px-8 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-gold-glow"
+            className="gold-button px-8 py-3 rounded-xl font-black text-black text-xs flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-black" />
             <span>{saving ? 'جاري الحفظ...' : 'حفظ الإعدادات العامة'}</span>
           </button>
         </div>

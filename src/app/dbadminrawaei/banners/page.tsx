@@ -15,6 +15,7 @@ import {
   ArrowUpDown,
 } from 'lucide-react';
 import { BannerDto, BannerSlideDto } from '@/lib/types';
+import MediaUploader from '@/components/admin/MediaUploader';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<BannerDto[]>([]);
@@ -84,7 +85,6 @@ export default function AdminBannersPage() {
     fetchBanners();
   }, []);
 
-  // Save Hero Banner settings
   const handleSaveHero = async () => {
     setSaving(true);
     setMessage(null);
@@ -112,7 +112,7 @@ export default function AdminBannersPage() {
       });
 
       if (!res.ok) throw new Error('فشل حفظ البانر الرئيسي');
-      setMessage('تم حفظ إعدادات البانر الرئيسي والشرائح بنجاح!');
+      setMessage('تم حفظ إعدادات البانر الرئيسي بنجاح!');
       setTimeout(() => setMessage(null), 3000);
       fetchBanners();
     } catch (err: any) {
@@ -122,7 +122,6 @@ export default function AdminBannersPage() {
     }
   };
 
-  // Save Promotional Banners
   const handleSavePromo = async () => {
     setSaving(true);
     setMessage(null);
@@ -158,7 +157,6 @@ export default function AdminBannersPage() {
     }
   };
 
-  // Add a new slide to slides list
   const addSlide = () => {
     setSlides([
       ...slides,
@@ -168,8 +166,8 @@ export default function AdminBannersPage() {
         titleEn: 'New Slide Title',
         subtitleAr: 'وصف مختصر للشريحة العطرية',
         subtitleEn: 'Short description',
-        desktopImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=1920',
-        mobileImage: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=800',
+        desktopImage: '',
+        mobileImage: '',
         link: '/perfumes',
         buttonTextAr: 'تسوق الآن',
         buttonTextEn: 'Shop Now',
@@ -192,14 +190,14 @@ export default function AdminBannersPage() {
   return (
     <div className="space-y-10 pb-12">
       <div>
-        <h1 className="text-2xl font-black text-white">إدارة البانرات والسلايدر والفيديو</h1>
-        <p className="text-xs text-gray-400 mt-1">
+        <h1 className="text-2xl font-black text-black">إدارة البانرات والسلايدر والفيديو</h1>
+        <p className="text-xs text-neutral-600 mt-1">
           التحكم في البانر الرئيسي بثلاثة أوضاع (صورة، سلايدر، فيديو)، وتخصيص البانرات الإعلانية
         </p>
       </div>
 
       {message && (
-        <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-black">
           {message}
         </div>
       )}
@@ -207,14 +205,14 @@ export default function AdminBannersPage() {
       {/* ============================================================== */}
       {/* 1. HERO BANNER SETTINGS                                        */}
       {/* ============================================================== */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DFC27A]/20 pb-4">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Sliders className="w-5 h-5 text-[#C49A45]" />
+            <h2 className="text-lg font-black text-black flex items-center gap-2">
+              <Sliders className="w-5 h-5 text-[#98702B]" />
               <span>البانر الرئيسي للمتجر (Hero Banner)</span>
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-neutral-600 mt-0.5">
               اختر وضع العرض المناسب: صورة ثابتة، سلايدشو متعدد الصور، أو فيديو
             </p>
           </div>
@@ -222,9 +220,9 @@ export default function AdminBannersPage() {
           <button
             onClick={handleSaveHero}
             disabled={saving}
-            className="gold-button px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-gold-glow"
+            className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-black" />
             <span>{saving ? 'جاري الحفظ...' : 'حفظ إعدادات البانر الرئيسي'}</span>
           </button>
         </div>
@@ -234,128 +232,126 @@ export default function AdminBannersPage() {
           <button
             type="button"
             onClick={() => setHeroMode('STATIC')}
-            className={`p-4 rounded-2xl border text-right transition-all flex items-center gap-3 ${
+            className={`p-4 rounded-2xl border text-right transition-all flex items-center gap-3 cursor-pointer ${
               heroMode === 'STATIC'
-                ? 'bg-[#C49A45]/20 border-[#C49A45] text-white shadow-gold-glow'
-                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                ? 'bg-amber-100 border-[#DFC27A] text-black shadow-sm font-black'
+                : 'bg-[#FAF8F5] border-neutral-300 text-neutral-700 hover:bg-neutral-100 font-bold'
             }`}
           >
-            <ImageIcon className="w-6 h-6 text-[#DFC27A]" />
+            <ImageIcon className="w-6 h-6 text-[#98702B]" />
             <div>
-              <div className="font-bold text-xs">1. صورة ثابتة (Static)</div>
-              <div className="text-[11px] opacity-75">صورة واحدة عريضة فائقة الجودة</div>
+              <div className="font-black text-xs text-black">1. صورة ثابتة (Static)</div>
+              <div className="text-[11px] text-neutral-600">صورة واحدة عريضة فائقة الجودة</div>
             </div>
           </button>
 
           <button
             type="button"
             onClick={() => setHeroMode('SLIDESHOW')}
-            className={`p-4 rounded-2xl border text-right transition-all flex items-center gap-3 ${
+            className={`p-4 rounded-2xl border text-right transition-all flex items-center gap-3 cursor-pointer ${
               heroMode === 'SLIDESHOW'
-                ? 'bg-[#C49A45]/20 border-[#C49A45] text-white shadow-gold-glow'
-                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                ? 'bg-amber-100 border-[#DFC27A] text-black shadow-sm font-black'
+                : 'bg-[#FAF8F5] border-neutral-300 text-neutral-700 hover:bg-neutral-100 font-bold'
             }`}
           >
-            <Layers className="w-6 h-6 text-[#DFC27A]" />
+            <Layers className="w-6 h-6 text-[#98702B]" />
             <div>
-              <div className="font-bold text-xs">2. Slideshow متعدد الصور</div>
-              <div className="text-[11px] opacity-75">شرائح متعددة قابلة للتبديل والمدة</div>
+              <div className="font-black text-xs text-black">2. Slideshow متعدد الصور</div>
+              <div className="text-[11px] text-neutral-600">شرائح متعددة قابلة للتبديل والمدة</div>
             </div>
           </button>
 
           <button
             type="button"
             onClick={() => setHeroMode('VIDEO')}
-            className={`p-4 rounded-2xl border text-right transition-all flex items-center gap-3 ${
+            className={`p-4 rounded-2xl border text-right transition-all flex items-center gap-3 cursor-pointer ${
               heroMode === 'VIDEO'
-                ? 'bg-[#C49A45]/20 border-[#C49A45] text-white shadow-gold-glow'
-                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                ? 'bg-amber-100 border-[#DFC27A] text-black shadow-sm font-black'
+                : 'bg-[#FAF8F5] border-neutral-300 text-neutral-700 hover:bg-neutral-100 font-bold'
             }`}
           >
-            <Film className="w-6 h-6 text-[#DFC27A]" />
+            <Film className="w-6 h-6 text-[#98702B]" />
             <div>
-              <div className="font-bold text-xs">3. فيديو (Video)</div>
-              <div className="text-[11px] opacity-75">فيديو سنيمائي يعمل تلقائياً وبشكل متكرر</div>
+              <div className="font-black text-xs text-black">3. فيديو (Video)</div>
+              <div className="text-[11px] text-neutral-600">فيديو سنيمائي عالي الدقة</div>
             </div>
           </button>
         </div>
 
         {/* Mode-specific Fields */}
         {heroMode === 'STATIC' && (
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-4 text-xs">
-            <h3 className="font-bold text-white text-sm">بيانات الصورة الثابتة:</h3>
+          <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-4 text-xs">
+            <h3 className="font-black text-black text-sm">بيانات الصورة الثابتة:</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-gray-300">رابط صورة الكمبيوتر (1920x800)</label>
-                <input
-                  type="url"
+              <div className="space-y-1 sm:col-span-2">
+                <MediaUploader
+                  label="صورة الكمبيوتر (1920x800) - تضغط وترفع إلى Cloudinary"
                   value={heroDesktopImg}
-                  onChange={(e) => setHeroDesktopImg(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-gray-300">رابط صورة الموبايل (800x900 بدون تشويه)</label>
-                <input
-                  type="url"
-                  value={heroMobileImg}
-                  onChange={(e) => setHeroMobileImg(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-gray-300">العنوان بالعربية</label>
-                <input
-                  type="text"
-                  value={heroTitleAr}
-                  onChange={(e) => setHeroTitleAr(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-gray-300">العنوان بالإنجليزية</label>
-                <input
-                  type="text"
-                  value={heroTitleEn}
-                  onChange={(e) => setHeroTitleEn(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                  dir="ltr"
+                  onChange={(url) => setHeroDesktopImg(url)}
+                  acceptType="image"
+                  folder="banners"
                 />
               </div>
 
               <div className="space-y-1 sm:col-span-2">
-                <label className="text-gray-300">الوصف الترويجي</label>
-                <input
-                  type="text"
-                  value={heroSubtitleAr}
-                  onChange={(e) => setHeroSubtitleAr(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                <MediaUploader
+                  label="صورة الموبايل (800x900 بدون تشويه)"
+                  value={heroMobileImg}
+                  onChange={(url) => setHeroMobileImg(url)}
+                  acceptType="image"
+                  folder="banners"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-gray-300">رابط الزر (Link)</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان بالعربية</label>
                 <input
                   type="text"
-                  value={heroLink}
-                  onChange={(e) => setHeroLink(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  value={heroTitleAr}
+                  onChange={(e) => setHeroTitleAr(e.target.value)}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان بالإنجليزية</label>
+                <input
+                  type="text"
+                  value={heroTitleEn}
+                  onChange={(e) => setHeroTitleEn(e.target.value)}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                   dir="ltr"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-gray-300">نص الزر</label>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black block">الوصف الترويجي</label>
+                <input
+                  type="text"
+                  value={heroSubtitleAr}
+                  onChange={(e) => setHeroSubtitleAr(e.target.value)}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">رابط الزر (Link)</label>
+                <input
+                  type="text"
+                  value={heroLink}
+                  onChange={(e) => setHeroLink(e.target.value)}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">نص الزر</label>
                 <input
                   type="text"
                   value={heroBtnTextAr}
                   onChange={(e) => setHeroBtnTextAr(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                 />
               </div>
             </div>
@@ -363,49 +359,47 @@ export default function AdminBannersPage() {
         )}
 
         {heroMode === 'VIDEO' && (
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-4 text-xs">
-            <h3 className="font-bold text-white text-sm">بيانات فيديو البانر:</h3>
+          <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-4 text-xs">
+            <h3 className="font-black text-black text-sm">بيانات فيديو البانر:</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1 sm:col-span-2">
-                <label className="text-gray-300">رابط الفيديو (Direct MP4 URL) *</label>
-                <input
-                  type="url"
+              <div className="space-y-1.5 sm:col-span-2">
+                <MediaUploader
+                  label="ملف الفيديو (MP4 / WebM - يرفع مباشرة إلى Cloudinary)"
                   value={heroVideoUrl}
-                  onChange={(e) => setHeroVideoUrl(e.target.value)}
-                  placeholder="https://.../video.mp4"
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                  dir="ltr"
+                  onChange={(url) => setHeroVideoUrl(url)}
+                  acceptType="video"
+                  folder="banners"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-gray-300">العنوان بالعربية</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان بالعربية</label>
                 <input
                   type="text"
                   value={heroTitleAr}
                   onChange={(e) => setHeroTitleAr(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="text-gray-300">العنوان بالإنجليزية</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان بالإنجليزية</label>
                 <input
                   type="text"
                   value={heroTitleEn}
                   onChange={(e) => setHeroTitleEn(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                   dir="ltr"
                 />
               </div>
 
-              <div className="space-y-1 sm:col-span-2">
-                <label className="text-gray-300">الوصف الفرعي</label>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black block">الوصف الفرعي</label>
                 <input
                   type="text"
                   value={heroSubtitleAr}
                   onChange={(e) => setHeroSubtitleAr(e.target.value)}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                 />
               </div>
             </div>
@@ -415,15 +409,15 @@ export default function AdminBannersPage() {
         {heroMode === 'SLIDESHOW' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-white text-sm">
+              <h3 className="font-black text-black text-sm">
                 شرائح السلايد شو الحالية ({slides.length}):
               </h3>
               <button
                 type="button"
                 onClick={addSlide}
-                className="gold-button px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
+                className="gold-button px-4 py-2 rounded-xl text-xs font-black text-black flex items-center gap-1.5 shadow-sm hover:brightness-105 cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5 text-black" />
                 <span>إضافة شريحة جديدة</span>
               </button>
             </div>
@@ -432,16 +426,16 @@ export default function AdminBannersPage() {
               {slides.map((s, idx) => (
                 <div
                   key={s.id || idx}
-                  className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4 text-xs"
+                  className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/40 space-y-4 text-xs"
                 >
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="font-bold text-[#DFC27A]">
+                  <div className="flex items-center justify-between border-b border-[#DFC27A]/20 pb-3">
+                    <span className="font-black text-[#98702B] text-sm">
                       الشريحة رقم {idx + 1}
                     </span>
                     <button
                       type="button"
                       onClick={() => removeSlide(idx)}
-                      className="text-red-400 hover:text-red-300 flex items-center gap-1 text-xs"
+                      className="text-red-600 hover:text-red-700 flex items-center gap-1 text-xs font-bold cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       <span>حذف الشريحة</span>
@@ -449,30 +443,40 @@ export default function AdminBannersPage() {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-gray-300">صورة الكمبيوتر (URL)</label>
-                      <input
-                        type="url"
+                    <div className="space-y-1 sm:col-span-2 lg:col-span-3">
+                      <MediaUploader
+                        label="صورة الكمبيوتر (تضغط وترفع لكلاوديناري)"
                         value={s.desktopImage}
-                        onChange={(e) => updateSlideField(idx, 'desktopImage', e.target.value)}
-                        className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-1.5 text-white"
-                        dir="ltr"
+                        onChange={(url) => updateSlideField(idx, 'desktopImage', url)}
+                        acceptType="image"
+                        folder="banners"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-gray-300">صورة الموبايل (URL)</label>
+                      <label className="text-black font-black block">عنوان الشريحة</label>
                       <input
-                        type="url"
-                        value={s.mobileImage}
-                        onChange={(e) => updateSlideField(idx, 'mobileImage', e.target.value)}
-                        className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-1.5 text-white"
+                        type="text"
+                        value={s.titleAr}
+                        onChange={(e) => updateSlideField(idx, 'titleAr', e.target.value)}
+                        className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-black font-black block">رابط التحويل عند الضغط</label>
+                      <input
+                        type="text"
+                        value={s.link}
+                        onChange={(e) => updateSlideField(idx, 'link', e.target.value)}
+                        placeholder="/perfumes"
+                        className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                         dir="ltr"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-gray-300">مدة العرض (بالثواني)</label>
+                      <label className="text-black font-black block">مدة العرض (بالثواني)</label>
                       <input
                         type="number"
                         min="2"
@@ -481,39 +485,7 @@ export default function AdminBannersPage() {
                         onChange={(e) =>
                           updateSlideField(idx, 'durationSeconds', parseInt(e.target.value) || 5)
                         }
-                        className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-1.5 text-white"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-gray-300">عنوان الشريحة</label>
-                      <input
-                        type="text"
-                        value={s.titleAr}
-                        onChange={(e) => updateSlideField(idx, 'titleAr', e.target.value)}
-                        className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-1.5 text-white"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-gray-300">رابط التحويل عند الضغط</label>
-                      <input
-                        type="text"
-                        value={s.link}
-                        onChange={(e) => updateSlideField(idx, 'link', e.target.value)}
-                        placeholder="/perfumes/for-him"
-                        className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-1.5 text-white"
-                        dir="ltr"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-gray-300">نص الزر</label>
-                      <input
-                        type="text"
-                        value={s.buttonTextAr}
-                        onChange={(e) => updateSlideField(idx, 'buttonTextAr', e.target.value)}
-                        className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-1.5 text-white"
+                        className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                       />
                     </div>
                   </div>
@@ -527,14 +499,14 @@ export default function AdminBannersPage() {
       {/* ============================================================== */}
       {/* 2. PROMOTIONAL BANNERS MANAGEMENT                              */}
       {/* ============================================================== */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DFC27A]/20 pb-4">
           <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#C49A45]" />
+            <h2 className="text-lg font-black text-black flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-[#98702B]" />
               <span>قسم البانرات الإعلانية (بانر عريض + بانران صغيران)</span>
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-neutral-600 mt-0.5">
               تعديل صور ونصوص وروابط البانرات الإعلانية الترويجية في الصفحة الرئيسية
             </p>
           </div>
@@ -542,52 +514,51 @@ export default function AdminBannersPage() {
           <button
             onClick={handleSavePromo}
             disabled={saving}
-            className="gold-button px-6 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-gold-glow"
+            className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-black" />
             <span>{saving ? 'جاري الحفظ...' : 'حفظ البانرات الإعلانية'}</span>
           </button>
         </div>
 
         {/* 1. Wide Banner Form */}
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-3 text-xs">
-          <span className="font-bold text-white text-sm block">1. البانر الإعلاني العريض:</span>
+        <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-3 text-xs">
+          <span className="font-black text-black text-sm block">1. البانر الإعلاني العريض:</span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-gray-300">العنوان بالعربية</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">العنوان بالعربية</label>
               <input
                 type="text"
                 value={promoWide.titleAr || ''}
                 onChange={(e) => setPromoWide({ ...promoWide, titleAr: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-gray-300">الوصف</label>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">الوصف</label>
               <input
                 type="text"
                 value={promoWide.subtitleAr || ''}
                 onChange={(e) => setPromoWide({ ...promoWide, subtitleAr: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-gray-300">رابط صورة الكمبيوتر (1200x800)</label>
-              <input
-                type="url"
+            <div className="space-y-1.5 sm:col-span-2">
+              <MediaUploader
+                label="صورة البانر العريض (تضغط وترفع لكلاوديناري)"
                 value={promoWide.desktopImage || ''}
-                onChange={(e) => setPromoWide({ ...promoWide, desktopImage: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                dir="ltr"
+                onChange={(url) => setPromoWide({ ...promoWide, desktopImage: url })}
+                acceptType="image"
+                folder="banners"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-gray-300">رابط الانتقال (Link)</label>
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-black font-black block">رابط الانتقال (Link)</label>
               <input
                 type="text"
                 value={promoWide.link || ''}
                 onChange={(e) => setPromoWide({ ...promoWide, link: e.target.value })}
-                className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                 dir="ltr"
               />
             </div>
@@ -597,35 +568,34 @@ export default function AdminBannersPage() {
         {/* 2. Small Banners 1 and 2 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* Small Banner 1 */}
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-3 text-xs">
-            <span className="font-bold text-white text-sm block">2. البانر الإعلاني الصغير الأول:</span>
+          <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-3 text-xs">
+            <span className="font-black text-black text-sm block">2. البانر الإعلاني الصغير الأول:</span>
             <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-gray-300">العنوان</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان</label>
                 <input
                   type="text"
                   value={promoSmall1.titleAr || ''}
                   onChange={(e) => setPromoSmall1({ ...promoSmall1, titleAr: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-gray-300">رابط الصورة (URL)</label>
-                <input
-                  type="url"
+              <div className="space-y-1.5">
+                <MediaUploader
+                  label="صورة البانر الصغير 1"
                   value={promoSmall1.desktopImage || ''}
-                  onChange={(e) => setPromoSmall1({ ...promoSmall1, desktopImage: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                  dir="ltr"
+                  onChange={(url) => setPromoSmall1({ ...promoSmall1, desktopImage: url })}
+                  acceptType="image"
+                  folder="banners"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-gray-300">رابط الانتقال</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">رابط الانتقال</label>
                 <input
                   type="text"
                   value={promoSmall1.link || ''}
                   onChange={(e) => setPromoSmall1({ ...promoSmall1, link: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                   dir="ltr"
                 />
               </div>
@@ -633,35 +603,34 @@ export default function AdminBannersPage() {
           </div>
 
           {/* Small Banner 2 */}
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-3 text-xs">
-            <span className="font-bold text-white text-sm block">3. البانر الإعلاني الصغير الثاني:</span>
+          <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-3 text-xs">
+            <span className="font-black text-black text-sm block">3. البانر الإعلاني الصغير الثاني:</span>
             <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-gray-300">العنوان</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان</label>
                 <input
                   type="text"
                   value={promoSmall2.titleAr || ''}
                   onChange={(e) => setPromoSmall2({ ...promoSmall2, titleAr: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-gray-300">رابط الصورة (URL)</label>
-                <input
-                  type="url"
+              <div className="space-y-1.5">
+                <MediaUploader
+                  label="صورة البانر الصغير 2"
                   value={promoSmall2.desktopImage || ''}
-                  onChange={(e) => setPromoSmall2({ ...promoSmall2, desktopImage: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
-                  dir="ltr"
+                  onChange={(url) => setPromoSmall2({ ...promoSmall2, desktopImage: url })}
+                  acceptType="image"
+                  folder="banners"
                 />
               </div>
-              <div className="space-y-1">
-                <label className="text-gray-300">رابط الانتقال</label>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">رابط الانتقال</label>
                 <input
                   type="text"
                   value={promoSmall2.link || ''}
                   onChange={(e) => setPromoSmall2({ ...promoSmall2, link: e.target.value })}
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                   dir="ltr"
                 />
               </div>

@@ -96,21 +96,21 @@ export default function AdminShippingPaymentPage() {
   return (
     <div className="space-y-8 pb-12">
       <div>
-        <h1 className="text-2xl font-black text-white">إدارة وسائل الشحن والدفع</h1>
-        <p className="text-xs text-gray-400 mt-1">
+        <h1 className="text-2xl font-black text-black">إدارة وسائل الشحن والدفع</h1>
+        <p className="text-xs text-neutral-600 mt-1">
           تحديد أسعار الشحن، فترات التوصيل، حد الشحن المجاني، وأرقام التحويل الإلكتروني (انستاباي وفودافون كاش)
         </p>
       </div>
 
       {/* 1. Electronic Payment Numbers Control (InstaPay & Vodafone Cash) */}
-      <form onSubmit={handleSavePaymentSettings} className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-4">
+      <form onSubmit={handleSavePaymentSettings} className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#DFC27A]/20 pb-4 gap-4">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Smartphone className="w-5 h-5 text-[#C49A45]" />
+            <h2 className="text-base font-black text-black flex items-center gap-2">
+              <Smartphone className="w-5 h-5 text-[#98702B]" />
               <span>أرقام وحسابات التحويل الإلكتروني (انستاباي & فودافون كاش)</span>
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-neutral-600 mt-0.5">
               هذه الأرقام تظهر للعملاء في صفحة الدفع مباشرة لنسخها والتحويل عليها
             </p>
           </div>
@@ -118,28 +118,28 @@ export default function AdminShippingPaymentPage() {
           <button
             type="submit"
             disabled={savingPayment}
-            className="gold-button px-6 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-gold-glow self-start sm:self-auto"
+            className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 self-start sm:self-auto cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-black" />
             <span>{savingPayment ? 'جاري الحفظ...' : 'حفظ أرقام الدفع'}</span>
           </button>
         </div>
 
         {paymentMessage && (
-          <div className="p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold flex items-center gap-2">
-            <Check className="w-4 h-4 text-emerald-400" />
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-black flex items-center gap-2">
+            <Check className="w-4 h-4 text-emerald-600" />
             <span>{paymentMessage}</span>
           </div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs">
           {/* InstaPay Number */}
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-            <div className="flex items-center gap-2 text-white font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#C49A45]" />
+          <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
+            <div className="flex items-center gap-2 text-black font-black">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#98702B]" />
               <label>رقم هاتف انستاباي (InstaPay)</label>
             </div>
-            <p className="text-[11px] text-gray-400">
+            <p className="text-[11px] text-neutral-600">
               الرقم المسجل في تطبيق InstaPay الذي سيقوم العميل بالتحويل عليه
             </p>
             <input
@@ -150,18 +150,18 @@ export default function AdminShippingPaymentPage() {
                 setPaymentSettings({ ...paymentSettings, payment_instapay_number: e.target.value })
               }
               placeholder="010XXXXXXXX"
-              className="w-full bg-[#181818] border border-white/15 focus:border-[#C49A45] rounded-xl px-3.5 py-2.5 text-white font-bold text-sm tracking-wider outline-none"
+              className="w-full bg-white border border-[#DFC27A]/40 focus:border-[#C49A45] rounded-xl px-3.5 py-2.5 text-black font-black text-sm tracking-wider outline-none"
               dir="ltr"
             />
           </div>
 
           {/* Vodafone Cash Number */}
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-            <div className="flex items-center gap-2 text-white font-bold">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
+          <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
+            <div className="flex items-center gap-2 text-black font-black">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-600" />
               <label>رقم محفظة فودافون كاش / محافظ إلكترونية</label>
             </div>
-            <p className="text-[11px] text-gray-400">
+            <p className="text-[11px] text-neutral-600">
               رقم المحفظة الذكية للتحويل (فودافون كاش، اتصالات، أورنج، وي)
             </p>
             <input
@@ -172,18 +172,18 @@ export default function AdminShippingPaymentPage() {
                 setPaymentSettings({ ...paymentSettings, payment_vodafone_cash_number: e.target.value })
               }
               placeholder="010XXXXXXXX"
-              className="w-full bg-[#181818] border border-white/15 focus:border-[#C49A45] rounded-xl px-3.5 py-2.5 text-white font-bold text-sm tracking-wider outline-none"
+              className="w-full bg-white border border-[#DFC27A]/40 focus:border-[#C49A45] rounded-xl px-3.5 py-2.5 text-black font-black text-sm tracking-wider outline-none"
               dir="ltr"
             />
           </div>
 
           {/* Account Name */}
-          <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-            <div className="flex items-center gap-2 text-white font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-2">
+            <div className="flex items-center gap-2 text-black font-black">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
               <label>اسم صاحب الحساب / المستلم</label>
             </div>
-            <p className="text-[11px] text-gray-400">
+            <p className="text-[11px] text-neutral-600">
               الاسم الذي يظهر للعميل في التطبيق للتأكد من صحة التحويل
             </p>
             <input
@@ -193,16 +193,16 @@ export default function AdminShippingPaymentPage() {
                 setPaymentSettings({ ...paymentSettings, payment_account_name: e.target.value })
               }
               placeholder="روائع للعطور (RAWAEI)"
-              className="w-full bg-[#181818] border border-white/15 focus:border-[#C49A45] rounded-xl px-3.5 py-2.5 text-white font-bold text-sm outline-none"
+              className="w-full bg-white border border-[#DFC27A]/40 focus:border-[#C49A45] rounded-xl px-3.5 py-2.5 text-black font-black text-sm outline-none"
             />
           </div>
         </div>
       </form>
 
       {/* 2. Shipping Methods */}
-      <div className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-6">
-        <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-white/10 pb-4">
-          <Truck className="w-5 h-5 text-[#C49A45]" />
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6">
+        <h2 className="text-base font-black text-black flex items-center gap-2 border-b border-[#DFC27A]/20 pb-4">
+          <Truck className="w-5 h-5 text-[#98702B]" />
           <span>طرق الشحن والتوصيل المدعومة داخل مصر</span>
         </h2>
 
@@ -210,24 +210,24 @@ export default function AdminShippingPaymentPage() {
           {shippingMethods.map((sm, idx) => (
             <div
               key={sm.id}
-              className="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-4 text-xs"
+              className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-4 text-xs"
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-[#DFC27A] text-sm">
+                <span className="font-black text-black text-sm">
                   {sm.nameAr}
                 </span>
                 <span
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                    sm.isActive ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
+                  className={`px-3 py-1 rounded-full text-[11px] font-black ${
+                    sm.isActive ? 'bg-emerald-100 text-emerald-950 border border-emerald-300' : 'bg-red-100 text-red-950 border border-red-300'
                   }`}
                 >
-                  {sm.isActive ? 'مفعل' : 'معطل'}
+                  {sm.isActive ? 'مفعل ✓' : 'معطل ✕'}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <label className="text-gray-300">سعر الشحن الأساسي (ج.م)</label>
+                <div className="space-y-1.5">
+                  <label className="text-black font-black block">سعر الشحن الأساسي (ج.م)</label>
                   <input
                     type="number"
                     value={sm.cost}
@@ -236,12 +236,12 @@ export default function AdminShippingPaymentPage() {
                       copy[idx].cost = parseFloat(e.target.value) || 0;
                       setShippingMethods(copy);
                     }}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                    className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-black font-black focus:outline-none focus:border-[#C49A45]"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-gray-300">شحن مجاني للطلبات فوق (ج.م)</label>
+                <div className="space-y-1.5">
+                  <label className="text-black font-black block">شحن مجاني للطلبات فوق (ج.م)</label>
                   <input
                     type="number"
                     value={sm.freeShippingAbove || ''}
@@ -251,12 +251,12 @@ export default function AdminShippingPaymentPage() {
                       setShippingMethods(copy);
                     }}
                     placeholder="800"
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white font-bold"
+                    className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-black font-black focus:outline-none focus:border-[#C49A45]"
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-gray-300">مدة التوصيل المقدرة</label>
+                <div className="space-y-1.5">
+                  <label className="text-black font-black block">مدة التوصيل المقدرة</label>
                   <input
                     type="text"
                     value={sm.estimatedDays || ''}
@@ -265,13 +265,13 @@ export default function AdminShippingPaymentPage() {
                       copy[idx].estimatedDays = e.target.value;
                       setShippingMethods(copy);
                     }}
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+                    className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-black font-bold focus:outline-none focus:border-[#C49A45]"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                <label className="flex items-center gap-2 cursor-pointer text-gray-300">
+              <div className="flex items-center justify-between pt-3 border-t border-[#DFC27A]/20">
+                <label className="flex items-center gap-2 cursor-pointer text-black font-bold">
                   <input
                     type="checkbox"
                     checked={sm.isActive}
@@ -280,7 +280,7 @@ export default function AdminShippingPaymentPage() {
                       copy[idx].isActive = e.target.checked;
                       setShippingMethods(copy);
                     }}
-                    className="accent-[#C49A45]"
+                    className="accent-[#C49A45] w-4 h-4"
                   />
                   <span>تفعيل طريقة الشحن هذه</span>
                 </label>
@@ -288,7 +288,7 @@ export default function AdminShippingPaymentPage() {
                 <button
                   type="button"
                   onClick={() => handleUpdateShipping(sm)}
-                  className="gold-button px-5 py-1.5 rounded-xl font-bold text-xs"
+                  className="gold-button px-5 py-2 rounded-xl font-black text-black text-xs shadow-sm hover:brightness-105 cursor-pointer"
                 >
                   حفظ التعديل
                 </button>

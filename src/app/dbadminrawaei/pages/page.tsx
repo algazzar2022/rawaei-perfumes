@@ -81,8 +81,8 @@ export default function AdminPagesManager() {
     <div className="space-y-6 pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white">إدارة صفحات الموقع الثابتة (CMS)</h1>
-          <p className="text-xs text-gray-400 mt-1">
+          <h1 className="text-2xl font-black text-black">إدارة صفحات الموقع الثابتة (CMS)</h1>
+          <p className="text-xs text-neutral-600 mt-1">
             تعديل صفحات (من نحن، سياسة الخصوصية، الشروط والأحكام، وسياسة الشحن والاسترجاع)
           </p>
         </div>
@@ -90,15 +90,15 @@ export default function AdminPagesManager() {
         <a
           href={`/page/${selectedSlug}`}
           target="_blank"
-          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 self-start sm:self-auto"
+          className="px-4 py-2 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#DFC27A]/40 text-xs font-bold text-black flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
         >
-          <ExternalLink className="w-3.5 h-3.5 text-[#C49A45]" />
+          <ExternalLink className="w-3.5 h-3.5 text-[#98702B]" />
           <span>معاينة الصفحة المباشرة</span>
         </a>
       </div>
 
       {message && (
-        <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-black">
           {message}
         </div>
       )}
@@ -110,10 +110,10 @@ export default function AdminPagesManager() {
             key={p.slug}
             type="button"
             onClick={() => handleSelectPage(p.slug)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
               selectedSlug === p.slug
-                ? 'bg-[#C49A45] text-black shadow-gold-glow'
-                : 'bg-white/5 text-gray-300 hover:text-white'
+                ? 'gold-button text-black shadow-sm'
+                : 'bg-white border border-neutral-300 text-neutral-800 hover:bg-neutral-100'
             }`}
           >
             {p.titleAr}
@@ -124,62 +124,62 @@ export default function AdminPagesManager() {
       {/* Editor Form */}
       <form
         onSubmit={handleSave}
-        className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-5"
+        className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-5"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">عنوان الصفحة بالعربية</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">عنوان الصفحة بالعربية</label>
             <input
               type="text"
               required
               value={titleAr}
               onChange={(e) => setTitleAr(e.target.value)}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">عنوان الصفحة بالإنجليزية</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">عنوان الصفحة بالإنجليزية</label>
             <input
               type="text"
               required
               value={titleEn}
               onChange={(e) => setTitleEn(e.target.value)}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
               dir="ltr"
             />
           </div>
 
-          <div className="space-y-1 sm:col-span-2">
-            <label className="text-gray-300 font-semibold">محتوى الصفحة بالعربية (HTML مدعوم)</label>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label className="text-black font-black block">محتوى الصفحة بالعربية (HTML مدعوم)</label>
             <textarea
               rows={8}
               value={contentAr}
               onChange={(e) => setContentAr(e.target.value)}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl p-3 text-white font-mono text-xs"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-black font-mono text-xs focus:outline-none focus:border-[#C49A45] focus:bg-white leading-relaxed"
             />
           </div>
 
-          <div className="space-y-1 sm:col-span-2">
-            <label className="text-gray-300 font-semibold">محتوى الصفحة بالإنجليزية (HTML مدعوم)</label>
+          <div className="space-y-1.5 sm:col-span-2">
+            <label className="text-black font-black block">محتوى الصفحة بالإنجليزية (HTML مدعوم)</label>
             <textarea
               rows={6}
               value={contentEn}
               onChange={(e) => setContentEn(e.target.value)}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl p-3 text-white font-mono text-xs"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-black font-mono text-xs focus:outline-none focus:border-[#C49A45] focus:bg-white leading-relaxed"
               dir="ltr"
             />
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/10 flex justify-end">
+        <div className="pt-4 border-t border-[#DFC27A]/20 flex justify-end">
           <button
             type="submit"
             disabled={saving}
-            className="gold-button px-8 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-gold-glow"
+            className="gold-button px-8 py-3 rounded-xl font-black text-black text-xs flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
-            <span>{saving ? 'جاري الحفظ...' : 'حفظ الصفحة'}</span>
+            <Save className="w-4 h-4 text-black" />
+            <span>{saving ? 'جاري الحفظ...' : 'حفظ ونشر التعديلات'}</span>
           </button>
         </div>
       </form>

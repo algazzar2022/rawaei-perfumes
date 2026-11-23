@@ -53,74 +53,74 @@ export default function AdminSEOSettings() {
   return (
     <div className="space-y-6 pb-12">
       <div>
-        <h1 className="text-2xl font-black text-white">إعدادات محركات البحث وSEO</h1>
-        <p className="text-xs text-gray-400 mt-1">
+        <h1 className="text-2xl font-black text-black">إعدادات محركات البحث وSEO</h1>
+        <p className="text-xs text-neutral-600 mt-1">
           تهيئة الكلمات المفتاحية، عناوين الميتا، وبطاقات OpenGraph لمحركات البحث مثل Google
         </p>
       </div>
 
       {message && (
-        <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold">
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-black">
           {message}
         </div>
       )}
 
       <form
         onSubmit={handleSave}
-        className="glass-card rounded-3xl p-6 sm:p-8 border border-[#C49A45]/30 space-y-6"
+        className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6"
       >
         <div className="space-y-4 text-xs">
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">عنوان الموقع الرئيسي في جوجل (Meta Title)</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">عنوان الموقع الرئيسي في جوجل (Meta Title)</label>
             <input
               type="text"
               value={settings.seo_meta_title}
               onChange={(e) => setSettings({ ...settings, seo_meta_title: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2.5 text-white"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">وصف الموقع لمحركات البحث (Meta Description)</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">وصف الموقع لمحركات البحث (Meta Description)</label>
             <textarea
               rows={3}
               value={settings.seo_meta_description}
               onChange={(e) => setSettings({ ...settings, seo_meta_description: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl p-3 text-white"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white leading-relaxed"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">الكلمات الدلالية المفتاحية (Keywords)</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">الكلمات الدلالية المفتاحية (Keywords)</label>
             <input
               type="text"
               value={settings.seo_keywords}
               onChange={(e) => setSettings({ ...settings, seo_keywords: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
             />
-            <span className="text-[11px] text-gray-400">افصل بين الكلمات بفواصل (مثل: عطور, دهن عود, الرياض)</span>
+            <span className="text-[11px] text-neutral-500 font-bold">افصل بين الكلمات بفواصل (مثل: عطور رجالية, بخور وعود, متجر عطور مصري)</span>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-gray-300 font-semibold">معرف إحصائيات جوجل (Google Analytics ID)</label>
+          <div className="space-y-1.5">
+            <label className="text-black font-black block">معرف إحصائيات جوجل (Google Analytics ID)</label>
             <input
               type="text"
               placeholder="G-XXXXXXXXXX"
               value={settings.google_analytics_id}
               onChange={(e) => setSettings({ ...settings, google_analytics_id: e.target.value })}
-              className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white font-mono"
+              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
               dir="ltr"
             />
           </div>
         </div>
 
-        <div className="pt-4 border-t border-white/10 flex justify-end">
+        <div className="pt-4 border-t border-[#DFC27A]/20 flex justify-end">
           <button
             type="submit"
             disabled={saving}
-            className="gold-button px-8 py-3 rounded-xl font-bold text-xs flex items-center gap-2 shadow-gold-glow"
+            className="gold-button px-8 py-3 rounded-xl font-black text-black text-xs flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-4 h-4 text-black" />
             <span>{saving ? 'جاري الحفظ...' : 'حفظ إعدادات SEO'}</span>
           </button>
         </div>
