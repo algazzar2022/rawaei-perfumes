@@ -98,7 +98,7 @@ export default function HeroBanner({ initialBanner }: HeroBannerProps) {
                     {/* Banner Image */}
                     <div className="absolute inset-0">
                       <Image
-                        src={slide.desktopImage || slide.mobileImage || 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=1920'}
+                        src={slide.desktopImage || slide.mobileImage || '/logo.png'}
                         alt="روائع للعطور"
                         fill
                         priority={index === 0}
@@ -162,7 +162,7 @@ export default function HeroBanner({ initialBanner }: HeroBannerProps) {
           {/* Banner Image */}
           <div className="absolute inset-0">
             <Image
-              src={banner.desktopImage || banner.mobileImage || 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=1920'}
+              src={banner.desktopImage || banner.mobileImage || '/logo.png'}
               alt="روائع للعطور"
               fill
               priority

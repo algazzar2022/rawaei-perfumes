@@ -19,11 +19,10 @@ export default function GenderSections() {
       titleEn: 'For Him',
       tagAr: 'تشكيلة رجالية',
       tagEn: 'COLLECTION',
-      scentsAr: '111 عطر فاخر',
-      scentsEn: '111 SCENTS',
+      scentsAr: 'عطور رجالية فاخرة',
+      scentsEn: 'MEN COLLECTION',
       link: '/perfumes/for-him',
-      // High-resolution portrait of a handsome gentleman in beige knit polo holding luxury perfume bottle
-      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1200&auto=format&fit=crop',
+      image: '/logo.png',
     },
     {
       id: 'for-her',
@@ -32,11 +31,10 @@ export default function GenderSections() {
       titleEn: 'For Her',
       tagAr: 'تشكيلة نسائية',
       tagEn: 'COLLECTION',
-      scentsAr: '80 عطر فاخر',
-      scentsEn: '80 SCENTS',
+      scentsAr: 'عطور نسائية فاخرة',
+      scentsEn: 'WOMEN COLLECTION',
       link: '/perfumes/for-her',
-      // High-resolution portrait of an elegant woman in black attire holding luxury perfume bottle
-      image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1200&auto=format&fit=crop',
+      image: '/logo.png',
     },
     {
       id: 'unisex',
@@ -45,11 +43,10 @@ export default function GenderSections() {
       titleEn: 'Unisex',
       tagAr: 'تشكيلة للجنسين',
       tagEn: 'COLLECTION',
-      scentsAr: '62 عطر فاخر',
-      scentsEn: '62 SCENTS',
+      scentsAr: 'عطور للجنسين فاخرة',
+      scentsEn: 'UNISEX COLLECTION',
       link: '/perfumes/unisex',
-      // High-resolution portrait of the couple together, holding their luxury perfume bottles in an affectionate, respectful pose
-      image: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1200&auto=format&fit=crop',
+      image: '/logo.png',
     },
   ];
 

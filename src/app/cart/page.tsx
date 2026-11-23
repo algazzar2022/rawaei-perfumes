@@ -97,7 +97,7 @@ export default function CartPage() {
             {items.map((item) => {
               const mainImg =
                 item.product.images?.[0]?.url ||
-                'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=400';
+                '/logo.png';
               const title = language === 'ar' ? item.product.nameAr : item.product.nameEn;
 
               return (

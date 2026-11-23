@@ -8,6 +8,7 @@ import PromotionalBanners from '@/components/home/PromotionalBanners';
 import VideoReviewsSection from '@/components/home/VideoReviewsSection';
 
 // Disable full static caching so admin changes appear immediately
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function HomePage() {

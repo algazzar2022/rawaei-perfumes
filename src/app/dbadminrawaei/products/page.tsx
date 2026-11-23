@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ProductDto, CategoryDto } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
+import MediaUploader from '@/components/admin/MediaUploader';
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<ProductDto[]>([]);
@@ -230,22 +231,22 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="glass-card rounded-2xl p-4 border border-white/10 flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute top-1/2 -translate-y-1/2 right-3 w-4 h-4 text-gray-400" />
+      <div className="bg-white rounded-2xl p-4 border border-[#DFC27A]/40 shadow-sm flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[220px]">
+          <Search className="absolute top-1/2 -translate-y-1/2 right-3 w-4 h-4 text-neutral-500" />
           <input
             type="text"
             placeholder="بحث بالاسم أو SKU..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#171717] border border-white/10 rounded-xl pr-9 pl-3 py-2 text-xs text-white focus:outline-none focus:border-[#C49A45]"
+            className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl pr-10 pl-3 py-2.5 text-xs text-black font-bold placeholder-[#666666] focus:outline-none focus:border-[#C49A45] focus:bg-white"
           />
         </div>
 
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className="bg-[#171717] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C49A45]"
+          className="bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
         >
           <option value="ALL">جميع التصنيفات</option>
           {categories.map((c) => (
@@ -258,7 +259,7 @@ export default function AdminProductsPage() {
         <select
           value={selectedGender}
           onChange={(e) => setSelectedGender(e.target.value)}
-          className="bg-[#171717] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C49A45]"
+          className="bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
         >
           <option value="ALL">جميع الأقسام (الجنس)</option>
           <option value="HIM">For Him (رجالي)</option>
@@ -268,92 +269,102 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Products Table */}
-      <div className="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+      <div className="bg-white rounded-3xl border border-[#DFC27A]/40 overflow-hidden shadow-md">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-right">
-            <thead className="bg-[#151515] border-b border-white/5 text-gray-400">
+            <thead className="bg-[#FAF6EE] border-b-2 border-[#DFC27A]/30 text-black">
               <tr>
-                <th className="p-4 font-semibold">الصورة</th>
-                <th className="p-4 font-semibold">اسم العطر</th>
-                <th className="p-4 font-semibold">التصنيف</th>
-                <th className="p-4 font-semibold">القسم</th>
-                <th className="p-4 font-semibold">السعر</th>
-                <th className="p-4 font-semibold">المخزون</th>
-                <th className="p-4 font-semibold">مميز؟</th>
-                <th className="p-4 font-semibold">الحالة</th>
-                <th className="p-4 font-semibold text-center">إجراءات</th>
+                <th className="p-4 font-black text-black">الصورة</th>
+                <th className="p-4 font-black text-black">اسم العطر</th>
+                <th className="p-4 font-black text-black">التصنيف</th>
+                <th className="p-4 font-black text-black text-center">القسم</th>
+                <th className="p-4 font-black text-black">السعر</th>
+                <th className="p-4 font-black text-black text-center">المخزون</th>
+                <th className="p-4 font-black text-black text-center">مميز؟</th>
+                <th className="p-4 font-black text-black text-center">الحالة</th>
+                <th className="p-4 font-black text-black text-center">إجراءات</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-gray-200">
+            <tbody className="divide-y divide-[#DFC27A]/15 text-black">
               {filteredProducts.map((p) => {
-                const img =
-                  p.images?.[0]?.url ||
-                  'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=200';
+                const img = p.images?.[0]?.url || '/logo.png';
                 return (
-                  <tr key={p.id} className="hover:bg-white/5 transition-colors">
+                  <tr key={p.id} className="hover:bg-[#FAF8F5] transition-colors">
                     <td className="p-4">
-                      <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-neutral-900 border border-white/10">
-                        <Image src={img} alt={p.nameAr} fill className="object-cover" sizes="50px" />
+                      <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-[#FAF8F5] border border-[#DFC27A]/30">
+                        <Image src={img} alt={p.nameAr} fill className="object-contain p-1" sizes="50px" />
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="font-bold text-white text-sm">{p.nameAr}</div>
-                      <div className="text-[11px] text-gray-400">{p.nameEn}</div>
-                      <div className="text-[10px] text-[#DFC27A]">SKU: {p.sku}</div>
+                      <div className="font-black text-black text-sm">{p.nameAr}</div>
+                      <div className="text-[11px] text-neutral-600 font-semibold">{p.nameEn}</div>
+                      <div className="text-[10px] text-[#98702B] font-mono font-bold">SKU: {p.sku}</div>
                     </td>
-                    <td className="p-4 text-gray-300 font-medium">
+                    <td className="p-4 text-black font-bold">
                       {p.category?.nameAr || '-'}
                     </td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 rounded-full bg-black/60 border border-white/10 text-[10px] font-bold text-[#DFC27A]">
+                    <td className="p-4 text-center">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-[11px] font-black ${
+                          p.gender === 'HER'
+                            ? 'bg-pink-100 text-pink-900 border border-pink-300'
+                            : p.gender === 'HIM'
+                            ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                            : 'bg-amber-100 text-amber-950 border border-amber-300'
+                        }`}
+                      >
                         {p.gender === 'HIM' ? 'رجالي' : p.gender === 'HER' ? 'نسائي' : 'للجنسين'}
                       </span>
                     </td>
-                    <td className="p-4 font-extrabold text-[#DFC27A] text-sm">
+                    <td className="p-4 font-black text-black text-sm">
                       {formatPrice(p.price, 'ar')}
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       <span
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
+                        className={`inline-block px-2.5 py-1 rounded-lg text-xs font-black ${
                           p.stock <= 5
-                            ? 'bg-red-500/20 text-red-300'
-                            : 'bg-emerald-500/20 text-emerald-300'
+                            ? 'bg-red-100 text-red-900 border border-red-300'
+                            : 'bg-emerald-100 text-emerald-950 border border-emerald-300'
                         }`}
                       >
                         {p.stock} قطعة
                       </span>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 text-center">
                       {p.isFeatured ? (
-                        <span className="px-2 py-0.5 rounded-full bg-[#C49A45]/20 text-[#DFC27A] font-bold text-[10px]">
-                          نعم
+                        <span className="inline-block px-2.5 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs">
+                          نعم ⭐
                         </span>
                       ) : (
-                        <span className="text-gray-500 text-[10px]">لا</span>
+                        <span className="text-neutral-500 font-bold text-xs">لا</span>
                       )}
                     </td>
-                    <td className="p-4">
-                      {p.isActive ? (
-                        <span className="text-emerald-400 font-bold">نشط</span>
-                      ) : (
-                        <span className="text-red-400 font-bold">معطل</span>
-                      )}
+                    <td className="p-4 text-center">
+                      <span
+                        className={`inline-block px-2.5 py-1 rounded-full text-xs font-black ${
+                          p.isActive
+                            ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
+                            : 'bg-neutral-100 text-neutral-800 border border-neutral-300'
+                        }`}
+                      >
+                        {p.isActive ? 'نشط ✓' : 'معطل ✕'}
+                      </span>
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => openEditModal(p)}
-                          className="p-1.5 rounded-lg bg-white/5 hover:bg-[#C49A45] hover:text-black text-gray-300 transition-colors"
-                          title="تعديل"
+                          className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm"
+                          title="تعديل العطر"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(p.id, p.nameAr)}
-                          className="p-1.5 rounded-lg bg-red-950/40 hover:bg-red-600 text-red-300 hover:text-white transition-colors"
-                          title="حذف"
+                          className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm"
+                          title="حذف العطر"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>
@@ -488,14 +499,13 @@ export default function AdminProductsPage() {
                 </div>
 
                 <div className="space-y-1 sm:col-span-2">
-                  <label className="text-gray-300 font-semibold">رابط صورة المنتج (URL)</label>
-                  <input
-                    type="url"
+                  <MediaUploader
+                    label="صورة المنتج (يتم ضغط الحجم فورياً ورفعها إلى Cloudinary)"
                     value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                    dir="ltr"
+                    onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                    acceptType="image"
+                    folder="products"
+                    placeholder="https://res.cloudinary.com/..."
                   />
                 </div>
 

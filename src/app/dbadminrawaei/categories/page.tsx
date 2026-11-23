@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Plus, Edit2, Trash2, Check, X, Layers, Sparkles } from 'lucide-react';
 import { CategoryDto } from '@/lib/types';
+import MediaUploader from '@/components/admin/MediaUploader';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
@@ -177,21 +178,21 @@ export default function AdminCategoriesPage() {
             </div>
 
             <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-              <span className="text-xs text-gray-400">
+              <span className="text-xs font-bold text-black">
                 المنتجات: {cat._count?.products || 0}
               </span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => openEditModal(cat)}
-                  className="p-2 rounded-xl bg-white/5 hover:bg-[#C49A45] hover:text-black text-gray-300 transition-colors"
-                  title="تعديل"
+                  className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm"
+                  title="تعديل التصنيف"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(cat.id, cat.nameAr)}
-                  className="p-2 rounded-xl bg-red-950/40 hover:bg-red-600 text-red-300 hover:text-white transition-colors"
-                  title="حذف"
+                  className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm"
+                  title="حذف التصنيف"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -254,14 +255,13 @@ export default function AdminCategoriesPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-gray-300 font-semibold">رابط الصورة (URL)</label>
-                <input
-                  type="url"
+                <MediaUploader
+                  label="صورة التصنيف (يتم ضغط الحجم فورياً ورفعها إلى Cloudinary)"
                   value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-[#181818] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
-                  dir="ltr"
+                  onChange={(url) => setFormData({ ...formData, image: url })}
+                  acceptType="image"
+                  folder="categories"
+                  placeholder="https://res.cloudinary.com/..."
                 />
               </div>
 

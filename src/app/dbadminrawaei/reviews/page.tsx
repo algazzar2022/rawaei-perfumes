@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { VideoReviewDto } from '@/lib/types';
+import MediaUploader from '@/components/admin/MediaUploader';
 
 export default function AdminVideoReviewsPage() {
   const [reviews, setReviews] = useState<VideoReviewDto[]>([]);
@@ -253,26 +254,26 @@ export default function AdminVideoReviewsPage() {
               </div>
 
               {/* Actions Footer */}
-              <div className="p-3 bg-[#181818] border-t border-white/5 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-gray-400">
+              <div className="p-3 bg-white border-t border-[#DFC27A]/20 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5 text-black font-bold">
                   <span>الترتيب:</span>
-                  <span className="font-bold text-white">{rev.sortOrder}</span>
+                  <span className="font-black text-black">{rev.sortOrder}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => openEditModal(rev)}
-                    className="p-1.5 rounded-lg bg-white/5 hover:bg-[#C49A45] hover:text-black text-gray-300 transition-colors"
-                    title="تعديل"
+                    className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm"
+                    title="تعديل الفيديو"
                   >
-                    <Edit2 className="w-3.5 h-3.5" />
+                    <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(rev.id)}
-                    className="p-1.5 rounded-lg bg-red-950/40 hover:bg-red-600 text-red-400 hover:text-white transition-colors"
-                    title="حذف"
+                    className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm"
+                    title="حذف الفيديو"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -325,25 +326,24 @@ export default function AdminVideoReviewsPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-gray-300 font-semibold">رابط صورة الغلاف (Poster Image) *</label>
-                <input
-                  type="url"
-                  required
-                  placeholder="https://..."
+                <MediaUploader
+                  label="صورة غلاف الفيديو (Poster Image)"
                   value={formData.posterImage}
-                  onChange={(e) => setFormData({ ...formData, posterImage: e.target.value })}
-                  className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
+                  onChange={(url) => setFormData({ ...formData, posterImage: url })}
+                  acceptType="image"
+                  folder="reviews"
+                  placeholder="https://res.cloudinary.com/..."
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-gray-300 font-semibold">رابط ملف الفيديو (MP4 / WebM / Stream)</label>
-                <input
-                  type="url"
-                  placeholder="https://...mp4"
+                <MediaUploader
+                  label="ملف الفيديو (MP4 / WebM)"
                   value={formData.videoUrl}
-                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                  className="w-full bg-[#1B1B1B] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#C49A45]"
+                  onChange={(url) => setFormData({ ...formData, videoUrl: url })}
+                  acceptType="video"
+                  folder="reviews"
+                  placeholder="https://res.cloudinary.com/..."
                 />
               </div>
 

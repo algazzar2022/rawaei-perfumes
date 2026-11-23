@@ -21,7 +21,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const mainImage =
     product.images?.find((img) => img.isMain)?.url ||
     product.images?.[0]?.url ||
-    'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=600';
+    '/logo.png';
 
   const title = language === 'ar' ? product.nameAr : product.nameEn;
   const defaultSize = product.sizes?.find((s) => s.isDefault) || product.sizes?.[0];

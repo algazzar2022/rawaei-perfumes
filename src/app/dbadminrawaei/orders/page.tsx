@@ -178,29 +178,29 @@ export default function AdminOrdersPage() {
                     <td className="p-4 font-extrabold text-[#DFC27A]">
                       {formatPrice(o.totalAmount, 'ar')}
                     </td>
-                    <td className="p-4 text-gray-300">
+                    <td className="p-4 text-black font-semibold">
                       {o.paymentMethod === 'cod' ? (
-                        <span className="text-gray-300">عند الاستلام</span>
+                        <span className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-900 border border-neutral-300 font-bold">عند الاستلام</span>
                       ) : o.paymentMethod === 'instapay' ? (
-                        <span className="px-2 py-0.5 rounded-md bg-[#C49A45]/20 text-[#DFC27A] font-bold">انستاباي ⚡</span>
+                        <span className="px-2.5 py-1 rounded-md bg-purple-100 text-purple-950 border border-purple-300 font-bold">انستاباي ⚡</span>
                       ) : o.paymentMethod === 'vodafone_cash' ? (
-                        <span className="px-2 py-0.5 rounded-md bg-red-500/20 text-red-300 font-bold">فودافون كاش 📱</span>
+                        <span className="px-2.5 py-1 rounded-md bg-red-100 text-red-950 border border-red-300 font-bold">فودافون كاش 📱</span>
                       ) : (
                         o.paymentMethod
                       )}
                     </td>
                     <td className="p-4">
                       <span
-                        className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                        className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
                           o.status === 'DELIVERED'
-                            ? 'bg-emerald-500/20 text-emerald-300'
+                            ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
                             : o.status === 'SHIPPED'
-                            ? 'bg-blue-500/20 text-blue-300'
+                            ? 'bg-blue-100 text-blue-950 border border-blue-300'
                             : o.status === 'PROCESSING'
-                            ? 'bg-purple-500/20 text-purple-300'
+                            ? 'bg-purple-100 text-purple-950 border border-purple-300'
                             : o.status === 'CANCELLED'
-                            ? 'bg-red-500/20 text-red-300'
-                            : 'bg-amber-500/20 text-amber-300'
+                            ? 'bg-red-100 text-red-950 border border-red-300'
+                            : 'bg-amber-100 text-amber-950 border border-amber-300'
                         }`}
                       >
                         {o.status}
@@ -209,7 +209,7 @@ export default function AdminOrdersPage() {
                     <td className="p-4 text-center">
                       <button
                         onClick={() => openOrderModal(o)}
-                        className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-[#C49A45] hover:text-black text-gray-300 transition-colors font-semibold"
+                        className="px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-[#C49A45] text-amber-950 hover:text-black border border-amber-300 transition-colors font-black shadow-sm"
                       >
                         عرض وإدارة
                       </button>

@@ -52,7 +52,7 @@ export default function PromotionalBanners({ initialBanners }: PromoBannersProps
             >
               <div className="absolute inset-0">
                 <Image
-                  src={wideBanner.desktopImage || 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1200'}
+                  src={wideBanner.desktopImage || '/logo.png'}
                   alt={wideBanner.titleAr || 'عرض روائع'}
                   fill
                   className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
@@ -97,7 +97,7 @@ export default function PromotionalBanners({ initialBanners }: PromoBannersProps
               >
                 <div className="absolute inset-0">
                   <Image
-                    src={smallBanner1.desktopImage || 'https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?q=80&w=800'}
+                    src={smallBanner1.desktopImage || '/logo.png'}
                     alt={smallBanner1.titleAr || 'مخمريات روائع'}
                     fill
                     className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
@@ -133,7 +133,7 @@ export default function PromotionalBanners({ initialBanners }: PromoBannersProps
               >
                 <div className="absolute inset-0">
                   <Image
-                    src={smallBanner2.desktopImage || 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?q=80&w=800'}
+                    src={smallBanner2.desktopImage || '/logo.png'}
                     alt={smallBanner2.titleAr || 'معطرات روائع'}
                     fill
                     className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
