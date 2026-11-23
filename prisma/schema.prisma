@@ -1,0 +1,499 @@
+// Prisma schema for RAWAEI PERFUMES (روائع للعطور)
+// Compatible with SQLite for zero-setup local execution and easily switchable to PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------------
+// 1. Users & Authentication
+// -------------------------------------------------------------
+model User {
+  id            String      @id @default(uuid())
+  name          String
+  email         String      @unique
+  passwordHash  String
+  role          String      @default("CUSTOMER") // ADMIN, MANAGER, STAFF, CUSTOMER
+  phone         String?
+  avatar        String?
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  customer      Customer?
+  orders        Order[]
+  carts         Cart[]
+
+  @@index([email])
+  @@index([role])
+}
+
+// -------------------------------------------------------------
+// 2. Customers & Addresses
+// -------------------------------------------------------------
+model Customer {
+  id            String      @id @default(uuid())
+  userId        String?     @unique
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name          String
+  email         String
+  phone         String
+  city          String?
+  totalOrders   Int         @default(0)
+  totalSpent    Float       @default(0.0)
+  notes         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Address {
+  id            String      @id @default(uuid())
+  customerId    String
+  customer      Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  title         String      @default("المنزل") // Home, Work, etc.
+  recipientName String
+  phone         String
+  city          String
+  district      String?
+  addressLine   String
+  postalCode    String?
+  isDefault     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([customerId])
+}
+
+// -------------------------------------------------------------
+// 3. Categories
+// -------------------------------------------------------------
+model Category {
+  id            String      @id @default(uuid())
+  nameAr        String
+  nameEn        String
+  slug          String      @unique
+  descriptionAr String?
+  descriptionEn String?
+  image         String?
+  icon          String?     // Lucide icon name or SVG
+  sortOrder     Int         @default(0)
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  products      Product[]
+
+  @@index([slug])
+  @@index([sortOrder])
+}
+
+// -------------------------------------------------------------
+// 4. Products & Variations
+// -------------------------------------------------------------
+model Product {
+  id              String            @id @default(uuid())
+  nameAr          String
+  nameEn          String
+  slug            String            @unique
+  descriptionAr   String
+  descriptionEn   String
+  price           Float
+  compareAtPrice  Float?
+  costPrice       Float?
+  sku             String?           @unique
+  barcode         String?
+  stock           Int               @default(0)
+  volumeMl        Int               @default(100) // Default bottle size (e.g. 50, 75, 100, 150)
+  gender          String            @default("UNISEX") // HIM, HER, UNISEX
+  scentFamily     String?           // Woody, Oriental, Citrus, Floral, etc.
+  topNotes        String?           // الافتتاحية (e.g. Bergamot, Lavender)
+  heartNotes      String?           // قلب العطر (e.g. Cardamom, Jasmine)
+  baseNotes       String?           // القاعدة (e.g. Agarwood Oud, Amber, Musk)
+  longevity       String?           // ثبات العطر (e.g. 12-24 hours)
+  sillage         String?           // فوحان العطر (e.g. Strong, Medium)
+  isFeatured      Boolean           @default(false)
+  isActive        Boolean           @default(true)
+  rating          Float             @default(5.0)
+  reviewCount     Int               @default(0)
+  categoryId      String
+  category        Category          @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  images          ProductImage[]
+  variants        ProductVariant[]
+  sizes           ProductSize[]
+  featuredEntries FeaturedProduct[]
+  orderItems      OrderItem[]
+  cartItems       CartItem[]
+  collectionItems CollectionItem[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([gender])
+  @@index([isFeatured])
+  @@index([price])
+}
+
+model ProductImage {
+  id            String      @id @default(uuid())
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url           String
+  alt           String?
+  isMain        Boolean     @default(false)
+  sortOrder     Int         @default(0)
+  createdAt     DateTime    @default(now())
+
+  @@index([productId])
+  @@index([sortOrder])
+}
+
+model ProductVariant {
+  id            String      @id @default(uuid())
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  nameAr        String
+  nameEn        String
+  sku           String?     @unique
+  price         Float
+  stock         Int         @default(0)
+  image         String?
+  createdAt     DateTime    @default(now())
+
+  @@index([productId])
+}
+
+model ProductSize {
+  id            String      @id @default(uuid())
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sizeMl        Int         // 50, 75, 100, 150, 200
+  price         Float
+  comparePrice  Float?
+  stock         Int         @default(10)
+  isDefault     Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  @@index([productId])
+}
+
+// -------------------------------------------------------------
+// 5. Product Collections
+// -------------------------------------------------------------
+model ProductCollection {
+  id            String            @id @default(uuid())
+  nameAr        String
+  nameEn        String
+  slug          String            @unique
+  descriptionAr String?
+  descriptionEn String?
+  image         String?
+  isActive      Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  items         CollectionItem[]
+
+  @@index([slug])
+}
+
+model CollectionItem {
+  id            String            @id @default(uuid())
+  collectionId  String
+  collection    ProductCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder     Int               @default(0)
+
+  @@unique([collectionId, productId])
+  @@index([collectionId])
+  @@index([productId])
+}
+
+// -------------------------------------------------------------
+// 6. Featured Products Section
+// -------------------------------------------------------------
+model FeaturedProduct {
+  id            String      @id @default(uuid())
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder     Int         @default(0)
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  @@unique([productId])
+  @@index([sortOrder])
+}
+
+// -------------------------------------------------------------
+// 7. Banners & Slides
+// -------------------------------------------------------------
+model Banner {
+  id            String        @id @default(uuid())
+  type          String        // HERO, PROMO_WIDE, PROMO_SMALL_1, PROMO_SMALL_2
+  mode          String        @default("STATIC") // STATIC, SLIDESHOW, VIDEO
+  titleAr       String?
+  titleEn       String?
+  subtitleAr    String?
+  subtitleEn    String?
+  link          String?
+  buttonTextAr  String?
+  buttonTextEn  String?
+  desktopImage  String?
+  mobileImage   String?
+  videoUrl      String?
+  autoplaySpeed Int           @default(5000) // ms duration per slide
+  isActive      Boolean       @default(true)
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  slides        BannerSlide[]
+
+  @@index([type])
+  @@index([isActive])
+}
+
+model BannerSlide {
+  id              String      @id @default(uuid())
+  bannerId        String
+  banner          Banner      @relation(fields: [bannerId], references: [id], onDelete: Cascade)
+  titleAr         String?
+  titleEn         String?
+  subtitleAr      String?
+  subtitleEn      String?
+  desktopImage    String
+  mobileImage     String?
+  link            String?
+  buttonTextAr    String?     @default("تسوق الآن")
+  buttonTextEn    String?     @default("Shop Now")
+  durationSeconds Int         @default(5)
+  sortOrder       Int         @default(0)
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([bannerId])
+  @@index([sortOrder])
+}
+
+// -------------------------------------------------------------
+// 8. Carts & Cart Items
+// -------------------------------------------------------------
+model Cart {
+  id            String      @id @default(uuid())
+  sessionId     String      @unique
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  couponCode    String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  items         CartItem[]
+
+  @@index([sessionId])
+  @@index([userId])
+}
+
+model CartItem {
+  id            String      @id @default(uuid())
+  cartId        String
+  cart          Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sizeMl        Int         @default(100)
+  quantity      Int         @default(1)
+  unitPrice     Float
+  createdAt     DateTime    @default(now())
+
+  @@unique([cartId, productId, sizeMl])
+  @@index([cartId])
+  @@index([productId])
+}
+
+// -------------------------------------------------------------
+// 9. Orders & Order Items
+// -------------------------------------------------------------
+model Order {
+  id              String        @id @default(uuid())
+  orderNumber     String        @unique // e.g. RW-2026-00101
+  customerId      String?
+  customer        Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status          String        @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  shippingCity    String
+  shippingAddress String
+  shippingMethod  String        @default("standard")
+  paymentMethod   String        @default("cod") // cod, card, tabby, tamara
+  paymentStatus   String        @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  subtotal        Float
+  discountAmount  Float         @default(0.0)
+  shippingCost    Float         @default(0.0)
+  taxAmount       Float         @default(0.0)
+  totalAmount     Float
+  couponCode      String?
+  customerNotes   String?
+  adminNotes      String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  items           OrderItem[]
+  payments        Payment[]
+
+  @@index([orderNumber])
+  @@index([status])
+  @@index([customerId])
+  @@index([customerEmail])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id            String      @id @default(uuid())
+  orderId       String
+  order         Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productNameAr String
+  productNameEn String
+  sizeMl        Int         @default(100)
+  unitPrice     Float
+  quantity      Int
+  totalPrice    Float
+  createdAt     DateTime    @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// -------------------------------------------------------------
+// 10. Coupons & Discounts
+// -------------------------------------------------------------
+model Coupon {
+  id            String      @id @default(uuid())
+  code          String      @unique
+  discountType  String      @default("PERCENTAGE") // PERCENTAGE, FIXED
+  discountValue Float
+  minOrderValue Float?      @default(0.0)
+  maxDiscount   Float?
+  usageLimit    Int?
+  usedCount     Int         @default(0)
+  startDate     DateTime?
+  expiresAt     DateTime?
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}
+
+// -------------------------------------------------------------
+// 11. Payments
+// -------------------------------------------------------------
+model Payment {
+  id            String      @id @default(uuid())
+  orderId       String
+  order         Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method        String      // cod, credit_card, mada, tabby, tamara
+  status        String      @default("PENDING") // PENDING, COMPLETED, FAILED, REFUNDED
+  amount        Float
+  transactionId String?
+  rawResponse   String?
+  createdAt     DateTime    @default(now())
+
+  @@index([orderId])
+}
+
+// -------------------------------------------------------------
+// 12. Shipping Methods
+// -------------------------------------------------------------
+model ShippingMethod {
+  id                 String      @id @default(uuid())
+  nameAr             String
+  nameEn             String
+  cost               Float       @default(0.0)
+  estimatedDays      String?     // e.g. "2-4 أيام عمل"
+  freeShippingAbove  Float?
+  isActive           Boolean     @default(true)
+  sortOrder          Int         @default(0)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@index([isActive])
+}
+
+// -------------------------------------------------------------
+// 13. Pages (CMS)
+// -------------------------------------------------------------
+model Page {
+  id            String      @id @default(uuid())
+  slug          String      @unique // about, privacy, terms, shipping-returns, contact
+  titleAr       String
+  titleEn       String
+  contentAr     String
+  contentEn     String
+  metaTitle     String?
+  metaDesc      String?
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([slug])
+}
+
+// -------------------------------------------------------------
+// 14. Site Settings & Visual Identity
+// -------------------------------------------------------------
+model SiteSetting {
+  id            String      @id @default(uuid())
+  key           String      @unique
+  value         String
+  group         String      @default("general") // general, identity, seo, social, hero, featured
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([key])
+  @@index([group])
+}
+
+// -------------------------------------------------------------
+// 15. Video Reviews & Influencer Testimonials
+// -------------------------------------------------------------
+model VideoReview {
+  id              String      @id @default(uuid())
+  authorName      String      // e.g. Menna Ehab, Ahmed El Kholy
+  authorHandle    String?     // e.g. @mennaehab, @ahmedelkholy612
+  authorAvatar    String?     // profile image URL
+  quoteAr         String      // e.g. "ريحتك حلوة كل يوم فعلاً.. ثبات فظيع"
+  quoteEn         String?
+  badgeText       String?     @default("REAL REVIEW") // REAL REVIEW, تجربة موثقة
+  videoUrl        String?     // video stream or MP4 URL
+  posterImage     String      // High-res poster/thumbnail of the reel
+  platform        String?     @default("REELS") // REELS, TIKTOK, VIMEO, YOUTUBE
+  productTag      String?     // e.g. "بوكس 3 عطور + 1 هدية", "بلاك أفقانو"
+  rating          Float       @default(5.0)
+  sortOrder       Int         @default(0)
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([sortOrder])
+  @@index([isActive])
+}
+
