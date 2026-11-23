@@ -269,7 +269,7 @@ export default function AdminVideoReviewsPage() {
                 />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
+              <div className="space-y-1.5 sm:col-span-1">
                 <label className="text-black font-black text-xs block">اقتباس العميل / رأيه في العطر (بالعربية) *</label>
                 <textarea
                   required
@@ -277,6 +277,18 @@ export default function AdminVideoReviewsPage() {
                   placeholder="رأيه في ثبات العطر، التغليف، والفوحان المميز..."
                   value={formData.quoteAr}
                   onChange={(e) => setFormData({ ...formData, quoteAr: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-1">
+                <label className="text-black font-black text-xs block">اقتباس العميل بالإنجليزية (Quote in English)</label>
+                <textarea
+                  rows={3}
+                  dir="ltr"
+                  placeholder="Customer review in English: longevity, sillage, luxurious packaging..."
+                  value={formData.quoteEn}
+                  onChange={(e) => setFormData({ ...formData, quoteEn: e.target.value })}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>

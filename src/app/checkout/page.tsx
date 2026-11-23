@@ -637,7 +637,7 @@ export default function CheckoutPage() {
                       {language === 'ar' ? item.product.nameAr : item.product.nameEn}
                     </h4>
                     <span className="text-neutral-500">
-                      {item.quantity} × {formatPrice(item.unitPrice, language)} ({item.sizeMl} مل)
+                      {item.quantity} × {formatPrice(item.unitPrice, language)} ({item.sizeMl} {t('مل', 'ml')})
                     </span>
                   </div>
                   <span className="text-xs font-black text-[#98702B]">

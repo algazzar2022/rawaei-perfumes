@@ -318,8 +318,8 @@ export default function AdminBannersPage() {
                 />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-black font-black block">الوصف الترويجي</label>
+              <div className="space-y-1.5 sm:col-span-1">
+                <label className="text-black font-black block">الوصف الترويجي بالعربية</label>
                 <input
                   type="text"
                   value={heroSubtitleAr}
@@ -328,7 +328,39 @@ export default function AdminBannersPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-1">
+                <label className="text-black font-black block">الوصف الترويجي بالإنجليزية (Subtitle)</label>
+                <input
+                  type="text"
+                  value={heroSubtitleEn}
+                  onChange={(e) => setHeroSubtitleEn(e.target.value)}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-1">
+                <label className="text-black font-black block">نص الزر بالعربية</label>
+                <input
+                  type="text"
+                  value={heroBtnTextAr}
+                  onChange={(e) => setHeroBtnTextAr(e.target.value)}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-1">
+                <label className="text-black font-black block">نص الزر بالإنجليزية (Button Text)</label>
+                <input
+                  type="text"
+                  value={heroBtnTextEn}
+                  onChange={(e) => setHeroBtnTextEn(e.target.value)}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                  dir="ltr"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-black font-black block">رابط الزر (Link)</label>
                 <input
                   type="text"
@@ -336,16 +368,6 @@ export default function AdminBannersPage() {
                   onChange={(e) => setHeroLink(e.target.value)}
                   className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                   dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-black font-black block">نص الزر</label>
-                <input
-                  type="text"
-                  value={heroBtnTextAr}
-                  onChange={(e) => setHeroBtnTextAr(e.target.value)}
-                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
                 />
               </div>
             </div>
@@ -448,12 +470,23 @@ export default function AdminBannersPage() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-black font-black block">عنوان الشريحة</label>
+                      <label className="text-black font-black block">عنوان الشريحة بالعربية</label>
                       <input
                         type="text"
                         value={s.titleAr}
                         onChange={(e) => updateSlideField(idx, 'titleAr', e.target.value)}
                         className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-black font-black block">عنوان الشريحة بالإنجليزية (Title En)</label>
+                      <input
+                        type="text"
+                        value={s.titleEn || ''}
+                        onChange={(e) => updateSlideField(idx, 'titleEn', e.target.value)}
+                        className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                        dir="ltr"
                       />
                     </div>
 
@@ -526,12 +559,32 @@ export default function AdminBannersPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-black font-black block">الوصف</label>
+              <label className="text-black font-black block">العنوان بالإنجليزية (Title En)</label>
+              <input
+                type="text"
+                value={promoWide.titleEn || ''}
+                onChange={(e) => setPromoWide({ ...promoWide, titleEn: e.target.value })}
+                className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                dir="ltr"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">الوصف بالعربية</label>
               <input
                 type="text"
                 value={promoWide.subtitleAr || ''}
                 onChange={(e) => setPromoWide({ ...promoWide, subtitleAr: e.target.value })}
                 className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-black font-black block">الوصف بالإنجليزية (Subtitle En)</label>
+              <input
+                type="text"
+                value={promoWide.subtitleEn || ''}
+                onChange={(e) => setPromoWide({ ...promoWide, subtitleEn: e.target.value })}
+                className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                dir="ltr"
               />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
@@ -563,12 +616,22 @@ export default function AdminBannersPage() {
             <span className="font-black text-black text-sm block">2. البانر الإعلاني الصغير الأول:</span>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <label className="text-black font-black block">العنوان</label>
+                <label className="text-black font-black block">العنوان بالعربية</label>
                 <input
                   type="text"
                   value={promoSmall1.titleAr || ''}
                   onChange={(e) => setPromoSmall1({ ...promoSmall1, titleAr: e.target.value })}
                   className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان بالإنجليزية (Title En)</label>
+                <input
+                  type="text"
+                  value={promoSmall1.titleEn || ''}
+                  onChange={(e) => setPromoSmall1({ ...promoSmall1, titleEn: e.target.value })}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                  dir="ltr"
                 />
               </div>
               <div className="space-y-1.5">
@@ -598,12 +661,22 @@ export default function AdminBannersPage() {
             <span className="font-black text-black text-sm block">3. البانر الإعلاني الصغير الثاني:</span>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <label className="text-black font-black block">العنوان</label>
+                <label className="text-black font-black block">العنوان بالعربية</label>
                 <input
                   type="text"
                   value={promoSmall2.titleAr || ''}
                   onChange={(e) => setPromoSmall2({ ...promoSmall2, titleAr: e.target.value })}
                   className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-black font-black block">العنوان بالإنجليزية (Title En)</label>
+                <input
+                  type="text"
+                  value={promoSmall2.titleEn || ''}
+                  onChange={(e) => setPromoSmall2({ ...promoSmall2, titleEn: e.target.value })}
+                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                  dir="ltr"
                 />
               </div>
               <div className="space-y-1.5">

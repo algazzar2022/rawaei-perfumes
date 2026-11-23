@@ -97,7 +97,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div>
           {/* Scent Family / Category */}
           <div className="flex items-center justify-between text-[10px] sm:text-xs text-neutral-500">
-            <span className="truncate max-w-[90px] sm:max-w-none">{product.scentFamily || product.category?.nameAr || 'عطر فاخر'}</span>
+            <span className="truncate max-w-[90px] sm:max-w-none">
+              {product.scentFamily ||
+                (product.category
+                  ? language === 'ar'
+                    ? product.category.nameAr
+                    : product.category.nameEn
+                  : t('عطر فاخر', 'Royal Fragrance'))}
+            </span>
             <div className="flex items-center gap-0.5 sm:gap-1 text-[#98702B]">
               <Star className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 fill-[#C49A45] text-[#C49A45]" />
               <span className="font-bold text-[#171717] text-[10px] sm:text-xs">{product.rating.toFixed(1)}</span>

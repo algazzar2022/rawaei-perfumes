@@ -239,13 +239,25 @@ export default function AdminCategoriesPage() {
                 />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-2">
+              <div className="space-y-1.5 sm:col-span-1">
                 <label className="text-black font-black text-xs block">الوصف بالعربية</label>
                 <textarea
                   rows={3}
                   value={formData.descriptionAr}
                   onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
                   placeholder="وصف مختصر للتصنيف ومحتواه العطري..."
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:col-span-1">
+                <label className="text-black font-black text-xs block">الوصف بالإنجليزية (Description in English)</label>
+                <textarea
+                  rows={3}
+                  dir="ltr"
+                  value={formData.descriptionEn}
+                  onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
+                  placeholder="Short category description in English..."
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>

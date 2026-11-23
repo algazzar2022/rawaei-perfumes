@@ -63,7 +63,12 @@ export default function ProductDetailView({ product, relatedProducts }: DetailPr
   const description = language === 'ar' ? product.descriptionAr : product.descriptionEn;
 
   const currentPrice = selectedSize.price;
-  const comparePrice = selectedSize.comparePrice || product.compareAtPrice;
+  const comparePrice =
+    selectedSize.comparePrice !== undefined && selectedSize.comparePrice !== null
+      ? selectedSize.comparePrice
+      : selectedSize.isDefault || sizes.length === 1
+      ? product.compareAtPrice
+      : null;
   const discountPercent =
     comparePrice && comparePrice > currentPrice
       ? Math.round(((comparePrice - currentPrice) / comparePrice) * 100)
@@ -200,14 +205,19 @@ export default function ProductDetailView({ product, relatedProducts }: DetailPr
             </div>
 
             {/* Price Block */}
-            <div className="p-5 rounded-2xl bg-white border border-[#C49A45]/25 flex items-baseline gap-4 shadow-sm">
+            <div className="p-5 rounded-2xl bg-white border border-[#C49A45]/25 flex items-center flex-wrap gap-4 shadow-sm">
               <span className="text-3xl sm:text-4xl font-black text-[#98702B]">
                 {formatPrice(currentPrice, language)}
               </span>
               {comparePrice && comparePrice > currentPrice && (
-                <span className="text-base text-neutral-400 line-through">
-                  {formatPrice(comparePrice, language)}
-                </span>
+                <>
+                  <span className="text-base text-neutral-400 line-through">
+                    {formatPrice(comparePrice, language)}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-black bg-red-50 text-red-700 border border-red-200">
+                    {t(`وفر ${discountPercent}%`, `Save ${discountPercent}%`)}
+                  </span>
+                </>
               )}
             </div>
 
