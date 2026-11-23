@@ -180,7 +180,7 @@ export default function AdminUsersPage() {
                 <input
                   type="email"
                   required
-                  placeholder="admin@rawaei.com"
+                  placeholder="user@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-mono font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
@@ -319,17 +319,13 @@ export default function AdminUsersPage() {
                           </span>
                         </td>
                         <td className="p-4 text-center">
-                          {u.email !== 'admin@rawaei.com' ? (
-                            <button
-                              onClick={() => handleDeleteUser(u.id, u.name)}
-                              className="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-xs inline-flex items-center justify-center cursor-pointer"
-                              title="حذف المستخدم"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          ) : (
-                            <span className="text-[11px] text-neutral-400 font-bold">رئيسي</span>
-                          )}
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.name)}
+                            className="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-xs inline-flex items-center justify-center cursor-pointer"
+                            title="حذف المستخدم"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </td>
                       </tr>
                     ))

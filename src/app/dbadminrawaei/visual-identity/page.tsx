@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Palette, Save, Check, Sparkles, Plus, Trash2, Eye, HelpCircle } from 'lucide-react';
+import { Palette, Save, Check, Sparkles, Plus, Trash2 } from 'lucide-react';
 
 interface AnnouncementItem {
   id: string;
@@ -267,37 +267,6 @@ export default function AdminVisualIdentityPage() {
           </label>
         </div>
 
-        {/* Live Preview Box */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-black">
-            <span className="flex items-center gap-1.5">
-              <Eye className="w-4 h-4 text-[#98702B]" />
-              <span>معاينة حية لشكل الشريط في المتجر مع الفاصل التلقائي ✨:</span>
-            </span>
-            <span className="text-neutral-500 text-[11px]">
-              {settings.announcement_active === 'true' ? 'الشريط مفعل حالياً' : 'الشريط معطل'}
-            </span>
-          </div>
-
-          <div className="relative w-full overflow-hidden bg-[#111813] border border-[#C49A45]/40 rounded-2xl py-3 px-4 text-white text-xs font-semibold shadow-inner">
-            <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap">
-              {announcements
-                .filter((a) => a.textAr.trim() || a.textEn.trim())
-                .map((ann, idx, arr) => (
-                  <React.Fragment key={ann.id || idx}>
-                    <span className="text-neutral-100 font-bold">
-                      {ann.textAr || ann.textEn}
-                    </span>
-                    {idx < arr.length - 1 && (
-                      <span className="text-[#DFC27A] font-black text-sm px-1 animate-pulse">
-                        ✨
-                      </span>
-                    )}
-                  </React.Fragment>
-                ))}
-            </div>
-          </div>
-        </div>
 
         {/* List of Announcement Items */}
         <div className="space-y-4 pt-2">

@@ -6,30 +6,9 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seeding for RAWAEI PERFUMES...');
 
-  // 1. Create Default Admin User
-  const adminEmail = 'admin@rawaei.com';
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
-
-  const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash('RawaeiAdmin2026!', salt);
-
-  let adminUser;
-  if (!existingAdmin) {
-    adminUser = await prisma.user.create({
-      data: {
-        name: 'مدير المتجر - روائع للعطور',
-        email: adminEmail,
-        passwordHash,
-        role: 'ADMIN',
-        phone: '+966501234567',
-        isActive: true,
-      },
-    });
-    console.log('✅ Created default admin user: admin@rawaei.com (Password: RawaeiAdmin2026!)');
-  } else {
-    adminUser = existingAdmin;
-    console.log('ℹ️ Admin user already exists');
-  }
+  // 1. Verify Admin Users
+  const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
+  console.log(`ℹ️ Current admin users count: ${adminCount}`);
 
   // 2. Seed the 6 Mandatory Categories
   const categoriesData = [

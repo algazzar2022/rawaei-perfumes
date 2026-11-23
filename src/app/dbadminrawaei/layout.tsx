@@ -32,33 +32,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ name: string; email: string; role: string } | null>(null);
+  const [authChecking, setAuthChecking] = useState(true);
 
-  // Auto-sync authentication state so the owner is never locked out or told "غير مصرح"
+  // Authenticate session on client
   useEffect(() => {
-    if (pathname === '/dbadminrawaei/login') return;
+    if (pathname === '/dbadminrawaei/login') {
+      setAuthChecking(false);
+      return;
+    }
 
-    const checkAndEnsureAuth = async () => {
+    const checkAuth = async () => {
       try {
-        const res = await fetch('/api/auth/me');
+        const headers: Record<string, string> = {};
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('rawaei_admin_token');
+          if (token) headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const res = await fetch('/api/auth/me', { headers });
         const data = await res.json();
-        if (!data.user) {
-          const loginRes = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: 'admin@rawaei.com', password: 'RawaeiAdmin2026!' }),
-          });
-          const loginData = await loginRes.json();
-          if (loginData.token && typeof window !== 'undefined') {
-            localStorage.setItem('rawaei_admin_token', loginData.token);
-          }
+        if (data.user) {
+          setCurrentUser(data.user);
+        } else {
+          router.push('/dbadminrawaei/login');
         }
       } catch (err) {
-        console.error('Admin layout auth sync error:', err);
+        console.error('Auth verification error:', err);
+        router.push('/dbadminrawaei/login');
+      } finally {
+        setAuthChecking(false);
       }
     };
 
-    checkAndEnsureAuth();
-  }, [pathname]);
+    checkAuth();
+  }, [pathname, router]);
 
   // Skip layout styling on /dbadminrawaei/login
   if (pathname === '/dbadminrawaei/login') {
@@ -185,8 +193,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 text-xs">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-black font-semibold">المدير:</span>
-              <span className="font-bold text-black">admin@rawaei.com</span>
+              <span className="text-black font-semibold">المسؤول:</span>
+              <span className="font-bold text-black">{currentUser?.name || currentUser?.email || 'المسؤول الحالي'}</span>
             </div>
 
             <Link

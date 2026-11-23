@@ -19,11 +19,16 @@ export async function DELETE(
       return NextResponse.json({ error: 'المستخدم غير موجود' }, { status: 404 });
     }
 
-    if (user.email === 'admin@rawaei.com') {
-      return NextResponse.json(
-        { error: 'لا يمكن حذف حساب المسؤول الرئيسي للنظام' },
-        { status: 400 }
-      );
+    if (user.role === 'ADMIN') {
+      const adminCount = await prisma.user.count({
+        where: { role: 'ADMIN' },
+      });
+      if (adminCount <= 1) {
+        return NextResponse.json(
+          { error: 'لا يمكن حذف المسؤول الوحيد المتبقي في النظام' },
+          { status: 400 }
+        );
+      }
     }
 
     await prisma.user.delete({
