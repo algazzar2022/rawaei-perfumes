@@ -101,9 +101,6 @@ export default function AdminCouponsPage() {
                 <TicketPercent className="w-6 h-6 text-[#98702B]" />
                 <span>إنشاء كود وقسيمة خصم جديدة</span>
               </h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                حدد شروط الكود ونوع الخصم (نسبة مئوية أو مبلغ ثابت)
-              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -246,9 +243,6 @@ export default function AdminCouponsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-black">إدارة الكوبونات وقسائم الخصم</h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                إنشاء أكواد الخصم الترويجية بالنسبة المئوية أو المبلغ الثابت وتحديد شروط الاستخدام
-              </p>
             </div>
 
             <button

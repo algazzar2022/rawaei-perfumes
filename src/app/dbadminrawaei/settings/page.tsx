@@ -16,7 +16,6 @@ export default function AdminGeneralSettingsPage() {
     contact_address_en: '90th St, New Cairo, Cairo, Egypt',
     currency: 'EGP',
     currency_symbol_ar: 'ج.م',
-    tax_rate_percent: '14',
     social_instagram: 'https://instagram.com/rawaeiperfumes',
     social_facebook: 'https://facebook.com/rawaeiperfumes',
     social_tiktok: 'https://tiktok.com/@rawaeiperfumes',
@@ -65,9 +64,6 @@ export default function AdminGeneralSettingsPage() {
     <div className="space-y-6 pb-12">
       <div>
         <h1 className="text-2xl font-black text-black">إعدادات الموقع العامة</h1>
-        <p className="text-xs text-neutral-600 mt-1">
-          بيانات المتجر الرسمية، أرقام التواصل، العملة، الضريبة، وروابط التواصل الاجتماعي
-        </p>
       </div>
 
       {message && (
@@ -118,12 +114,13 @@ export default function AdminGeneralSettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-black font-black block">نسبة ضريبة القيمة المضافة (%)</label>
+              <label className="text-black font-black block">شعار المتجر (Tagline) بالإنجليزية</label>
               <input
-                type="number"
-                value={settings.tax_rate_percent}
-                onChange={(e) => setSettings({ ...settings, tax_rate_percent: e.target.value })}
-                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-black focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                type="text"
+                value={settings.tagline_en}
+                onChange={(e) => setSettings({ ...settings, tagline_en: e.target.value })}
+                className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
+                dir="ltr"
               />
             </div>
           </div>

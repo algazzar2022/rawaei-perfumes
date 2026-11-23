@@ -189,9 +189,6 @@ export default function AdminVideoReviewsPage() {
                 <Video className="w-6 h-6 text-[#98702B]" />
                 <span>{editingReview ? `تعديل فيديو: ${editingReview.authorName}` : 'إضافة فيديو تجربة واقعية جديد'}</span>
               </h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                ارفع الفيديو وصورة الغلاف عبر Cloudinary ليظهر في سيكشن الريلز بالصفحة الرئيسية
-              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -356,9 +353,6 @@ export default function AdminVideoReviewsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-black">إدارة فيديوهات المؤثرين وتجارب العملاء</h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                التحكم في قسم الفيديوهات والتجارب الواقعية التي تظهر في الصفحة الرئيسية
-              </p>
             </div>
 
             <button

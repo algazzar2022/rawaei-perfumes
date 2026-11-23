@@ -54,9 +54,6 @@ export default function AdminSEOSettings() {
     <div className="space-y-6 pb-12">
       <div>
         <h1 className="text-2xl font-black text-black">إعدادات محركات البحث وSEO</h1>
-        <p className="text-xs text-neutral-600 mt-1">
-          تهيئة الكلمات المفتاحية، عناوين الميتا، وبطاقات OpenGraph لمحركات البحث مثل Google
-        </p>
       </div>
 
       {message && (

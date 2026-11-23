@@ -246,9 +246,6 @@ export default function AdminProductsPage() {
               <h1 className="text-2xl font-black text-black">
                 {editingProduct ? `تعديل بيانات العطر: ${editingProduct.nameAr}` : 'إضافة عطر فاخر جديد'}
               </h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                املأ البيانات والمواصفات العطرية أدناه، ثم اضغط حفظ لتحديث المتجر مباشرة
-              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -498,9 +495,6 @@ export default function AdminProductsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-black">إدارة المنتجات والعطور</h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                إضافة وتعديل وحذف العطور، تحديد الأسعار، الأحجام، والنوتات العطرية
-              </p>
             </div>
 
             <button

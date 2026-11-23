@@ -50,9 +50,6 @@ export default async function AdminGenderSectionsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-black text-black">إدارة أقسام العطور الرئيسية</h1>
-        <p className="text-xs text-neutral-600 mt-1">
-          متابعة الأقسام الثلاثة (For Him, For Her, Unisex) وإدارة منتجات وفلاتر كل قسم
-        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

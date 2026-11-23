@@ -191,9 +191,6 @@ export default function AdminBannersPage() {
     <div className="space-y-10 pb-12">
       <div>
         <h1 className="text-2xl font-black text-black">إدارة البانرات والسلايدر والفيديو</h1>
-        <p className="text-xs text-neutral-600 mt-1">
-          التحكم في البانر الرئيسي بثلاثة أوضاع (صورة، سلايدر، فيديو)، وتخصيص البانرات الإعلانية
-        </p>
       </div>
 
       {message && (
@@ -212,9 +209,6 @@ export default function AdminBannersPage() {
               <Sliders className="w-5 h-5 text-[#98702B]" />
               <span>البانر الرئيسي للمتجر (Hero Banner)</span>
             </h2>
-            <p className="text-xs text-neutral-600 mt-0.5">
-              اختر وضع العرض المناسب: صورة ثابتة، سلايدشو متعدد الصور، أو فيديو
-            </p>
           </div>
 
           <button
@@ -506,9 +500,6 @@ export default function AdminBannersPage() {
               <Sparkles className="w-5 h-5 text-[#98702B]" />
               <span>قسم البانرات الإعلانية (بانر عريض + بانران صغيران)</span>
             </h2>
-            <p className="text-xs text-neutral-600 mt-0.5">
-              تعديل صور ونصوص وروابط البانرات الإعلانية الترويجية في الصفحة الرئيسية
-            </p>
           </div>
 
           <button

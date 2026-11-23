@@ -63,9 +63,6 @@ export default function AdminInventoryPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-black">إدارة المخزون والمستودع</h1>
-          <p className="text-xs text-neutral-600 mt-1">
-            مراقبة كميات العطور المتوفرة، تنبيهات النفاذ، والتعديل السريع للكميات
-          </p>
         </div>
 
         <button

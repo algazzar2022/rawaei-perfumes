@@ -19,9 +19,6 @@ export default async function AdminCustomersPage() {
     <div className="space-y-6 pb-12">
       <div>
         <h1 className="text-2xl font-black text-black">إدارة العملاء والزبائن</h1>
-        <p className="text-xs text-neutral-600 mt-1">
-          قائمة العملاء، إجمالي مشترياتهم، وعدد طلباتهم في متجر روائع للعطور
-        </p>
       </div>
 
       <div className="bg-white rounded-3xl border border-[#DFC27A]/40 overflow-hidden shadow-md">

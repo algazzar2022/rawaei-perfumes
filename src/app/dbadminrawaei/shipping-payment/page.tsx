@@ -245,9 +245,6 @@ export default function AdminShippingPaymentPage() {
     <div className="space-y-8 pb-12">
       <div>
         <h1 className="text-2xl font-black text-black">إدارة وسائل الشحن والدفع (مصر فقط)</h1>
-        <p className="text-xs text-neutral-600 mt-1">
-          المتجر يشحن حصرياً داخل جمهورية مصر العربية – حدد تكلفة الشحن، حد الشحن المجاني، ومدة التوصيل لكل محافظة
-        </p>
       </div>
 
       {/* ============================================================== */}
@@ -260,9 +257,6 @@ export default function AdminShippingPaymentPage() {
               <Smartphone className="w-5 h-5 text-[#98702B]" />
               <span>أرقام وحسابات التحويل الإلكتروني (انستاباي & فودافون كاش)</span>
             </h2>
-            <p className="text-xs text-neutral-600 mt-0.5">
-              هذه الأرقام تظهر للعملاء في صفحة الدفع مباشرة لنسخها والتحويل عليها
-            </p>
           </div>
 
           <button
@@ -363,9 +357,6 @@ export default function AdminShippingPaymentPage() {
             <h2 className="text-xl font-black text-black">
               أسعار الشحن لمحافظات مصر الـ 27 (Governorates Shipping Rates)
             </h2>
-            <p className="text-xs text-neutral-600 mt-1">
-              عدّل سعر الشحن أو مدة التوصيل أو حد الشحن المجاني لأي محافظة، وسيظهر زر الحفظ وتنعكس الأسعار فورياً في شاشة الدفع والطلبات
-            </p>
           </div>
 
           {/* Action buttons */}

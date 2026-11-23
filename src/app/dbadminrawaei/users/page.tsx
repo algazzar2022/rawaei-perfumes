@@ -125,11 +125,8 @@ export default function AdminUsersPage() {
               </button>
               <h1 className="text-2xl font-black text-black flex items-center gap-2">
                 <Shield className="w-6 h-6 text-[#98702B]" />
-                <span>إضافة مسؤول / مشرف جديد بكامل الصلاحيات</span>
+                <span>إضافة مسؤول / مشرف جديد</span>
               </h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                تحديد بيانات الحساب والصلاحيات الإدارية المطلوبة
-              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -251,9 +248,6 @@ export default function AdminUsersPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-black">إدارة المستخدمين والصلاحيات</h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                إضافة مدراء وموظفين ومتابعة مستويات الصلاحيات الإدارية
-              </p>
             </div>
 
             <button
@@ -304,7 +298,7 @@ export default function AdminUsersPage() {
                         <td className="p-4 text-center">
                           {u.email.toLowerCase() === 'borseteletoor@gmail.com' ? (
                             <span className="inline-block px-3.5 py-1 rounded-full text-[11px] font-black tracking-wide bg-gradient-to-r from-amber-100 via-amber-200 to-amber-100 text-amber-950 border border-amber-400 shadow-xs">
-                              👑 المسؤول الرئيسي الأعلى (Super Admin)
+                              Super Admin
                             </span>
                           ) : (
                             <span
@@ -326,8 +320,8 @@ export default function AdminUsersPage() {
                         </td>
                         <td className="p-4 text-center">
                           {u.email.toLowerCase() === 'borseteletoor@gmail.com' ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#98702B] bg-[#FAF6EE] px-2.5 py-1 rounded-lg border border-[#DFC27A]/40 select-none">
-                              🔒 محمي من الحذف
+                            <span className="text-neutral-400 font-black text-base select-none">
+                              -
                             </span>
                           ) : (
                             <button

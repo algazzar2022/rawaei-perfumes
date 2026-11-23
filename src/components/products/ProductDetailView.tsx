@@ -209,9 +209,6 @@ export default function ProductDetailView({ product, relatedProducts }: DetailPr
                   {formatPrice(comparePrice, language)}
                 </span>
               )}
-              <span className="text-xs text-neutral-500 font-medium">
-                {t('شامل ضريبة القيمة المضافة', 'VAT included')}
-              </span>
             </div>
 
             {/* Bottle Sizes Selection */}

@@ -65,9 +65,6 @@ export default async function AdminDashboardPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-black">
             مرحباً بك في إدارة المتجر
           </h1>
-          <p className="text-xs sm:text-sm text-black font-medium">
-            تابع مبيعاتك، مخزون العطور الفاخرة، وحالات الشحن والطلبات بصورة حية ولحظية.
-          </p>
         </div>
 
         <div className="relative z-10 flex items-center gap-3">

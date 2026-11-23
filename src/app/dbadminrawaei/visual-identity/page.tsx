@@ -156,9 +156,6 @@ export default function AdminVisualIdentityPage() {
     <div className="space-y-8 pb-12">
       <div>
         <h1 className="text-2xl font-black text-black">إعدادات الهوية البصرية وشريط الإعلانات</h1>
-        <p className="text-xs text-neutral-600 mt-1">
-          إدارة ألوان المتجر الفاخرة، والتحكم في نصوص شريط الإعلانات المتحرك أعلى المتجر
-        </p>
       </div>
 
       {message && (
@@ -234,9 +231,6 @@ export default function AdminVisualIdentityPage() {
               <Sparkles className="w-5 h-5 text-[#98702B]" />
               <span>شريط الإعلانات العلوي في المتجر (Announcement Bar)</span>
             </h2>
-            <p className="text-xs text-neutral-600 mt-1">
-              أضف أكثر من نص إعلاني بالعربية والإنجليزية – وتلقائياً يُضاف الرمز <span className="text-[#98702B] font-black text-sm">✨</span> كفاصل بين كل إعلان وآخر في العرض
-            </p>
           </div>
 
           <button

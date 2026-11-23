@@ -331,9 +331,6 @@ export default function AdminOrdersPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-black">إدارة الطلبات والشحنات</h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                متابعة جميع طلبات المتجر، تحديث حالات الشحن والتوصيل، واستعراض الفواتير
-              </p>
             </div>
           </div>
 

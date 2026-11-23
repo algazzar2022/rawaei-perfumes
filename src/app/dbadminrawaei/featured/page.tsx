@@ -155,9 +155,6 @@ export default function AdminFeaturedProductsPage() {
             <span>إدارة قسم مختارات حصرية</span>
           </div>
           <h1 className="text-2xl font-black text-black">المنتجات المميزة (من جميع التصنيفات)</h1>
-          <p className="text-xs text-neutral-600 mt-1">
-            اختر المنتجات يدوياً من أي تصنيف ورتّبها حسب رغبتك لتظهر في واجهة المتجر
-          </p>
         </div>
 
         <button
@@ -336,9 +333,6 @@ export default function AdminFeaturedProductsPage() {
               <Filter className="w-4 h-4 text-[#98702B]" />
               <span>اختر يدوياً من جميع تصنيفات المتجر ({allProducts.length} منتج متوفر)</span>
             </h2>
-            <p className="text-xs text-neutral-600 mt-0.5">
-              انقر على أي منتج لتحديده أو إلغاء اختياره. المنتجات المحددة تظهر بإطار وإضاءة ذهبية.
-            </p>
           </div>
 
           {/* Search Box */}

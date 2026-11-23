@@ -144,9 +144,6 @@ export default function AdminCategoriesPage() {
               <h1 className="text-2xl font-black text-black">
                 {editingCategory ? `تعديل التصنيف: ${editingCategory.nameAr}` : 'إضافة تصنيف رئيسي جديد'}
               </h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                املأ بيانات التصنيف ثم اضغط حفظ لتحديث المتجر فورياً
-              </p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -293,9 +290,6 @@ export default function AdminCategoriesPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-black">إدارة التصنيفات الرئيسية الستة</h1>
-              <p className="text-xs text-neutral-600 mt-1">
-                التحكم في تصنيفات المتجر (العطور، البخور والعود، الهدايا، معطرات المنزل، البادي سبلاش، والمخمريات)
-              </p>
             </div>
 
             <button
