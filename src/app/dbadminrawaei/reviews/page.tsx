@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { VideoReviewDto } from '@/lib/types';
 import MediaUploader from '@/components/admin/MediaUploader';
+import { autoTranslate } from '@/lib/translate';
 
 export default function AdminVideoReviewsPage() {
   const [reviews, setReviews] = useState<VideoReviewDto[]>([]);
@@ -42,6 +43,24 @@ export default function AdminVideoReviewsPage() {
     sortOrder: 0,
     isActive: true,
   });
+
+  const [translating, setTranslating] = useState(false);
+
+  const handleTranslateQuote = async () => {
+    if (!formData.quoteAr.trim()) return;
+    setTranslating(true);
+    try {
+      const en = await autoTranslate(formData.quoteAr);
+      if (en) {
+        setFormData((prev) => ({
+          ...prev,
+          quoteEn: en,
+        }));
+      }
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   const fetchReviews = async () => {
     try {
@@ -270,19 +289,48 @@ export default function AdminVideoReviewsPage() {
               </div>
 
               <div className="space-y-1.5 sm:col-span-1">
-                <label className="text-black font-black text-xs block">اقتباس العميل / رأيه في العطر (بالعربية) *</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-black font-black text-xs block">اقتباس العميل / رأيه في العطر (بالعربية) *</label>
+                  {formData.quoteAr.trim() && (
+                    <button
+                      type="button"
+                      onClick={handleTranslateQuote}
+                      disabled={translating}
+                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3 text-[#98702B]" />
+                      <span>{translating ? 'جاري الترجمة...' : 'ترجمة للاقتباس الإنجليزي'}</span>
+                    </button>
+                  )}
+                </div>
                 <textarea
                   required
                   rows={3}
                   placeholder="رأيه في ثبات العطر، التغليف، والفوحان المميز..."
                   value={formData.quoteAr}
                   onChange={(e) => setFormData({ ...formData, quoteAr: e.target.value })}
+                  onBlur={() => {
+                    if (formData.quoteAr.trim() && !formData.quoteEn.trim()) {
+                      handleTranslateQuote();
+                    }
+                  }}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
 
               <div className="space-y-1.5 sm:col-span-1">
-                <label className="text-black font-black text-xs block">اقتباس العميل بالإنجليزية (Quote in English)</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-black font-black text-xs block">اقتباس العميل بالإنجليزية (Quote in English)</label>
+                  <button
+                    type="button"
+                    onClick={handleTranslateQuote}
+                    disabled={!formData.quoteAr.trim() || translating}
+                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3 text-[#98702B]" />
+                    <span>{translating ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
+                  </button>
+                </div>
                 <textarea
                   rows={3}
                   dir="ltr"

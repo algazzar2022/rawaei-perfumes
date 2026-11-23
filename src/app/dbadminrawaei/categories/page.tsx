@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Plus, Edit2, Trash2, ArrowRight, Layers, Sparkles } from 'lucide-react';
 import { CategoryDto } from '@/lib/types';
 import MediaUploader from '@/components/admin/MediaUploader';
+import { autoTranslate } from '@/lib/translate';
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
@@ -27,6 +28,41 @@ export default function AdminCategoriesPage() {
     sortOrder: 0,
     isActive: true,
   });
+
+  const [translating, setTranslating] = useState<string | null>(null);
+
+  const handleTranslateName = async () => {
+    if (!formData.nameAr.trim()) return;
+    setTranslating('name');
+    try {
+      const en = await autoTranslate(formData.nameAr);
+      if (en) {
+        setFormData((prev) => ({
+          ...prev,
+          nameEn: en,
+          slug: prev.slug || en.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+        }));
+      }
+    } finally {
+      setTranslating(null);
+    }
+  };
+
+  const handleTranslateDesc = async () => {
+    if (!formData.descriptionAr.trim()) return;
+    setTranslating('desc');
+    try {
+      const en = await autoTranslate(formData.descriptionAr);
+      if (en) {
+        setFormData((prev) => ({
+          ...prev,
+          descriptionEn: en,
+        }));
+      }
+    } finally {
+      setTranslating(null);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -179,19 +215,48 @@ export default function AdminCategoriesPage() {
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-black font-black text-xs block">الاسم بالعربية *</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-black font-black text-xs block">الاسم بالعربية *</label>
+                  {formData.nameAr.trim() && (
+                    <button
+                      type="button"
+                      onClick={handleTranslateName}
+                      disabled={translating === 'name'}
+                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3 text-[#98702B]" />
+                      <span>{translating === 'name' ? 'جاري الترجمة...' : 'ترجمة للاسم الإنجليزي'}</span>
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text"
                   required
                   placeholder="مثال: عطور رجالية فاخرة"
                   value={formData.nameAr}
                   onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                  onBlur={() => {
+                    if (formData.nameAr.trim() && !formData.nameEn.trim()) {
+                      handleTranslateName();
+                    }
+                  }}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-black font-black text-xs block">الاسم بالإنجليزية *</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-black font-black text-xs block">الاسم بالإنجليزية *</label>
+                  <button
+                    type="button"
+                    onClick={handleTranslateName}
+                    disabled={!formData.nameAr.trim() || translating === 'name'}
+                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3 text-[#98702B]" />
+                    <span>{translating === 'name' ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
+                  </button>
+                </div>
                 <input
                   type="text"
                   required
@@ -240,18 +305,47 @@ export default function AdminCategoriesPage() {
               </div>
 
               <div className="space-y-1.5 sm:col-span-1">
-                <label className="text-black font-black text-xs block">الوصف بالعربية</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-black font-black text-xs block">الوصف بالعربية</label>
+                  {formData.descriptionAr.trim() && (
+                    <button
+                      type="button"
+                      onClick={handleTranslateDesc}
+                      disabled={translating === 'desc'}
+                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3 text-[#98702B]" />
+                      <span>{translating === 'desc' ? 'جاري الترجمة...' : 'ترجمة للوصف الإنجليزي'}</span>
+                    </button>
+                  )}
+                </div>
                 <textarea
                   rows={3}
                   value={formData.descriptionAr}
                   onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
+                  onBlur={() => {
+                    if (formData.descriptionAr.trim() && !formData.descriptionEn.trim()) {
+                      handleTranslateDesc();
+                    }
+                  }}
                   placeholder="وصف مختصر للتصنيف ومحتواه العطري..."
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
 
               <div className="space-y-1.5 sm:col-span-1">
-                <label className="text-black font-black text-xs block">الوصف بالإنجليزية (Description in English)</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-black font-black text-xs block">الوصف بالإنجليزية (Description in English)</label>
+                  <button
+                    type="button"
+                    onClick={handleTranslateDesc}
+                    disabled={!formData.descriptionAr.trim() || translating === 'desc'}
+                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3 text-[#98702B]" />
+                    <span>{translating === 'desc' ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
+                  </button>
+                </div>
                 <textarea
                   rows={3}
                   dir="ltr"
