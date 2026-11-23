@@ -13,6 +13,7 @@ import {
   Smartphone,
   Copy,
   Info,
+  Truck,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -69,6 +70,9 @@ export default function CheckoutPage() {
     customerNotes: '',
   });
 
+  // Dynamic Egyptian Governorates from database
+  const [shippingGovernorates, setShippingGovernorates] = useState<any[]>([]);
+
   // Admin configurable payment settings
   const [paymentSettings, setPaymentSettings] = useState({
     instapayNumber: '01001234567',
@@ -80,25 +84,53 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Fetch admin payment numbers on load
+  // Fetch admin payment numbers and governorate shipping rates
   useEffect(() => {
-    async function loadPaymentSettings() {
+    async function loadCheckoutData() {
       try {
-        const res = await fetch('/api/admin/settings?group=payment');
-        const data = await res.json();
-        if (data.settings) {
+        const [payRes, shipRes] = await Promise.all([
+          fetch('/api/admin/settings?group=payment'),
+          fetch('/api/shipping'),
+        ]);
+        const payData = await payRes.json();
+        const shipData = await shipRes.json();
+
+        if (payData.settings) {
           setPaymentSettings({
-            instapayNumber: data.settings.payment_instapay_number || '01001234567',
-            vodafoneNumber: data.settings.payment_vodafone_cash_number || '01009876543',
-            accountName: data.settings.payment_account_name || 'روائع للعطور (RAWAEI)',
+            instapayNumber: payData.settings.payment_instapay_number || '01001234567',
+            vodafoneNumber: payData.settings.payment_vodafone_cash_number || '01009876543',
+            accountName: payData.settings.payment_account_name || 'روائع للعطور (RAWAEI)',
           });
         }
+
+        if (shipData.shippingMethods && shipData.shippingMethods.length > 0) {
+          setShippingGovernorates(shipData.shippingMethods);
+        }
       } catch (err) {
-        console.error('Failed to load payment settings', err);
+        console.error('Failed to load checkout settings', err);
       }
     }
-    loadPaymentSettings();
+    loadCheckoutData();
   }, []);
+
+  // Determine active governorate object and dynamic shipping rate
+  const selectedGov = React.useMemo(() => {
+    return shippingGovernorates.find(
+      (g) => g.nameAr === formData.shippingGovernorate || g.nameAr.includes(formData.shippingGovernorate)
+    );
+  }, [shippingGovernorates, formData.shippingGovernorate]);
+
+  const effectiveShippingCost = React.useMemo(() => {
+    if (items.length === 0) return 0;
+    if (!selectedGov) return subtotal >= 800 ? 0 : 50;
+    const freeAbove = selectedGov.freeShippingAbove !== null && selectedGov.freeShippingAbove !== undefined
+      ? selectedGov.freeShippingAbove
+      : 800;
+    if (subtotal >= freeAbove) return 0;
+    return selectedGov.cost;
+  }, [selectedGov, subtotal, items.length]);
+
+  const effectiveTotal = Math.max(0, subtotal - discountAmount + effectiveShippingCost);
 
   const handleCopy = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
@@ -269,7 +301,7 @@ export default function CheckoutPage() {
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* 1. Governorate Dropdown (Pure names only) */}
+                {/* 1. Governorate Dropdown (Loaded from Database with live rates) */}
                 <div className="space-y-1.5">
                   <label className="text-xs text-neutral-700 font-semibold">
                     {t('المحافظة *', 'Governorate *')}
@@ -279,12 +311,44 @@ export default function CheckoutPage() {
                     onChange={(e) => setFormData({ ...formData, shippingGovernorate: e.target.value })}
                     className="w-full bg-[#FAF7F2] border border-[#C49A45]/30 rounded-xl px-4 py-2.5 text-xs text-[#171717] focus:outline-none focus:border-[#C49A45] font-semibold"
                   >
-                    {egyptianGovernorates.map((gov) => (
-                      <option key={gov} value={gov}>
-                        {gov}
-                      </option>
-                    ))}
+                    {shippingGovernorates.length > 0
+                      ? shippingGovernorates.map((gov) => (
+                          <option key={gov.id} value={gov.nameAr}>
+                            {gov.nameAr} ({gov.cost} ج.م)
+                          </option>
+                        ))
+                      : egyptianGovernorates.map((gov) => (
+                          <option key={gov} value={gov}>
+                            {gov}
+                          </option>
+                        ))}
                   </select>
+
+                  {selectedGov && (
+                    <div className="mt-2 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-neutral-800 space-y-1">
+                      <div className="flex items-center justify-between font-bold">
+                        <span className="flex items-center gap-1.5 text-black">
+                          <Truck className="w-3.5 h-3.5 text-[#98702B]" />
+                          <span>توصيل {selectedGov.nameAr}:</span>
+                        </span>
+                        <span className="font-black text-black">
+                          {effectiveShippingCost === 0 ? (
+                            <span className="text-emerald-700 font-black">شحن مجاني 🎉</span>
+                          ) : (
+                            `${selectedGov.cost} ج.م`
+                          )}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-neutral-600 flex items-center justify-between">
+                        <span>مدة التوصيل: {selectedGov.estimatedDays || '2-4 أيام عمل'}</span>
+                        {selectedGov.freeShippingAbove && (
+                          <span className="text-[#98702B] font-bold">
+                            (مجاني فوق {selectedGov.freeShippingAbove} ج.م)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* 2. City Input (User types themselves) */}
@@ -464,7 +528,7 @@ export default function CheckoutPage() {
                     <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start gap-2">
                       <span className="text-base flex-shrink-0">💡</span>
                       <span>
-                        يرجى تحويل إجمالي المبلغ <strong>({formatPrice(total, language)})</strong> عبر تطبيق انستاباي إلى رقم الهاتف أعلاه ثم إدخال رقم هاتفك المحول منه لتأكيد الطلب.
+                        يرجى تحويل إجمالي المبلغ <strong>({formatPrice(effectiveTotal, language)})</strong> عبر تطبيق انستاباي إلى رقم الهاتف أعلاه ثم إدخال رقم هاتفك المحول منه لتأكيد الطلب.
                       </span>
                     </div>
 
@@ -520,7 +584,7 @@ export default function CheckoutPage() {
                     <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start gap-2">
                       <span className="text-base flex-shrink-0">💡</span>
                       <span>
-                        يرجى تحويل إجمالي المبلغ <strong>({formatPrice(total, language)})</strong> عبر محفظة فودافون كاش إلى الرقم أعلاه ثم إدخال رقم محفظتك المحول منها لتأكيد الطلب.
+                        يرجى تحويل إجمالي المبلغ <strong>({formatPrice(effectiveTotal, language)})</strong> عبر محفظة فودافون كاش إلى الرقم أعلاه ثم إدخال رقم محفظتك المحول منها لتأكيد الطلب.
                       </span>
                     </div>
 
@@ -600,12 +664,12 @@ export default function CheckoutPage() {
               )}
 
               <div className="flex justify-between text-neutral-600">
-                <span>{t('رسوم الشحن والتوصيل', 'Shipping')}</span>
+                <span>{t('رسوم الشحن والتوصيل', 'Shipping')} ({formData.shippingGovernorate})</span>
                 <span className="font-bold text-[#171717]">
-                  {shippingCost === 0 ? (
-                    <span className="text-emerald-600 font-black">{t('مجاني لكافة المحافظات ✨', 'Free Nationwide')}</span>
+                  {effectiveShippingCost === 0 ? (
+                    <span className="text-emerald-600 font-black">{t('شحن مجاني ✨', 'Free Shipping')}</span>
                   ) : (
-                    formatPrice(shippingCost, language)
+                    formatPrice(effectiveShippingCost, language)
                   )}
                 </span>
               </div>
@@ -613,7 +677,7 @@ export default function CheckoutPage() {
               <div className="pt-3 border-t border-[#C49A45]/30 flex justify-between items-center text-sm sm:text-base font-black text-[#171717]">
                 <span>{t('الإجمالي المستحق', 'Total Amount')}</span>
                 <span className="text-lg font-black text-[#98702B]">
-                  {formatPrice(total, language)}
+                  {formatPrice(effectiveTotal, language)}
                 </span>
               </div>
             </div>

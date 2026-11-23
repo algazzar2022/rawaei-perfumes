@@ -136,8 +136,35 @@ export async function POST(request: Request) {
       }
     }
 
-    // Shipping cost in Egypt: free above 800 EGP, else 50 EGP
-    const shippingCost = subtotal >= 800 ? 0 : 50;
+    // Lookup governorate shipping from database
+    let shippingCost = subtotal >= 800 ? 0 : 50;
+    let shippingMethodName = shippingGovernorate ? `شحن إلى ${shippingGovernorate}` : 'توصيل محلي داخل مصر';
+
+    if (shippingGovernorate) {
+      const govMethod = await prisma.shippingMethod.findFirst({
+        where: {
+          OR: [
+            { nameAr: shippingGovernorate.trim() },
+            { nameAr: { contains: shippingGovernorate.trim() } },
+            { id: `gov-${shippingGovernorate.trim()}` },
+          ],
+          isActive: true,
+        },
+      });
+
+      if (govMethod) {
+        const freeAbove = govMethod.freeShippingAbove !== null && govMethod.freeShippingAbove !== undefined
+          ? govMethod.freeShippingAbove
+          : 800;
+        if (subtotal >= freeAbove) {
+          shippingCost = 0;
+        } else {
+          shippingCost = govMethod.cost;
+        }
+        shippingMethodName = `${govMethod.nameAr}${govMethod.estimatedDays ? ` (${govMethod.estimatedDays})` : ''}`;
+      }
+    }
+
     const totalAmount = Math.max(0, subtotal - discountAmount + shippingCost);
 
     // Generate unique order number
@@ -209,7 +236,7 @@ export async function POST(request: Request) {
         customerPhone: customerPhone.trim(),
         shippingCity: fullCity,
         shippingAddress: shippingAddress.trim(),
-        shippingMethod,
+        shippingMethod: shippingMethodName,
         paymentMethod: actualPaymentMethod,
         paymentStatus: 'PENDING',
         subtotal,

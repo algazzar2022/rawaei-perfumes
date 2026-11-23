@@ -587,15 +587,15 @@ export default function AdminProductsPage() {
                         </td>
                         <td className="p-4 text-center">
                           <span
-                            className={`inline-block px-3 py-1 rounded-full text-[11px] font-black ${
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-black shadow-xs ${
                               p.gender === 'HER'
-                                ? 'bg-pink-100 text-pink-900 border border-pink-300'
+                                ? 'bg-[#FDF2F8] text-[#9D174D] border border-[#FBCFE8]'
                                 : p.gender === 'HIM'
-                                ? 'bg-blue-100 text-blue-900 border border-blue-300'
-                                : 'bg-amber-100 text-amber-950 border border-amber-300'
+                                ? 'bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]'
+                                : 'bg-[#FEFCE8] text-[#854D0E] border border-[#FEF08A]'
                             }`}
                           >
-                            {p.gender === 'HIM' ? 'رجالي' : p.gender === 'HER' ? 'نسائي' : 'للجنسين'}
+                            {p.gender === 'HIM' ? 'رجالي 👔' : p.gender === 'HER' ? 'نسائي 🌸' : 'للجنسين ✨'}
                           </span>
                         </td>
                         <td className="p-4 font-black text-black text-sm">
@@ -603,10 +603,10 @@ export default function AdminProductsPage() {
                         </td>
                         <td className="p-4 text-center">
                           <span
-                            className={`inline-block px-2.5 py-1 rounded-lg text-xs font-black ${
+                            className={`inline-block px-3 py-1 rounded-lg text-xs font-black shadow-xs ${
                               p.stock <= 5
-                                ? 'bg-red-100 text-red-900 border border-red-300'
-                                : 'bg-emerald-100 text-emerald-950 border border-emerald-300'
+                                ? 'bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]'
+                                : 'bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]'
                             }`}
                           >
                             {p.stock} قطعة
@@ -614,19 +614,19 @@ export default function AdminProductsPage() {
                         </td>
                         <td className="p-4 text-center">
                           {p.isFeatured ? (
-                            <span className="inline-block px-2.5 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs">
-                              نعم ⭐
+                            <span className="inline-block px-3 py-1 rounded-full bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A] font-black text-xs shadow-xs">
+                              مميز ⭐
                             </span>
                           ) : (
-                            <span className="text-neutral-500 font-bold text-xs">لا</span>
+                            <span className="text-neutral-400 font-bold text-xs">لا</span>
                           )}
                         </td>
                         <td className="p-4 text-center">
                           <span
-                            className={`inline-block px-2.5 py-1 rounded-full text-xs font-black ${
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-black shadow-xs ${
                               p.isActive
-                                ? 'bg-emerald-100 text-emerald-950 border border-emerald-300'
-                                : 'bg-neutral-100 text-neutral-800 border border-neutral-300'
+                                ? 'bg-[#F0FDF4] text-[#166534] border border-[#BBF7D0]'
+                                : 'bg-[#F4F4F5] text-[#3F3F46] border border-[#E4E4E7]'
                             }`}
                           >
                             {p.isActive ? 'نشط ✓' : 'معطل ✕'}
@@ -636,14 +636,14 @@ export default function AdminProductsPage() {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => openEditForm(p)}
-                              className="p-2 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-sm cursor-pointer"
+                              className="w-9 h-9 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 transition-all shadow-xs flex items-center justify-center cursor-pointer"
                               title="تعديل العطر"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleDelete(p.id, p.nameAr)}
-                              className="p-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-sm cursor-pointer"
+                              className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-xs flex items-center justify-center cursor-pointer"
                               title="حذف العطر"
                             >
                               <Trash2 className="w-4 h-4" />
