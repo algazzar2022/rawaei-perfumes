@@ -302,15 +302,21 @@ export default function AdminUsersPage() {
                           {u.phone || '-'}
                         </td>
                         <td className="p-4 text-center">
-                          <span
-                            className={`inline-block px-3 py-1 rounded-full text-[11px] font-black tracking-wide ${
-                              u.role === 'ADMIN'
-                                ? 'bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A]'
-                                : 'bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]'
-                            }`}
-                          >
-                            {u.role === 'ADMIN' ? '👑 مسؤول عام (ADMIN)' : '👔 مشرف متجر (STAFF)'}
-                          </span>
+                          {u.email.toLowerCase() === 'borseteletoor@gmail.com' ? (
+                            <span className="inline-block px-3.5 py-1 rounded-full text-[11px] font-black tracking-wide bg-gradient-to-r from-amber-100 via-amber-200 to-amber-100 text-amber-950 border border-amber-400 shadow-xs">
+                              👑 المسؤول الرئيسي الأعلى (Super Admin)
+                            </span>
+                          ) : (
+                            <span
+                              className={`inline-block px-3 py-1 rounded-full text-[11px] font-black tracking-wide ${
+                                u.role === 'ADMIN'
+                                  ? 'bg-[#FFFBEB] text-[#92400E] border border-[#FDE68A]'
+                                  : 'bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]'
+                              }`}
+                            >
+                              {u.role === 'ADMIN' ? '👑 مسؤول (ADMIN)' : '👔 مشرف متجر (STAFF)'}
+                            </span>
+                          )}
                         </td>
                         <td className="p-4 text-neutral-600 font-semibold">{formatDate(u.createdAt, 'ar')}</td>
                         <td className="p-4 text-center">
@@ -319,13 +325,19 @@ export default function AdminUsersPage() {
                           </span>
                         </td>
                         <td className="p-4 text-center">
-                          <button
-                            onClick={() => handleDeleteUser(u.id, u.name)}
-                            className="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-xs inline-flex items-center justify-center cursor-pointer"
-                            title="حذف المستخدم"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          {u.email.toLowerCase() === 'borseteletoor@gmail.com' ? (
+                            <span className="inline-flex items-center gap-1 text-[11px] font-black text-[#98702B] bg-[#FAF6EE] px-2.5 py-1 rounded-lg border border-[#DFC27A]/40 select-none">
+                              🔒 محمي من الحذف
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handleDeleteUser(u.id, u.name)}
+                              className="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-200 transition-all shadow-xs inline-flex items-center justify-center cursor-pointer"
+                              title="حذف المستخدم"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))

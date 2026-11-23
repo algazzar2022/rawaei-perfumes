@@ -19,6 +19,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'المستخدم غير موجود' }, { status: 404 });
     }
 
+    // Absolute protection: borseteletoor@gmail.com can NEVER be deleted
+    if (user.email.toLowerCase() === 'borseteletoor@gmail.com') {
+      return NextResponse.json(
+        { error: 'غير مسموح إطلاقاً بحذف حساب المسؤول الرئيسي الأعلى للنظام (borseteletoor@gmail.com)' },
+        { status: 403 }
+      );
+    }
+
     if (user.role === 'ADMIN') {
       const adminCount = await prisma.user.count({
         where: { role: 'ADMIN' },
@@ -52,6 +60,20 @@ export async function PUT(
     const { id } = params;
     const body = await request.json();
     const { role, isActive, phone } = body;
+
+    const userToUpdate = await prisma.user.findUnique({ where: { id } });
+    if (!userToUpdate) {
+      return NextResponse.json({ error: 'المستخدم غير موجود' }, { status: 404 });
+    }
+
+    if (userToUpdate.email.toLowerCase() === 'borseteletoor@gmail.com') {
+      if (role && role !== 'ADMIN') {
+        return NextResponse.json({ error: 'لا يمكن تعديل صلاحية المسؤول الرئيسي الأعلى' }, { status: 403 });
+      }
+      if (isActive === false) {
+        return NextResponse.json({ error: 'لا يمكن تعطيل حساب المسؤول الرئيسي الأعلى' }, { status: 403 });
+      }
+    }
 
     const updateData: any = {};
     if (role !== undefined) updateData.role = role;
