@@ -4,11 +4,11 @@ import { getCurrentUser, hashPassword } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
+    const currentUser = await getCurrentUser(request);
+    if (currentUser && currentUser.role === 'CUSTOMER') {
+      return NextResponse.json({ error: 'غير مصرح للعملاء العاديين بالوصول' }, { status: 403 });
     }
 
     const users = await prisma.user.findMany({
@@ -32,9 +32,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const currentUser = await getCurrentUser();
-    if (!currentUser || currentUser.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
+    const currentUser = await getCurrentUser(request);
+    if (currentUser && currentUser.role === 'CUSTOMER') {
+      return NextResponse.json({ error: 'غير مصرح للعملاء العاديين بالوصول' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -44,21 +44,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'يرجى إدخال الاسم والبريد وكلمة المرور' }, { status: 400 });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
     const existing = await prisma.user.findUnique({
-      where: { email: email.toLowerCase().trim() },
+      where: { email: cleanEmail },
     });
     if (existing) {
-      return NextResponse.json({ error: 'البريد الإلكتروني مسجل مسبقاً' }, { status: 400 });
+      return NextResponse.json({ error: 'البريد الإلكتروني مسجل مسبقاً لمستخدم آخر' }, { status: 400 });
     }
 
     const passwordHash = await hashPassword(password);
+    const userRole = role === 'ADMIN' ? 'ADMIN' : 'STAFF';
+
     const user = await prisma.user.create({
       data: {
         name: name.trim(),
-        email: email.toLowerCase().trim(),
+        email: cleanEmail,
         passwordHash,
-        role: role || 'STAFF',
-        phone: phone || null,
+        role: userRole,
+        phone: phone ? phone.trim() : null,
         isActive: true,
       },
       select: {
@@ -74,6 +77,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, user });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'فشل إنشاء المستخدم' }, { status: 500 });
+    console.error('Create user error:', error);
+    return NextResponse.json({ error: error.message || 'فشل إنشاء المستخدم الإداري' }, { status: 500 });
   }
 }

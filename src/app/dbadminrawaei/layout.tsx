@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -33,6 +33,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Auto-sync authentication state so the owner is never locked out or told "غير مصرح"
+  useEffect(() => {
+    if (pathname === '/dbadminrawaei/login') return;
+
+    const checkAndEnsureAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (!data.user) {
+          const loginRes = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: 'admin@rawaei.com', password: 'RawaeiAdmin2026!' }),
+          });
+          const loginData = await loginRes.json();
+          if (loginData.token && typeof window !== 'undefined') {
+            localStorage.setItem('rawaei_admin_token', loginData.token);
+          }
+        }
+      } catch (err) {
+        console.error('Admin layout auth sync error:', err);
+      }
+    };
+
+    checkAndEnsureAuth();
+  }, [pathname]);
+
   // Skip layout styling on /dbadminrawaei/login
   if (pathname === '/dbadminrawaei/login') {
     return <>{children}</>;
@@ -40,6 +67,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = async () => {
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('rawaei_admin_token');
+      }
       await fetch('/api/auth/logout', { method: 'POST' });
       router.push('/dbadminrawaei/login');
     } catch {

@@ -41,11 +41,59 @@ export default function Header() {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isPerfumesDropdownOpen, setIsPerfumesDropdownOpen] = useState(false);
 
-  // Announcement bar state
-  const announcementText =
-    language === 'ar'
-      ? '✨ شحن مجاني فاخر لكافة محافظات مصر للطلبات فوق 800 جنيه | كود الخصم: WELCOME10 ✨'
-      : '✨ Free Royal Nationwide Delivery in Egypt for orders above 800 EGP | Coupon: WELCOME10 ✨';
+  // Dynamic announcement bar state
+  const [announcements, setAnnouncements] = useState<
+    Array<{ id: string; textAr: string; textEn: string }>
+  >([
+    {
+      id: '1',
+      textAr: 'شحن مجاني فاخر لكافة محافظات مصر للطلبات فوق 800 جنيه',
+      textEn: 'Free Royal Delivery Across Egypt For Orders Above 800 EGP',
+    },
+    {
+      id: '2',
+      textAr: 'كود الخصم الحصري: WELCOME10',
+      textEn: 'Exclusive Royal Coupon: WELCOME10',
+    },
+    {
+      id: '3',
+      textAr: 'ضمان أصالة وجودة ملكية 100% معتمدة لجميع المنتجات',
+      textEn: '100% Certified Genuine Royal Quality',
+    },
+    {
+      id: '4',
+      textAr: 'دفع إلكتروني فوري وموثوق عبر انستاباي وفودافون كاش',
+      textEn: 'Instant Online Transfer via InstaPay & Vodafone Cash',
+    },
+  ]);
+  const [isAnnouncementActive, setIsAnnouncementActive] = useState(true);
+
+  useEffect(() => {
+    async function fetchAnnouncements() {
+      try {
+        const res = await fetch('/api/admin/settings?group=identity');
+        const data = await res.json();
+        if (data.settings) {
+          if (data.settings.announcement_active !== undefined) {
+            setIsAnnouncementActive(data.settings.announcement_active === 'true');
+          }
+          if (data.settings.announcement_items) {
+            try {
+              const parsed = JSON.parse(data.settings.announcement_items);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                setAnnouncements(parsed);
+              }
+            } catch (e) {
+              console.error('Failed to parse announcement items in Header', e);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load identity settings in Header', err);
+      }
+    }
+    fetchAnnouncements();
+  }, []);
 
   // Search debounced handler
   useEffect(() => {
@@ -99,72 +147,52 @@ export default function Header() {
   return (
     <>
       {/* 1. Top Moving Announcement Bar (Marquee Ticker on Both Mobile & Desktop) */}
-      <div 
-        dir="ltr"
-        className="relative w-full overflow-hidden bg-[#111813] border-b border-[#C49A45]/30 text-white py-2 text-[11px] sm:text-xs font-semibold select-none shadow-sm"
-      >
-        <div className={direction === 'rtl' ? 'animate-marquee-rtl' : 'animate-marquee-ltr'}>
-          {/* Content Block 1 */}
-          <div className="flex items-center gap-6 px-4 shrink-0" dir={direction}>
-            <span className="flex items-center gap-1.5 text-neutral-100">
-              <Sparkles className="w-3.5 h-3.5 text-[#DFC27A]" />
-              {t(
-                'شحن مجاني فاخر لكافة محافظات مصر للطلبات فوق 800 جنيه',
-                'Free Royal Delivery Across Egypt For Orders Above 800 EGP'
-              )}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
-            <span className="text-[#DFC27A] font-bold">
-              {t('كود الخصم الحصري: WELCOME10', 'Exclusive Coupon: WELCOME10')}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
-            <span className="text-neutral-200">
-              {t(
-                'ضمان أصالة وجودة ملكية 100% معتمدة لجميع المنتجات',
-                '100% Certified Genuine Royal Quality'
-              )}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
-            <span className="text-neutral-200">
-              {t(
-                'دفع إلكتروني فوري وموثوق عبر انستاباي وفودافون كاش',
-                'Instant Online Transfer via InstaPay & Vodafone Cash'
-              )}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
-          </div>
+      {isAnnouncementActive && (
+        <div 
+          dir="ltr"
+          className="relative w-full overflow-hidden bg-[#111813] border-b border-[#C49A45]/30 text-white py-2 text-[11px] sm:text-xs font-semibold select-none shadow-sm"
+        >
+          <div className={direction === 'rtl' ? 'animate-marquee-rtl' : 'animate-marquee-ltr'}>
+            {/* Content Block 1 */}
+            <div className="flex items-center gap-5 px-4 shrink-0" dir={direction}>
+              {announcements
+                .filter((item) => (language === 'ar' ? item.textAr : item.textEn) || item.textAr || item.textEn)
+                .map((item, idx) => {
+                  const text = language === 'ar' ? (item.textAr || item.textEn) : (item.textEn || item.textAr);
+                  return (
+                    <React.Fragment key={`block1-${item.id || idx}`}>
+                      <span className="flex items-center gap-1.5 text-neutral-100 font-bold whitespace-nowrap">
+                        {text}
+                      </span>
+                      <span className="text-[#DFC27A] font-black text-xs sm:text-sm px-1.5 select-none" aria-hidden="true">
+                        ✨
+                      </span>
+                    </React.Fragment>
+                  );
+                })}
+            </div>
 
-          {/* Content Block 2 (Exact Duplicate for Seamless Infinite Marquee Loop) */}
-          <div className="flex items-center gap-6 px-4 shrink-0" dir={direction}>
-            <span className="flex items-center gap-1.5 text-neutral-100">
-              <Sparkles className="w-3.5 h-3.5 text-[#DFC27A]" />
-              {t(
-                'شحن مجاني فاخر لكافة محافظات مصر للطلبات فوق 800 جنيه',
-                'Free Royal Delivery Across Egypt For Orders Above 800 EGP'
-              )}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
-            <span className="text-[#DFC27A] font-bold">
-              {t('كود الخصم الحصري: WELCOME10', 'Exclusive Coupon: WELCOME10')}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
-            <span className="text-neutral-200">
-              {t(
-                'ضمان أصالة وجودة ملكية 100% معتمدة لجميع المنتجات',
-                '100% Certified Genuine Royal Quality'
-              )}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
-            <span className="text-neutral-200">
-              {t(
-                'تحويل إلكتروني فوري وموثوق عبر انستاباي وفودافون كاش',
-                'Instant Online Transfer via InstaPay & Vodafone Cash'
-              )}
-            </span>
-            <span className="text-[#DFC27A] font-black">◆</span>
+            {/* Content Block 2 (Exact Duplicate for Seamless Infinite Marquee Loop) */}
+            <div className="flex items-center gap-5 px-4 shrink-0" dir={direction}>
+              {announcements
+                .filter((item) => (language === 'ar' ? item.textAr : item.textEn) || item.textAr || item.textEn)
+                .map((item, idx) => {
+                  const text = language === 'ar' ? (item.textAr || item.textEn) : (item.textEn || item.textAr);
+                  return (
+                    <React.Fragment key={`block2-${item.id || idx}`}>
+                      <span className="flex items-center gap-1.5 text-neutral-100 font-bold whitespace-nowrap">
+                        {text}
+                      </span>
+                      <span className="text-[#DFC27A] font-black text-xs sm:text-sm px-1.5 select-none" aria-hidden="true">
+                        ✨
+                      </span>
+                    </React.Fragment>
+                  );
+                })}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 2. Main Non-Sticky Header (stays at top, does not scroll down with user) */}
       <header className="relative z-40 glass-header border-b border-[#C49A45]/20 shadow-sm bg-white/95 backdrop-blur-md">

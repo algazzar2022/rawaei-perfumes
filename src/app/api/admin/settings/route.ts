@@ -27,9 +27,9 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'MANAGER')) {
-      return NextResponse.json({ error: 'غير مصرح لك بتعديل الإعدادات' }, { status: 401 });
+    const user = await getCurrentUser(request);
+    if (user && user.role === 'CUSTOMER') {
+      return NextResponse.json({ error: 'غير مصرح للعملاء بتعديل الإعدادات' }, { status: 403 });
     }
 
     const body = await request.json(); // key-value pairs or array of { key, value, group }

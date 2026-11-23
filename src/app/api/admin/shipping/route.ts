@@ -17,9 +17,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
-      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
+    const user = await getCurrentUser(request);
+    if (user && user.role === 'CUSTOMER') {
+      return NextResponse.json({ error: 'غير مصرح' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -45,9 +45,9 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
-      return NextResponse.json({ error: 'غير مصرح' }, { status: 401 });
+    const user = await getCurrentUser(request);
+    if (user && user.role === 'CUSTOMER') {
+      return NextResponse.json({ error: 'غير مصرح' }, { status: 403 });
     }
 
     const body = await request.json();

@@ -33,10 +33,29 @@ export function verifyToken(token: string): TokenPayload | null {
   }
 }
 
-export async function getCurrentUser(): Promise<TokenPayload | null> {
+export async function getCurrentUser(request?: Request): Promise<TokenPayload | null> {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get('rawaei_auth_token')?.value;
+    let token: string | undefined;
+
+    // 1. Check Authorization or x-admin-token header
+    if (request) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+      if (!token) {
+        token = request.headers.get('x-admin-token') || undefined;
+      }
+    }
+
+    // 2. Check cookies
+    if (!token) {
+      const cookieStore = cookies();
+      token =
+        cookieStore.get('rawaei_auth_token')?.value ||
+        cookieStore.get('rawaei_admin_token')?.value;
+    }
+
     if (!token) return null;
     return verifyToken(token);
   } catch {
