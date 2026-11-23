@@ -56,16 +56,16 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       {/* Top Banner Greeting */}
-      <div className="p-6 sm:p-8 rounded-3xl glass-card border border-[#C49A45]/30 relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-l from-[#FAF6EE] via-white to-[#F5ECE0] border border-[#DFC27A]/50 shadow-sm relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="relative z-10 space-y-1.5">
-          <div className="inline-flex items-center gap-2 text-xs font-bold text-[#DFC27A]">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 text-xs font-bold text-[#98702B]">
+            <Sparkles className="w-4 h-4 text-[#C49A45]" />
             <span>نظام روائع للعطور – لوحة القيادة المركزية</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1E1B18]">
             مرحباً بك في إدارة المتجر
           </h1>
-          <p className="text-xs sm:text-sm text-gray-400">
+          <p className="text-xs sm:text-sm text-[#6B6357]">
             تابع مبيعاتك، مخزون العطور الفاخرة، وحالات الشحن والطلبات بصورة حية ولحظية.
           </p>
         </div>
@@ -73,96 +73,96 @@ export default async function AdminDashboardPage() {
         <div className="relative z-10 flex items-center gap-3">
           <Link
             href="/dbadminrawaei/products"
-            className="gold-button px-5 py-2.5 rounded-xl text-xs font-bold shadow-gold-glow"
+            className="gold-button px-5 py-2.5 rounded-xl text-xs font-bold shadow-md hover:brightness-105 transition-all"
           >
             + إضافة عطر جديد
           </Link>
           <Link
             href="/dbadminrawaei/banners"
-            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-white hover:bg-[#FAF6EE] border border-[#DFC27A]/40 text-xs font-bold text-[#1E1B18] shadow-sm transition-colors"
           >
             إدارة البانرات
           </Link>
         </div>
 
         {/* Ambient background glow */}
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#C49A45]/10 rounded-full blur-[90px] pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#C49A45]/15 rounded-full blur-[90px] pointer-events-none" />
       </div>
 
       {/* 4 Core Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Total Sales */}
-        <div className="glass-card rounded-2xl p-6 border border-[#C49A45]/20 space-y-3">
+        <div className="bg-white rounded-2xl p-6 border border-[#DFC27A]/30 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400">إجمالي المبيعات</span>
-            <div className="w-10 h-10 rounded-xl bg-[#C49A45]/15 text-[#DFC27A] flex items-center justify-center">
-              <DollarSign className="w-5 h-5" />
+            <span className="text-xs font-bold text-[#7A7368]">إجمالي المبيعات</span>
+            <div className="w-10 h-10 rounded-xl bg-[#C49A45]/15 text-[#98702B] flex items-center justify-center font-bold">
+              <DollarSign className="w-5 h-5 text-[#98702B]" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-[#DFC27A]">
+          <div className="text-2xl sm:text-3xl font-black text-[#98702B]">
             {formatPrice(totalSales, 'ar')}
           </div>
-          <p className="text-[11px] text-gray-400">من كافة الطلبات المؤكدة</p>
+          <p className="text-[11px] text-[#8C8377]">من كافة الطلبات المؤكدة</p>
         </div>
 
         {/* Total Orders */}
-        <div className="glass-card rounded-2xl p-6 border border-[#C49A45]/20 space-y-3">
+        <div className="bg-white rounded-2xl p-6 border border-[#DFC27A]/30 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400">إجمالي الطلبات</span>
-            <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center">
+            <span className="text-xs font-bold text-[#7A7368]">إجمالي الطلبات</span>
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <ShoppingBag className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{totalOrders}</div>
-          <p className="text-[11px] text-gray-400">
+          <div className="text-2xl sm:text-3xl font-black text-[#1E1B18]">{totalOrders}</div>
+          <p className="text-[11px] text-[#8C8377]">
             {pendingOrders} طلبات بانتظار المراجعة
           </p>
         </div>
 
         {/* Active Products */}
-        <div className="glass-card rounded-2xl p-6 border border-[#C49A45]/20 space-y-3">
+        <div className="bg-white rounded-2xl p-6 border border-[#DFC27A]/30 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400">المنتجات النشطة</span>
-            <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center">
+            <span className="text-xs font-bold text-[#7A7368]">المنتجات النشطة</span>
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
               <Package className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{totalProducts}</div>
-          <p className="text-[11px] text-gray-400">عطور ودهن عود ومجموعات</p>
+          <div className="text-2xl sm:text-3xl font-black text-[#1E1B18]">{totalProducts}</div>
+          <p className="text-[11px] text-[#8C8377]">عطور ودهن عود ومجموعات</p>
         </div>
 
         {/* Total Customers */}
-        <div className="glass-card rounded-2xl p-6 border border-[#C49A45]/20 space-y-3">
+        <div className="bg-white rounded-2xl p-6 border border-[#DFC27A]/30 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-400">إجمالي العملاء</span>
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+            <span className="text-xs font-bold text-[#7A7368]">إجمالي العملاء</span>
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Users className="w-5 h-5" />
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{totalCustomers}</div>
-          <p className="text-[11px] text-gray-400">عملاء مسجلين ومشتريين</p>
+          <div className="text-2xl sm:text-3xl font-black text-[#1E1B18]">{totalCustomers}</div>
+          <p className="text-[11px] text-[#8C8377]">عملاء مسجلين ومشتريين</p>
         </div>
       </div>
 
       {/* Orders Status Breakdown Badges */}
-      <div className="glass-card rounded-2xl p-5 border border-white/5">
-        <h3 className="text-xs font-bold text-gray-400 mb-3">حالات الطلبات الحالية:</h3>
+      <div className="bg-white rounded-2xl p-5 border border-[#DFC27A]/30 shadow-sm">
+        <h3 className="text-xs font-bold text-[#7A7368] mb-3">حالات الطلبات الحالية:</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
-            <span className="text-amber-300 font-semibold">بانتظار التأكيد:</span>
-            <span className="font-bold text-white text-base">{pendingOrders}</span>
+          <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/70 flex items-center justify-between">
+            <span className="text-amber-800 font-bold">بانتظار التأكيد:</span>
+            <span className="font-black text-amber-950 text-base">{pendingOrders}</span>
           </div>
-          <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between">
-            <span className="text-blue-300 font-semibold">قيد التجهيز:</span>
-            <span className="font-bold text-white text-base">{processingOrders}</span>
+          <div className="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200/70 flex items-center justify-between">
+            <span className="text-blue-800 font-bold">قيد التجهيز:</span>
+            <span className="font-black text-blue-950 text-base">{processingOrders}</span>
           </div>
-          <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between">
-            <span className="text-purple-300 font-semibold">خرج للشحن:</span>
-            <span className="font-bold text-white text-base">{shippedOrders}</span>
+          <div className="p-3.5 rounded-xl bg-purple-50/80 border border-purple-200/70 flex items-center justify-between">
+            <span className="text-purple-800 font-bold">خرج للشحن:</span>
+            <span className="font-black text-purple-950 text-base">{shippedOrders}</span>
           </div>
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
-            <span className="text-emerald-300 font-semibold">تم التوصيل بنجاح:</span>
-            <span className="font-bold text-white text-base">{deliveredOrders}</span>
+          <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200/70 flex items-center justify-between">
+            <span className="text-emerald-800 font-bold">تم التوصيل بنجاح:</span>
+            <span className="font-black text-emerald-950 text-base">{deliveredOrders}</span>
           </div>
         </div>
       </div>
@@ -170,67 +170,67 @@ export default async function AdminDashboardPage() {
       {/* Two Columns: Recent Orders & Low Stock Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Orders (2 cols) */}
-        <div className="lg:col-span-2 glass-card rounded-3xl p-6 border border-[#C49A45]/20 space-y-4">
-          <div className="flex items-center justify-between border-b border-white/10 pb-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <ShoppingBag className="w-4 h-4 text-[#C49A45]" />
+        <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-[#DFC27A]/30 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-[#DFC27A]/20 pb-4">
+            <h3 className="text-base font-bold text-[#1E1B18] flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-[#C49A45]" />
               <span>أحدث الطلبات الواردة</span>
             </h3>
             <Link
               href="/dbadminrawaei/orders"
-              className="text-xs text-[#DFC27A] hover:underline"
+              className="text-xs font-bold text-[#98702B] hover:underline"
             >
               عرض جميع الطلبات ←
             </Link>
           </div>
 
           {recentOrders.length === 0 ? (
-            <p className="text-xs text-gray-400 py-8 text-center">
+            <p className="text-xs text-[#8C8377] py-8 text-center">
               لا توجد طلبات مسجلة بعد. عند إتمام أول طلب سيظهر هنا مباشرة!
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-right">
                 <thead>
-                  <tr className="border-b border-white/5 text-gray-400">
-                    <th className="py-2.5 font-semibold">رقم الطلب</th>
-                    <th className="py-2.5 font-semibold">العميل</th>
-                    <th className="py-2.5 font-semibold">التاريخ</th>
-                    <th className="py-2.5 font-semibold">المبلغ</th>
-                    <th className="py-2.5 font-semibold">الحالة</th>
-                    <th className="py-2.5 font-semibold">إجراء</th>
+                  <tr className="border-b border-[#DFC27A]/20 text-[#7A7368]">
+                    <th className="py-3 px-2 font-bold">رقم الطلب</th>
+                    <th className="py-3 px-2 font-bold">العميل</th>
+                    <th className="py-3 px-2 font-bold">التاريخ</th>
+                    <th className="py-3 px-2 font-bold">المبلغ</th>
+                    <th className="py-3 px-2 font-bold">الحالة</th>
+                    <th className="py-3 px-2 font-bold">إجراء</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-gray-200">
+                <tbody className="divide-y divide-[#DFC27A]/15 text-[#1E1B18]">
                   {recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-white/5 transition-colors">
-                      <td className="py-3 font-mono font-bold text-[#DFC27A]">
+                    <tr key={order.id} className="hover:bg-[#FAF8F5] transition-colors">
+                      <td className="py-3.5 px-2 font-mono font-bold text-[#98702B]">
                         {order.orderNumber}
                       </td>
-                      <td className="py-3 font-medium text-white">{order.customerName}</td>
-                      <td className="py-3 text-gray-400">{formatDate(order.createdAt, 'ar')}</td>
-                      <td className="py-3 font-bold">{formatPrice(order.totalAmount, 'ar')}</td>
-                      <td className="py-3">
+                      <td className="py-3.5 px-2 font-semibold text-[#1E1B18]">{order.customerName}</td>
+                      <td className="py-3.5 px-2 text-[#7A7368]">{formatDate(order.createdAt, 'ar')}</td>
+                      <td className="py-3.5 px-2 font-bold text-[#1E1B18]">{formatPrice(order.totalAmount, 'ar')}</td>
+                      <td className="py-3.5 px-2">
                         <span
                           className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
                             order.status === 'DELIVERED'
-                              ? 'bg-emerald-500/20 text-emerald-300'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                               : order.status === 'SHIPPED'
-                              ? 'bg-blue-500/20 text-blue-300'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
                               : order.status === 'PROCESSING'
-                              ? 'bg-purple-500/20 text-purple-300'
+                              ? 'bg-purple-100 text-purple-800 border border-purple-200'
                               : order.status === 'CANCELLED'
-                              ? 'bg-red-500/20 text-red-300'
-                              : 'bg-amber-500/20 text-amber-300'
+                              ? 'bg-red-100 text-red-800 border border-red-200'
+                              : 'bg-amber-100 text-amber-800 border border-amber-200'
                           }`}
                         >
                           {order.status}
                         </span>
                       </td>
-                      <td className="py-3">
+                      <td className="py-3.5 px-2">
                         <Link
                           href={`/dbadminrawaei/orders?order=${order.orderNumber}`}
-                          className="text-[#DFC27A] hover:underline"
+                          className="text-[#98702B] font-bold hover:underline"
                         >
                           عرض التفاصيل
                         </Link>
@@ -244,22 +244,22 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Low Stock Alerts (1 col) */}
-        <div className="glass-card rounded-3xl p-6 border border-[#C49A45]/20 space-y-4">
-          <div className="flex items-center justify-between border-b border-white/10 pb-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
+        <div className="bg-white rounded-3xl p-6 border border-[#DFC27A]/30 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-[#DFC27A]/20 pb-4">
+            <h3 className="text-base font-bold text-[#1E1B18] flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
               <span>تنبيهات انخفاض المخزون</span>
             </h3>
             <Link
               href="/dbadminrawaei/inventory"
-              className="text-xs text-[#DFC27A] hover:underline"
+              className="text-xs font-bold text-[#98702B] hover:underline"
             >
               المستودع ←
             </Link>
           </div>
 
           {lowStockProducts.length === 0 ? (
-            <p className="text-xs text-gray-400 py-8 text-center">
+            <p className="text-xs text-[#8C8377] py-8 text-center">
               جميع المنتجات تتمتع بمخزون كافٍ ومثالي.
             </p>
           ) : (
@@ -267,14 +267,14 @@ export default async function AdminDashboardPage() {
               {lowStockProducts.map((p) => (
                 <div
                   key={p.id}
-                  className="p-3 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between text-xs"
+                  className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/25 flex items-center justify-between text-xs"
                 >
                   <div>
-                    <h4 className="font-bold text-white line-clamp-1">{p.nameAr}</h4>
-                    <span className="text-[11px] text-gray-400">SKU: {p.sku}</span>
+                    <h4 className="font-bold text-[#1E1B18] line-clamp-1">{p.nameAr}</h4>
+                    <span className="text-[11px] text-[#7A7368]">SKU: {p.sku}</span>
                   </div>
                   <div className="text-left">
-                    <span className="px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 font-black text-xs block">
+                    <span className="px-2.5 py-1 rounded-full bg-red-100 border border-red-200 text-red-700 font-black text-xs block">
                       باقي {p.stock}
                     </span>
                   </div>

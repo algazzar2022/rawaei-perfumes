@@ -220,3 +220,159 @@ body {
 .animate-marquee-ltr:hover {
   animation-play-state: paused;
 }
+
+/* ============================================================ */
+/* Luxury Light Dashboard Theme                                 */
+/* ============================================================ */
+.admin-light {
+  background-color: #FAF8F5;
+  color: #171717;
+}
+
+.admin-light .glass-card {
+  background: #FFFFFF !important;
+  border-color: rgba(196, 154, 69, 0.22) !important;
+  box-shadow: 0 4px 20px -2px rgba(152, 112, 43, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  color: #171717 !important;
+}
+
+.admin-light .glass-card:hover {
+  border-color: rgba(196, 154, 69, 0.45) !important;
+  box-shadow: 0 10px 30px -4px rgba(152, 112, 43, 0.12) !important;
+}
+
+/* Light Card & Container Overrides */
+.admin-light .bg-\[\#171717\],
+.admin-light .bg-\[\#151515\],
+.admin-light .bg-\[\#111111\],
+.admin-light .bg-\[\#121212\],
+.admin-light .bg-\[\#0E0E0E\],
+.admin-light .bg-\[\#0A0A0A\],
+.admin-light .bg-\[\#070707\],
+.admin-light .bg-neutral-900,
+.admin-light .bg-neutral-950 {
+  background-color: #FFFFFF !important;
+  border-color: rgba(196, 154, 69, 0.25) !important;
+  color: #171717 !important;
+}
+
+/* Typography contrast */
+.admin-light h1.text-white,
+.admin-light h2.text-white,
+.admin-light h3.text-white,
+.admin-light h4.text-white,
+.admin-light .font-bold.text-white,
+.admin-light .font-black.text-white,
+.admin-light span.text-white,
+.admin-light div.text-white,
+.admin-light p.text-white {
+  color: #171717 !important;
+}
+
+.admin-light .text-gray-400,
+.admin-light .text-gray-300,
+.admin-light .text-gray-200 {
+  color: #555555 !important;
+}
+
+/* Form Inputs, Selects & Textareas */
+.admin-light input:not([type="checkbox"]):not([type="radio"]),
+.admin-light select,
+.admin-light textarea {
+  background-color: #FAF8F5 !important;
+  color: #171717 !important;
+  border: 1px solid rgba(196, 154, 69, 0.35) !important;
+  border-radius: 0.75rem !important;
+}
+
+.admin-light input:focus,
+.admin-light select:focus,
+.admin-light textarea:focus {
+  background-color: #FFFFFF !important;
+  border-color: #C49A45 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(196, 154, 69, 0.2) !important;
+}
+
+.admin-light input::placeholder,
+.admin-light textarea::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Table Light Styling */
+.admin-light table thead {
+  background-color: #F5EFE6 !important;
+  border-bottom: 1px solid rgba(196, 154, 69, 0.25) !important;
+}
+
+.admin-light table thead th {
+  color: #6B7280 !important;
+  font-weight: 700 !important;
+}
+
+.admin-light table tbody {
+  background-color: #FFFFFF !important;
+}
+
+.admin-light table tbody tr {
+  border-color: rgba(196, 154, 69, 0.12) !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.admin-light table tbody tr:hover {
+  background-color: rgba(196, 154, 69, 0.05) !important;
+}
+
+.admin-light table tbody td {
+  color: #1F2937 !important;
+}
+
+/* Borders & Dividers */
+.admin-light .border-white\/5,
+.admin-light .border-white\/10,
+.admin-light .border-white\/15,
+.admin-light .border-white\/20,
+.admin-light .border-white\/25,
+.admin-light .divide-white\/5,
+.admin-light .divide-white\/10 {
+  border-color: rgba(196, 154, 69, 0.18) !important;
+}
+
+.admin-light .bg-white\/5,
+.admin-light .bg-white\/10 {
+  background-color: rgba(196, 154, 69, 0.08) !important;
+  color: #98702B !important;
+}
+
+/* Gold Buttons */
+.admin-light .gold-button {
+  background: linear-gradient(135deg, #DFC27A 0%, #C49A45 50%, #98702B 100%) !important;
+  color: #121212 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(152, 112, 43, 0.22) !important;
+}
+
+.admin-light .gold-button:hover {
+  background: linear-gradient(135deg, #E6CD8B 0%, #D4AA52 50%, #A87D33 100%) !important;
+  box-shadow: 0 6px 20px rgba(152, 112, 43, 0.32) !important;
+}
+
+.admin-light .gold-button * {
+  color: #121212 !important;
+}
+
+.admin-light label {
+  color: #374151 !important;
+  font-weight: 600;
+}
+
+.admin-light select option {
+  background-color: #FFFFFF !important;
+  color: #171717 !important;
+}
+
+.admin-light .fixed.inset-0.bg-black\/80,
+.admin-light .fixed.inset-0.bg-black\/70 {
+  background-color: rgba(15, 12, 8, 0.55) !important;
+  backdrop-filter: blur(4px) !important;
+}

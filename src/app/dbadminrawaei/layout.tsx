@@ -68,31 +68,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="min-h-screen flex bg-[#0A0A0A] text-[#F8F5EF]" dir="rtl">
-      {/* 1. Sidebar for Desktop */}
-      <aside className="hidden lg:flex w-72 flex-col justify-between bg-[#111111] border-l border-[#C49A45]/20 shadow-2xl z-30">
+    <div className="admin-light min-h-screen flex bg-[#FAF8F5] text-[#171717]" dir="rtl">
+      {/* 1. Sidebar for Desktop (Light Luxury Design) */}
+      <aside className="hidden lg:flex w-72 flex-col justify-between bg-white border-l border-[#C49A45]/20 shadow-md z-30">
         <div>
           {/* Logo / Brand Header */}
-          <div className="p-6 border-b border-[#C49A45]/20 flex items-center gap-3.5">
+          <div className="p-6 border-b border-[#C49A45]/20 flex items-center gap-3.5 bg-gradient-to-r from-white to-[#FAF7F2]">
             <div className="relative w-14 h-14 flex-shrink-0">
               <Image
                 src="/logo.png"
                 alt="روائع للعطور"
                 fill
+                sizes="56px"
                 className="object-contain"
                 priority
               />
             </div>
             <div>
-              <h2 className="text-lg font-black text-white">روائع للعطور</h2>
-              <p className="text-[11px] tracking-wider text-[#C49A45] uppercase font-bold">
+              <h2 className="text-lg font-black text-[#171717]">روائع للعطور</h2>
+              <p className="text-[11px] tracking-wider text-[#98702B] uppercase font-bold">
                 لوحة التحكم الإدارية
               </p>
             </div>
           </div>
 
           {/* Nav Items List */}
-          <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-160px)]">
+          <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-170px)]">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -102,11 +103,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   href={item.href}
                   className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#C49A45] to-[#98702B] text-black shadow-gold-glow font-bold'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-gradient-to-r from-[#DFC27A] via-[#C49A45] to-[#98702B] text-black shadow-md font-bold'
+                      : 'text-neutral-600 hover:text-[#98702B] hover:bg-[#FAF7F2]'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-[#C49A45]'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-[#98702B]'}`} />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -115,19 +116,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Footer controls */}
-        <div className="p-4 border-t border-white/5 space-y-2 bg-[#0E0E0E]">
+        <div className="p-4 border-t border-[#C49A45]/20 space-y-2 bg-[#FAF7F2]">
           <Link
             href="/"
             target="_blank"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-gray-300 hover:text-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white hover:bg-[#C49A45]/10 border border-[#C49A45]/30 text-xs font-bold text-[#98702B] transition-colors shadow-sm"
           >
-            <ExternalLink className="w-4 h-4 text-[#C49A45]" />
+            <ExternalLink className="w-4 h-4 text-[#98702B]" />
             <span>معاينة المتجر المباشر</span>
           </Link>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-red-400 hover:bg-red-950/40 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             <span>تسجيل الخروج</span>
@@ -138,24 +139,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* 2. Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="h-16 px-4 sm:px-8 border-b border-[#C49A45]/20 bg-[#121212]/90 backdrop-blur-md flex items-center justify-between sticky top-0 z-20">
+        <header className="h-16 px-4 sm:px-8 border-b border-[#C49A45]/20 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-20 shadow-sm">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-gray-400 hover:text-white"
+              className="lg:hidden p-2 text-neutral-600 hover:text-[#171717] rounded-lg hover:bg-neutral-100"
             >
               <Menu className="w-6 h-6" />
             </button>
-            <span className="text-xs font-bold text-[#DFC27A] px-3 py-1 rounded-full bg-[#C49A45]/10 border border-[#C49A45]/30">
+            <span className="text-xs font-bold text-[#98702B] px-3 py-1 rounded-full bg-[#C49A45]/10 border border-[#C49A45]/30">
               نظام إدارة التجارة الإلكترونية الملكية
             </span>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 text-xs">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-gray-300">المدير:</span>
-              <span className="font-bold text-white">admin@rawaei.com</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-neutral-500">المدير:</span>
+              <span className="font-bold text-[#171717]">admin@rawaei.com</span>
             </div>
 
             <Link
@@ -170,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Content Container */}
-        <main className="flex-1 p-4 sm:p-8 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-4 sm:p-8 overflow-y-auto bg-[#FAF8F5]">{children}</main>
       </div>
 
       {/* 3. Mobile Navigation Drawer */}
@@ -178,15 +179,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
           />
-          <div className="fixed top-0 bottom-0 right-0 w-4/5 max-w-xs bg-[#111111] border-l border-[#C49A45]/30 p-6 flex flex-col justify-between overflow-y-auto">
+          <div className="fixed top-0 bottom-0 right-0 w-4/5 max-w-xs bg-white border-l border-[#C49A45]/30 p-6 flex flex-col justify-between overflow-y-auto shadow-2xl">
             <div>
-              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
-                <span className="font-bold text-white text-sm">لوحة التحكم</span>
+              <div className="flex items-center justify-between pb-4 border-b border-[#C49A45]/20 mb-4">
+                <span className="font-black text-[#171717] text-sm">لوحة التحكم</span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1 text-gray-400 hover:text-white"
+                  className="p-1 text-neutral-500 hover:text-black rounded-lg hover:bg-neutral-100"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -200,8 +201,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     onClick={() => setMobileMenuOpen(false)}
                     className={`block px-3 py-2 rounded-xl text-xs font-semibold ${
                       pathname === item.href
-                        ? 'bg-[#C49A45] text-black font-bold'
-                        : 'text-gray-300 hover:bg-white/5'
+                        ? 'bg-gradient-to-r from-[#DFC27A] via-[#C49A45] to-[#98702B] text-black font-bold shadow-sm'
+                        : 'text-neutral-600 hover:text-[#98702B] hover:bg-[#FAF7F2]'
                     }`}
                   >
                     {item.label}
@@ -210,10 +211,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
 
-            <div className="pt-6 border-t border-white/10">
+            <div className="pt-6 border-t border-[#C49A45]/20">
               <button
                 onClick={handleLogout}
-                className="w-full py-2.5 rounded-xl bg-red-950/40 text-red-400 text-xs font-bold text-center"
+                className="w-full py-2.5 rounded-xl bg-red-50 text-red-600 border border-red-200 text-xs font-bold text-center hover:bg-red-100 transition-colors"
               >
                 تسجيل الخروج
               </button>
