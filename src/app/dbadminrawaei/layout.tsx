@@ -110,7 +110,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="admin-light min-h-screen flex bg-[#FAF8F5] text-black" dir="rtl">
       {/* 1. Sidebar for Desktop (Light Luxury Design) */}
-      <aside className="hidden lg:flex w-72 flex-col justify-between bg-white border-l border-[#C49A45]/20 shadow-md z-30">
+      <aside className="hidden lg:flex w-72 flex-col justify-between bg-white border-l border-[#C49A45]/20 shadow-md z-30 flex-shrink-0">
         <div>
           {/* Logo / Brand Header */}
           <div className="p-6 border-b border-[#C49A45]/20 flex items-center gap-3.5 bg-gradient-to-r from-white to-[#FAF7F2]">
@@ -132,8 +132,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          {/* Nav Items List */}
-          <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-170px)]">
+          {/* Nav Items List (Natural flow without internal scrolling) */}
+          <nav className="p-4 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -210,8 +210,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        {/* Content Container */}
-        <main className="flex-1 p-4 sm:p-8 overflow-y-auto bg-[#FAF8F5]">{children}</main>
+        {/* Content Container (Unified full page scrolling) */}
+        <main className="flex-1 p-4 sm:p-8 bg-[#FAF8F5]">{children}</main>
       </div>
 
       {/* 3. Mobile Navigation Drawer */}
