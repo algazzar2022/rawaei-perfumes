@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Palette, Save, Check, Sparkles, Plus, Trash2 } from 'lucide-react';
+import { autoTranslate } from '@/lib/translate';
 
 interface AnnouncementItem {
   id: string;
@@ -117,12 +118,24 @@ export default function AdminVisualIdentityPage() {
     setMessage(null);
 
     try {
-      // Filter non-empty announcements
-      const cleanAnnouncements = announcements.map((item, idx) => ({
-        id: item.id || String(idx + 1),
-        textAr: item.textAr.trim() || 'روائع للعطور',
-        textEn: item.textEn.trim() || 'RAWAEI PERFUMES',
-      }));
+      // Auto-translate Arabic announcement texts into English in background
+      const translatedAnnouncements = await Promise.all(
+        announcements.map(async (item, idx) => {
+          const ar = item.textAr.trim() || 'روائع للعطور';
+          let en = item.textEn.trim();
+          try {
+            const trans = await autoTranslate(ar);
+            if (trans) en = trans;
+          } catch (tErr) {
+            console.warn('Announcement translation warning:', tErr);
+          }
+          return {
+            id: item.id || String(idx + 1),
+            textAr: ar,
+            textEn: en || ar,
+          };
+        })
+      );
 
       const payload = [
         { key: 'primary_gold', value: settings.primary_gold, group: 'identity' },
@@ -131,9 +144,9 @@ export default function AdminVisualIdentityPage() {
         { key: 'black', value: settings.black, group: 'identity' },
         { key: 'ivory', value: settings.ivory, group: 'identity' },
         { key: 'announcement_active', value: settings.announcement_active, group: 'identity' },
-        { key: 'announcement_items', value: JSON.stringify(cleanAnnouncements), group: 'identity' },
-        { key: 'announcement_bar_ar', value: cleanAnnouncements.map((i) => i.textAr).join(' ✨ '), group: 'identity' },
-        { key: 'announcement_bar_en', value: cleanAnnouncements.map((i) => i.textEn).join(' ✨ '), group: 'identity' },
+        { key: 'announcement_items', value: JSON.stringify(translatedAnnouncements), group: 'identity' },
+        { key: 'announcement_bar_ar', value: translatedAnnouncements.map((i) => i.textAr).join(' ✨ '), group: 'identity' },
+        { key: 'announcement_bar_en', value: translatedAnnouncements.map((i) => i.textEn).join(' ✨ '), group: 'identity' },
       ];
 
       const res = await fetch('/api/admin/settings', {
@@ -143,7 +156,7 @@ export default function AdminVisualIdentityPage() {
       });
 
       if (!res.ok) throw new Error('فشل الحفظ');
-      setMessage('تم حفظ إعدادات الهوية ونصوص شريط الإعلانات بنجاح! ✓');
+      setMessage('تمت الترجمة وحفظ إعدادات الهوية ونصوص شريط الإعلانات بنجاح! ✓');
       setTimeout(() => setMessage(null), 3500);
     } catch {
       alert('خطأ أثناء الحفظ');
@@ -297,38 +310,20 @@ export default function AdminVisualIdentityPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="space-y-1">
-                    <label className="text-black font-bold block text-[11px]">
-                      النص بالعربية *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="مثال: شحن مجاني لكافة محافظات مصر للطلبات فوق 800 جنيه"
-                      value={item.textAr}
-                      onChange={(e) =>
-                        handleUpdateAnnouncement(item.id, 'textAr', e.target.value)
-                      }
-                      className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3.5 py-2 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45]"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-black font-bold block text-[11px]">
-                      النص بالإنجليزية (English Text)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Example: Free Royal Delivery Across Egypt For Orders Above 800 EGP"
-                      value={item.textEn}
-                      onChange={(e) =>
-                        handleUpdateAnnouncement(item.id, 'textEn', e.target.value)
-                      }
-                      className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3.5 py-2 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45]"
-                      dir="ltr"
-                    />
-                  </div>
+                <div className="space-y-1 text-xs">
+                  <label className="text-black font-bold block text-[11px]">
+                    النص بالعربية *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="مثال: شحن مجاني لكافة محافظات مصر للطلبات فوق 800 جنيه"
+                    value={item.textAr}
+                    onChange={(e) =>
+                      handleUpdateAnnouncement(item.id, 'textAr', e.target.value)
+                    }
+                    className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3.5 py-2 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45]"
+                  />
                 </div>
               </div>
             ))}
@@ -351,8 +346,8 @@ export default function AdminVisualIdentityPage() {
             disabled={saving}
             className="gold-button px-8 py-3 rounded-xl font-black text-black text-xs flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4 text-black" />
-            <span>{saving ? 'جاري الحفظ...' : 'حفظ شريط الإعلانات وكافة الإعدادات'}</span>
+            <Sparkles className="w-4 h-4 text-black" />
+            <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : 'ترجمة وحفظ'}</span>
           </button>
         </div>
       </form>

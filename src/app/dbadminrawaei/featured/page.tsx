@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ProductDto, CategoryDto } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
+import { autoTranslate } from '@/lib/translate';
 
 export default function AdminFeaturedProductsPage() {
   const [allProducts, setAllProducts] = useState<ProductDto[]>([]);
@@ -104,17 +105,28 @@ export default function AdminFeaturedProductsPage() {
     setSaving(true);
     setMessage(null);
     try {
+      let translatedTitleEn = settings.titleEn;
+      try {
+        if (settings.titleAr?.trim()) {
+          const trans = await autoTranslate(settings.titleAr.trim());
+          if (trans) translatedTitleEn = trans;
+        }
+      } catch (err) {
+        console.warn('Featured title translation warning:', err);
+      }
+
       const res = await fetch('/api/featured-products', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productIds: selectedProductIds,
           ...settings,
+          titleEn: translatedTitleEn || settings.titleAr,
         }),
       });
 
       if (!res.ok) throw new Error('فشل حفظ التعديلات');
-      setMessage('تم حفظ إعدادات وترتيب قسم المنتجات المميزة بنجاح!');
+      setMessage('تمت الترجمة وحفظ إعدادات وترتيب قسم المنتجات المميزة بنجاح!');
       setTimeout(() => setMessage(null), 3500);
       fetchData();
     } catch (err: any) {
@@ -160,10 +172,10 @@ export default function AdminFeaturedProductsPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 self-start sm:self-auto shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+          className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 self-start sm:self-auto shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
         >
-          <Save className="w-4 h-4 text-black" />
-          <span>{saving ? 'جاري الحفظ...' : 'حفظ التغييرات بالكامل'}</span>
+          <Sparkles className="w-4 h-4 text-black" />
+          <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : 'ترجمة وحفظ'}</span>
         </button>
       </div>
 
@@ -182,24 +194,13 @@ export default function AdminFeaturedProductsPage() {
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <label className="text-black font-black block">عنوان القسم بالعربية</label>
             <input
               type="text"
               value={settings.titleAr}
               onChange={(e) => setSettings({ ...settings, titleAr: e.target.value })}
               className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:border-[#C49A45] focus:bg-white outline-none"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-black font-black block">عنوان القسم بالإنجليزية</label>
-            <input
-              type="text"
-              value={settings.titleEn}
-              onChange={(e) => setSettings({ ...settings, titleEn: e.target.value })}
-              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:border-[#C49A45] focus:bg-white outline-none"
-              dir="ltr"
             />
           </div>
 

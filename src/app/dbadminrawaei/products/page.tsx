@@ -74,83 +74,6 @@ export default function AdminProductsPage() {
     { sizeMl: 100, price: '950', comparePrice: '1250', stock: '30', isDefault: true },
   ]);
 
-  // Auto-translation state
-  const [translatingField, setTranslatingField] = useState<string | null>(null);
-
-  const handleTranslateName = async () => {
-    if (!formData.nameAr.trim()) return;
-    setTranslatingField('name');
-    try {
-      const en = await autoTranslate(formData.nameAr);
-      if (en) {
-        const cleanSlug = en
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '');
-        setFormData((prev) => ({
-          ...prev,
-          nameEn: en,
-          slug: prev.slug || cleanSlug,
-        }));
-      }
-    } finally {
-      setTranslatingField(null);
-    }
-  };
-
-  const handleTranslateDescription = async () => {
-    if (!formData.descriptionAr.trim()) return;
-    setTranslatingField('desc');
-    try {
-      const en = await autoTranslate(formData.descriptionAr);
-      if (en) {
-        setFormData((prev) => ({
-          ...prev,
-          descriptionEn: en,
-        }));
-      }
-    } finally {
-      setTranslatingField(null);
-    }
-  };
-
-  const handleTranslateAllFields = async () => {
-    if (!formData.nameAr.trim() && !formData.descriptionAr.trim()) {
-      alert('يرجى كتابة الاسم أو الوصف بالعربية أولاً ليتمكن النظام من ترجمته تلقائياً');
-      return;
-    }
-    setTranslatingField('all');
-    try {
-      const texts: Record<string, string> = {};
-      if (formData.nameAr.trim()) texts.name = formData.nameAr;
-      if (formData.descriptionAr.trim()) texts.desc = formData.descriptionAr;
-      if (formData.topNotes.trim()) texts.top = formData.topNotes;
-      if (formData.heartNotes.trim()) texts.heart = formData.heartNotes;
-      if (formData.baseNotes.trim()) texts.base = formData.baseNotes;
-
-      const res = await autoTranslateBatch(texts);
-      setFormData((prev) => {
-        const updated = { ...prev };
-        if (res.name) {
-          updated.nameEn = res.name;
-          if (!updated.slug) {
-            updated.slug = res.name
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-+|-+$/g, '');
-          }
-        }
-        if (res.desc) updated.descriptionEn = res.desc;
-        if (res.top) updated.topNotes = res.top;
-        if (res.heart) updated.heartNotes = res.heart;
-        if (res.base) updated.baseNotes = res.base;
-        return updated;
-      });
-    } finally {
-      setTranslatingField(null);
-    }
-  };
-
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -325,17 +248,54 @@ export default function AdminProductsPage() {
     setFormError(null);
 
     try {
-      if (!formData.nameAr.trim() || !formData.nameEn.trim()) {
-        throw new Error('يرجى كتابة اسم العطر باللغتين العربية والإنجليزية');
+      if (!formData.nameAr.trim()) {
+        throw new Error('يرجى كتابة اسم العطر بالعربية');
       }
 
-      if (!formData.descriptionAr.trim() || !formData.descriptionEn.trim()) {
-        throw new Error('يرجى كتابة وصف العطر باللغتين العربية والإنجليزية');
+      if (!formData.descriptionAr.trim()) {
+        throw new Error('يرجى كتابة وصف ومكونات العطر بالعربية');
       }
 
       if (sizes.length === 0) {
         throw new Error('يرجى إضافة حجم زجاجة واحد على الأقل للعطر مع السعر');
       }
+
+      // Auto-translate Arabic inputs to English in the background
+      let translatedNameEn = formData.nameEn.trim();
+      let translatedDescEn = formData.descriptionEn.trim();
+      let translatedTopNotes = formData.topNotes.trim();
+      let translatedHeartNotes = formData.heartNotes.trim();
+      let translatedBaseNotes = formData.baseNotes.trim();
+
+      try {
+        const textsToTranslate: Record<string, string> = {
+          name: formData.nameAr.trim(),
+          desc: formData.descriptionAr.trim(),
+        };
+        if (formData.topNotes.trim()) textsToTranslate.top = formData.topNotes.trim();
+        if (formData.heartNotes.trim()) textsToTranslate.heart = formData.heartNotes.trim();
+        if (formData.baseNotes.trim()) textsToTranslate.base = formData.baseNotes.trim();
+
+        const transRes = await autoTranslateBatch(textsToTranslate);
+        if (transRes.name) translatedNameEn = transRes.name;
+        if (transRes.desc) translatedDescEn = transRes.desc;
+        if (transRes.top) translatedTopNotes = transRes.top;
+        if (transRes.heart) translatedHeartNotes = transRes.heart;
+        if (transRes.base) translatedBaseNotes = transRes.base;
+      } catch (transErr) {
+        console.warn('Auto translation warning:', transErr);
+      }
+
+      if (!translatedNameEn) translatedNameEn = formData.nameAr.trim();
+      if (!translatedDescEn) translatedDescEn = formData.descriptionAr.trim();
+
+      const cleanSlug =
+        formData.slug.trim() ||
+        translatedNameEn
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') ||
+        `perfume-${Date.now()}`;
 
       const defaultSize = sizes.find((s) => s.isDefault) || sizes[0];
       const mainPrice = parseFloat(defaultSize.price) || parseFloat(formData.price) || 0;
@@ -350,19 +310,19 @@ export default function AdminProductsPage() {
 
       const payload = {
         nameAr: formData.nameAr,
-        nameEn: formData.nameEn,
-        slug: formData.slug || formData.nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        nameEn: translatedNameEn,
+        slug: cleanSlug,
         descriptionAr: formData.descriptionAr,
-        descriptionEn: formData.descriptionEn,
+        descriptionEn: translatedDescEn,
         price: mainPrice,
         compareAtPrice: mainComparePrice,
         stock: totalStock,
         volumeMl: mainVolume,
         gender: formData.gender,
         scentFamily: formData.scentFamily,
-        topNotes: formData.topNotes,
-        heartNotes: formData.heartNotes,
-        baseNotes: formData.baseNotes,
+        topNotes: translatedTopNotes,
+        heartNotes: translatedHeartNotes,
+        baseNotes: translatedBaseNotes,
         longevity: formData.longevity,
         sillage: formData.sillage,
         isFeatured: formData.isFeatured,
@@ -462,17 +422,6 @@ export default function AdminProductsPage() {
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                onClick={handleTranslateAllFields}
-                disabled={translatingField === 'all'}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200 border border-amber-300 text-xs font-black text-amber-950 flex items-center gap-1.5 shadow-xs hover:brightness-105 cursor-pointer disabled:opacity-50"
-                title="ترجمة الاسم والوصف والنوتات تلقائياً من العربية إلى الإنجليزية"
-              >
-                <Sparkles className="w-4 h-4 text-[#98702B]" />
-                <span>{translatingField === 'all' ? 'جاري الترجمة الذكية...' : 'ترجمة كل الحقول تلقائياً ✨'}</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => setViewMode('LIST')}
                 className="px-5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-neutral-200 border border-neutral-300 text-xs font-bold text-black transition-colors cursor-pointer"
               >
@@ -482,9 +431,10 @@ export default function AdminProductsPage() {
                 type="submit"
                 form="product-form"
                 disabled={saving}
-                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+                className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer flex items-center gap-2"
               >
-                {saving ? 'جاري الحفظ...' : editingProduct ? 'حفظ التعديلات' : 'نشر العطر الجديد'}
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : editingProduct ? 'ترجمة وحفظ التعديلات' : 'ترجمة وحفظ'}</span>
               </button>
             </div>
           </div>
@@ -502,70 +452,15 @@ export default function AdminProductsPage() {
             className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6 text-xs"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">اسم العطر بالعربية *</label>
-                  {formData.nameAr.trim() && (
-                    <button
-                      type="button"
-                      onClick={handleTranslateName}
-                      disabled={translatingField === 'name'}
-                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#98702B]" />
-                      <span>{translatingField === 'name' ? 'جاري الترجمة...' : 'ترجمة للاسم الإنجليزي'}</span>
-                    </button>
-                  )}
-                </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black text-xs block">اسم العطر بالعربية *</label>
                 <input
                   type="text"
                   required
                   placeholder="مثال: عطر سوفرين ليذر الملكي"
                   value={formData.nameAr}
                   onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                  onBlur={() => {
-                    if (formData.nameAr.trim() && !formData.nameEn.trim()) {
-                      handleTranslateName();
-                    }
-                  }}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">اسم العطر بالإنجليزية *</label>
-                  <button
-                    type="button"
-                    onClick={handleTranslateName}
-                    disabled={!formData.nameAr.trim() || translatingField === 'name'}
-                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-[#98702B]" />
-                    <span>{translatingField === 'name' ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  required
-                  placeholder="Sovereign Leather Royal Perfume"
-                  value={formData.nameEn}
-                  onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-black font-black text-xs block">المعرف اللطيف (Slug) *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="sovereign-leather"
-                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                  dir="ltr"
                 />
               </div>
 
@@ -608,57 +503,14 @@ export default function AdminProductsPage() {
                 />
               </div>
 
-              {/* Bilingual Descriptions */}
-              <div className="space-y-1.5 sm:col-span-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">الوصف بالعربية *</label>
-                  {formData.descriptionAr.trim() && (
-                    <button
-                      type="button"
-                      onClick={handleTranslateDescription}
-                      disabled={translatingField === 'desc'}
-                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#98702B]" />
-                      <span>{translatingField === 'desc' ? 'جاري الترجمة...' : 'ترجمة للوصف الإنجليزي'}</span>
-                    </button>
-                  )}
-                </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black text-xs block">الوصف بالعربية ومكونات العطر الفاخرة *</label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   required
                   placeholder="عطر فاخر يمزج بين عبق العود المعتّق والنفحات الخشبية والجلدية الساحرة..."
                   value={formData.descriptionAr}
                   onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                  onBlur={() => {
-                    if (formData.descriptionAr.trim() && !formData.descriptionEn.trim()) {
-                      handleTranslateDescription();
-                    }
-                  }}
-                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">الوصف بالإنجليزية (Description in English) *</label>
-                  <button
-                    type="button"
-                    onClick={handleTranslateDescription}
-                    disabled={!formData.descriptionAr.trim() || translatingField === 'desc'}
-                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-[#98702B]" />
-                    <span>{translatingField === 'desc' ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
-                  </button>
-                </div>
-                <textarea
-                  rows={3}
-                  required
-                  dir="ltr"
-                  placeholder="A royal luxurious fragrance blending vintage aged oud with rich woods and amber..."
-                  value={formData.descriptionEn}
-                  onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
@@ -891,9 +743,10 @@ export default function AdminProductsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+                className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer flex items-center gap-2"
               >
-                {saving ? 'جاري الحفظ...' : editingProduct ? 'حفظ التعديلات' : 'نشر العطر الجديد'}
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : editingProduct ? 'ترجمة وحفظ التعديلات' : 'ترجمة وحفظ'}</span>
               </button>
             </div>
           </form>

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, Save, Check, ExternalLink } from 'lucide-react';
+import { FileText, Save, Check, ExternalLink, Sparkles } from 'lucide-react';
+import { autoTranslate } from '@/lib/translate';
 
 export default function AdminPagesManager() {
   const [pages, setPages] = useState<any[]>([]);
@@ -54,20 +55,37 @@ export default function AdminPagesManager() {
     setSaving(true);
     setMessage(null);
     try {
+      // Auto-translate Arabic inputs to English in background
+      let translatedTitleEn = titleEn.trim();
+      let translatedContentEn = contentEn.trim();
+
+      try {
+        if (titleAr.trim()) {
+          const transTitle = await autoTranslate(titleAr.trim());
+          if (transTitle) translatedTitleEn = transTitle;
+        }
+        if (contentAr.trim()) {
+          const transContent = await autoTranslate(contentAr.trim());
+          if (transContent) translatedContentEn = transContent;
+        }
+      } catch (transErr) {
+        console.warn('Page translation warning:', transErr);
+      }
+
       const res = await fetch('/api/admin/pages', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           slug: selectedSlug,
           titleAr,
-          titleEn,
+          titleEn: translatedTitleEn || titleAr,
           contentAr,
-          contentEn,
+          contentEn: translatedContentEn || contentAr,
           isActive: true,
         }),
       });
       if (!res.ok) throw new Error('فشل الحفظ');
-      setMessage('تم حفظ محتوى الصفحة بنجاح!');
+      setMessage('تمت الترجمة وحفظ محتوى الصفحة بنجاح!');
       setTimeout(() => setMessage(null), 3000);
       fetchPages();
     } catch {
@@ -124,7 +142,7 @@ export default function AdminPagesManager() {
         className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-5"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <label className="text-black font-black block">عنوان الصفحة بالعربية</label>
             <input
               type="text"
@@ -135,36 +153,13 @@ export default function AdminPagesManager() {
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-black font-black block">عنوان الصفحة بالإنجليزية</label>
-            <input
-              type="text"
-              required
-              value={titleEn}
-              onChange={(e) => setTitleEn(e.target.value)}
-              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
-              dir="ltr"
-            />
-          </div>
-
           <div className="space-y-1.5 sm:col-span-2">
             <label className="text-black font-black block">محتوى الصفحة بالعربية (HTML مدعوم)</label>
             <textarea
-              rows={8}
+              rows={10}
               value={contentAr}
               onChange={(e) => setContentAr(e.target.value)}
               className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-black font-mono text-xs focus:outline-none focus:border-[#C49A45] focus:bg-white leading-relaxed"
-            />
-          </div>
-
-          <div className="space-y-1.5 sm:col-span-2">
-            <label className="text-black font-black block">محتوى الصفحة بالإنجليزية (HTML مدعوم)</label>
-            <textarea
-              rows={6}
-              value={contentEn}
-              onChange={(e) => setContentEn(e.target.value)}
-              className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-black font-mono text-xs focus:outline-none focus:border-[#C49A45] focus:bg-white leading-relaxed"
-              dir="ltr"
             />
           </div>
         </div>
@@ -175,8 +170,8 @@ export default function AdminPagesManager() {
             disabled={saving}
             className="gold-button px-8 py-3 rounded-xl font-black text-black text-xs flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4 text-black" />
-            <span>{saving ? 'جاري الحفظ...' : 'حفظ ونشر التعديلات'}</span>
+            <Sparkles className="w-4 h-4 text-black" />
+            <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : 'ترجمة وحفظ ونشر التعديلات'}</span>
           </button>
         </div>
       </form>

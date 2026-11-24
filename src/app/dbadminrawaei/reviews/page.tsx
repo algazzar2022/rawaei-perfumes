@@ -44,24 +44,6 @@ export default function AdminVideoReviewsPage() {
     isActive: true,
   });
 
-  const [translating, setTranslating] = useState(false);
-
-  const handleTranslateQuote = async () => {
-    if (!formData.quoteAr.trim()) return;
-    setTranslating(true);
-    try {
-      const en = await autoTranslate(formData.quoteAr);
-      if (en) {
-        setFormData((prev) => ({
-          ...prev,
-          quoteEn: en,
-        }));
-      }
-    } finally {
-      setTranslating(false);
-    }
-  };
-
   const fetchReviews = async () => {
     try {
       setLoading(true);
@@ -130,26 +112,42 @@ export default function AdminVideoReviewsPage() {
     setSaving(true);
 
     try {
+      // Auto-translate quote in the background
+      let translatedQuoteEn = formData.quoteEn.trim();
+      try {
+        if (formData.quoteAr.trim()) {
+          const trans = await autoTranslate(formData.quoteAr.trim());
+          if (trans) translatedQuoteEn = trans;
+        }
+      } catch (transErr) {
+        console.warn('Review translation warning:', transErr);
+      }
+
+      const payload = {
+        ...formData,
+        quoteEn: translatedQuoteEn || formData.quoteAr.trim(),
+      };
+
       if (editingReview) {
         // Update
         const res = await fetch(`/api/video-reviews/${editingReview.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'فشل تعديل المراجعة');
-        setSuccessMsg('تم تعديل مراجعة الفيديو بنجاح');
+        setSuccessMsg('تمت الترجمة وتعديل مراجعة الفيديو بنجاح');
       } else {
         // Create
         const res = await fetch('/api/video-reviews', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'فشل إضافة المراجعة');
-        setSuccessMsg('تمت إضافة مراجعة الفيديو بنجاح');
+        setSuccessMsg('تمت الترجمة وإضافة مراجعة الفيديو بنجاح');
       }
 
       setViewMode('LIST');
@@ -222,9 +220,10 @@ export default function AdminVideoReviewsPage() {
                 type="submit"
                 form="review-form"
                 disabled={saving}
-                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+                className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer flex items-center gap-2"
               >
-                {saving ? 'جاري الحفظ...' : editingReview ? 'حفظ التعديلات' : 'نشر الفيديو'}
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : editingReview ? 'ترجمة وحفظ التعديلات' : 'ترجمة وحفظ'}</span>
               </button>
             </div>
           </div>
@@ -288,55 +287,14 @@ export default function AdminVideoReviewsPage() {
                 />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">اقتباس العميل / رأيه في العطر (بالعربية) *</label>
-                  {formData.quoteAr.trim() && (
-                    <button
-                      type="button"
-                      onClick={handleTranslateQuote}
-                      disabled={translating}
-                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#98702B]" />
-                      <span>{translating ? 'جاري الترجمة...' : 'ترجمة للاقتباس الإنجليزي'}</span>
-                    </button>
-                  )}
-                </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black text-xs block">اقتباس العميل / رأيه في العطر (بالعربية) *</label>
                 <textarea
                   required
                   rows={3}
                   placeholder="رأيه في ثبات العطر، التغليف، والفوحان المميز..."
                   value={formData.quoteAr}
                   onChange={(e) => setFormData({ ...formData, quoteAr: e.target.value })}
-                  onBlur={() => {
-                    if (formData.quoteAr.trim() && !formData.quoteEn.trim()) {
-                      handleTranslateQuote();
-                    }
-                  }}
-                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">اقتباس العميل بالإنجليزية (Quote in English)</label>
-                  <button
-                    type="button"
-                    onClick={handleTranslateQuote}
-                    disabled={!formData.quoteAr.trim() || translating}
-                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-[#98702B]" />
-                    <span>{translating ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
-                  </button>
-                </div>
-                <textarea
-                  rows={3}
-                  dir="ltr"
-                  placeholder="Customer review in English: longevity, sillage, luxurious packaging..."
-                  value={formData.quoteEn}
-                  onChange={(e) => setFormData({ ...formData, quoteEn: e.target.value })}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
@@ -398,9 +356,10 @@ export default function AdminVideoReviewsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+                className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer flex items-center gap-2"
               >
-                {saving ? 'جاري الحفظ...' : editingReview ? 'حفظ التعديلات' : 'نشر الفيديو'}
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : editingReview ? 'ترجمة وحفظ التعديلات' : 'ترجمة وحفظ'}</span>
               </button>
             </div>
           </form>

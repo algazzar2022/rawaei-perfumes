@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { BannerDto, BannerSlideDto } from '@/lib/types';
 import MediaUploader from '@/components/admin/MediaUploader';
+import { autoTranslate, autoTranslateBatch } from '@/lib/translate';
 
 export default function AdminBannersPage() {
   const [banners, setBanners] = useState<BannerDto[]>([]);
@@ -92,27 +93,63 @@ export default function AdminBannersPage() {
       const hero = banners.find((b) => b.type === 'HERO');
       if (!hero) return;
 
+      // Auto-translate Arabic inputs to English in the background
+      let translatedTitleEn = heroTitleEn;
+      let translatedSubEn = heroSubtitleEn;
+      let translatedBtnEn = heroBtnTextEn;
+
+      try {
+        const texts: Record<string, string> = {};
+        if (heroTitleAr?.trim()) texts.title = heroTitleAr.trim();
+        if (heroSubtitleAr?.trim()) texts.sub = heroSubtitleAr.trim();
+        if (heroBtnTextAr?.trim()) texts.btn = heroBtnTextAr.trim();
+
+        if (Object.keys(texts).length > 0) {
+          const res = await autoTranslateBatch(texts);
+          if (res.title) translatedTitleEn = res.title;
+          if (res.sub) translatedSubEn = res.sub;
+          if (res.btn) translatedBtnEn = res.btn;
+        }
+      } catch (e) {
+        console.warn('Hero translation error:', e);
+      }
+
+      // Translate slide titles if any
+      const translatedSlides = await Promise.all(
+        slides.map(async (s) => {
+          if (s.titleAr?.trim()) {
+            try {
+              const trans = await autoTranslate(s.titleAr.trim());
+              return { ...s, titleEn: trans || s.titleAr };
+            } catch {
+              return s;
+            }
+          }
+          return s;
+        })
+      );
+
       const res = await fetch(`/api/banners/${hero.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: heroMode,
           titleAr: heroTitleAr,
-          titleEn: heroTitleEn,
+          titleEn: translatedTitleEn || heroTitleAr,
           subtitleAr: heroSubtitleAr,
-          subtitleEn: heroSubtitleEn,
+          subtitleEn: translatedSubEn || heroSubtitleAr,
           desktopImage: heroDesktopImg,
           mobileImage: heroMobileImg,
           videoUrl: heroVideoUrl,
           link: heroLink,
           buttonTextAr: heroBtnTextAr,
-          buttonTextEn: heroBtnTextEn,
-          slides,
+          buttonTextEn: translatedBtnEn || heroBtnTextAr,
+          slides: translatedSlides,
         }),
       });
 
       if (!res.ok) throw new Error('فشل حفظ البانر الرئيسي');
-      setMessage('تم حفظ إعدادات البانر الرئيسي بنجاح!');
+      setMessage('تمت الترجمة وحفظ إعدادات البانر الرئيسي بنجاح!');
       setTimeout(() => setMessage(null), 3000);
       fetchBanners();
     } catch (err: any) {
@@ -126,28 +163,50 @@ export default function AdminBannersPage() {
     setSaving(true);
     setMessage(null);
     try {
-      if (promoWide.id) {
-        await fetch(`/api/banners/${promoWide.id}`, {
+      const wideToSave = { ...promoWide };
+      const small1ToSave = { ...promoSmall1 };
+      const small2ToSave = { ...promoSmall2 };
+
+      try {
+        const texts: Record<string, string> = {};
+        if (wideToSave.titleAr?.trim()) texts.wTitle = wideToSave.titleAr.trim();
+        if (wideToSave.subtitleAr?.trim()) texts.wSub = wideToSave.subtitleAr.trim();
+        if (small1ToSave.titleAr?.trim()) texts.s1Title = small1ToSave.titleAr.trim();
+        if (small2ToSave.titleAr?.trim()) texts.s2Title = small2ToSave.titleAr.trim();
+
+        if (Object.keys(texts).length > 0) {
+          const res = await autoTranslateBatch(texts);
+          if (res.wTitle) wideToSave.titleEn = res.wTitle;
+          if (res.wSub) wideToSave.subtitleEn = res.wSub;
+          if (res.s1Title) small1ToSave.titleEn = res.s1Title;
+          if (res.s2Title) small2ToSave.titleEn = res.s2Title;
+        }
+      } catch (e) {
+        console.warn('Promo translation error:', e);
+      }
+
+      if (wideToSave.id) {
+        await fetch(`/api/banners/${wideToSave.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(promoWide),
+          body: JSON.stringify(wideToSave),
         });
       }
-      if (promoSmall1.id) {
-        await fetch(`/api/banners/${promoSmall1.id}`, {
+      if (small1ToSave.id) {
+        await fetch(`/api/banners/${small1ToSave.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(promoSmall1),
+          body: JSON.stringify(small1ToSave),
         });
       }
-      if (promoSmall2.id) {
-        await fetch(`/api/banners/${promoSmall2.id}`, {
+      if (small2ToSave.id) {
+        await fetch(`/api/banners/${small2ToSave.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(promoSmall2),
+          body: JSON.stringify(small2ToSave),
         });
       }
-      setMessage('تم حفظ البانرات الإعلانية بنجاح!');
+      setMessage('تمت الترجمة وحفظ البانرات الإعلانية بنجاح!');
       setTimeout(() => setMessage(null), 3000);
       fetchBanners();
     } catch (err: any) {
@@ -214,10 +273,10 @@ export default function AdminBannersPage() {
           <button
             onClick={handleSaveHero}
             disabled={saving}
-            className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+            className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4 text-black" />
-            <span>{saving ? 'جاري الحفظ...' : 'حفظ إعدادات البانر الرئيسي'}</span>
+            <Sparkles className="w-4 h-4 text-black" />
+            <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : 'ترجمة وحفظ'}</span>
           </button>
         </div>
 
@@ -297,7 +356,7 @@ export default function AdminBannersPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-black font-black block">العنوان بالعربية</label>
                 <input
                   type="text"
@@ -307,35 +366,13 @@ export default function AdminBannersPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-black font-black block">العنوان بالإنجليزية</label>
-                <input
-                  type="text"
-                  value={heroTitleEn}
-                  onChange={(e) => setHeroTitleEn(e.target.value)}
-                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-1">
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-black font-black block">الوصف الترويجي بالعربية</label>
                 <input
                   type="text"
                   value={heroSubtitleAr}
                   onChange={(e) => setHeroSubtitleAr(e.target.value)}
                   className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-1">
-                <label className="text-black font-black block">الوصف الترويجي بالإنجليزية (Subtitle)</label>
-                <input
-                  type="text"
-                  value={heroSubtitleEn}
-                  onChange={(e) => setHeroSubtitleEn(e.target.value)}
-                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                  dir="ltr"
                 />
               </div>
 
@@ -350,17 +387,6 @@ export default function AdminBannersPage() {
               </div>
 
               <div className="space-y-1.5 sm:col-span-1">
-                <label className="text-black font-black block">نص الزر بالإنجليزية (Button Text)</label>
-                <input
-                  type="text"
-                  value={heroBtnTextEn}
-                  onChange={(e) => setHeroBtnTextEn(e.target.value)}
-                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-black font-black block">رابط الزر (Link)</label>
                 <input
                   type="text"
@@ -388,24 +414,13 @@ export default function AdminBannersPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-2">
                 <label className="text-black font-black block">العنوان بالعربية</label>
                 <input
                   type="text"
                   value={heroTitleAr}
                   onChange={(e) => setHeroTitleAr(e.target.value)}
                   className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-black font-black block">العنوان بالإنجليزية</label>
-                <input
-                  type="text"
-                  value={heroTitleEn}
-                  onChange={(e) => setHeroTitleEn(e.target.value)}
-                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                  dir="ltr"
                 />
               </div>
 
@@ -479,16 +494,6 @@ export default function AdminBannersPage() {
                       />
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="text-black font-black block">عنوان الشريحة بالإنجليزية (Title En)</label>
-                      <input
-                        type="text"
-                        value={s.titleEn || ''}
-                        onChange={(e) => updateSlideField(idx, 'titleEn', e.target.value)}
-                        className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                        dir="ltr"
-                      />
-                    </div>
 
                     <div className="space-y-1">
                       <label className="text-black font-black block">رابط التحويل عند الضغط</label>
@@ -538,10 +543,10 @@ export default function AdminBannersPage() {
           <button
             onClick={handleSavePromo}
             disabled={saving}
-            className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+            className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black flex items-center gap-2 shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4 text-black" />
-            <span>{saving ? 'جاري الحفظ...' : 'حفظ البانرات الإعلانية'}</span>
+            <Sparkles className="w-4 h-4 text-black" />
+            <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : 'ترجمة وحفظ'}</span>
           </button>
         </div>
 
@@ -549,7 +554,7 @@ export default function AdminBannersPage() {
         <div className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#DFC27A]/30 space-y-3 text-xs">
           <span className="font-black text-black text-sm block">1. البانر الإعلاني العريض:</span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 sm:col-span-2">
               <label className="text-black font-black block">العنوان بالعربية</label>
               <input
                 type="text"
@@ -558,33 +563,13 @@ export default function AdminBannersPage() {
                 className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-black font-black block">العنوان بالإنجليزية (Title En)</label>
-              <input
-                type="text"
-                value={promoWide.titleEn || ''}
-                onChange={(e) => setPromoWide({ ...promoWide, titleEn: e.target.value })}
-                className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                dir="ltr"
-              />
-            </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 sm:col-span-2">
               <label className="text-black font-black block">الوصف بالعربية</label>
               <input
                 type="text"
                 value={promoWide.subtitleAr || ''}
                 onChange={(e) => setPromoWide({ ...promoWide, subtitleAr: e.target.value })}
                 className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-black font-black block">الوصف بالإنجليزية (Subtitle En)</label>
-              <input
-                type="text"
-                value={promoWide.subtitleEn || ''}
-                onChange={(e) => setPromoWide({ ...promoWide, subtitleEn: e.target.value })}
-                className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                dir="ltr"
               />
             </div>
             <div className="space-y-1.5 sm:col-span-2">
@@ -625,16 +610,6 @@ export default function AdminBannersPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-black font-black block">العنوان بالإنجليزية (Title En)</label>
-                <input
-                  type="text"
-                  value={promoSmall1.titleEn || ''}
-                  onChange={(e) => setPromoSmall1({ ...promoSmall1, titleEn: e.target.value })}
-                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                  dir="ltr"
-                />
-              </div>
-              <div className="space-y-1.5">
                 <MediaUploader
                   label="صورة البانر الصغير 1"
                   value={promoSmall1.desktopImage || ''}
@@ -667,16 +642,6 @@ export default function AdminBannersPage() {
                   value={promoSmall2.titleAr || ''}
                   onChange={(e) => setPromoSmall2({ ...promoSmall2, titleAr: e.target.value })}
                   className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-black font-black block">العنوان بالإنجليزية (Title En)</label>
-                <input
-                  type="text"
-                  value={promoSmall2.titleEn || ''}
-                  onChange={(e) => setPromoSmall2({ ...promoSmall2, titleEn: e.target.value })}
-                  className="w-full bg-white border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
-                  dir="ltr"
                 />
               </div>
               <div className="space-y-1.5">

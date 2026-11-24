@@ -29,41 +29,6 @@ export default function AdminCategoriesPage() {
     isActive: true,
   });
 
-  const [translating, setTranslating] = useState<string | null>(null);
-
-  const handleTranslateName = async () => {
-    if (!formData.nameAr.trim()) return;
-    setTranslating('name');
-    try {
-      const en = await autoTranslate(formData.nameAr);
-      if (en) {
-        setFormData((prev) => ({
-          ...prev,
-          nameEn: en,
-          slug: prev.slug || en.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
-        }));
-      }
-    } finally {
-      setTranslating(null);
-    }
-  };
-
-  const handleTranslateDesc = async () => {
-    if (!formData.descriptionAr.trim()) return;
-    setTranslating('desc');
-    try {
-      const en = await autoTranslate(formData.descriptionAr);
-      if (en) {
-        setFormData((prev) => ({
-          ...prev,
-          descriptionEn: en,
-        }));
-      }
-    } finally {
-      setTranslating(null);
-    }
-  };
-
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -121,6 +86,45 @@ export default function AdminCategoriesPage() {
     setFormError(null);
 
     try {
+      if (!formData.nameAr.trim()) {
+        throw new Error('يرجى كتابة اسم التصنيف بالعربية');
+      }
+
+      // Auto-translate Arabic inputs to English in the background
+      let translatedNameEn = formData.nameEn.trim();
+      let translatedDescEn = formData.descriptionEn.trim();
+
+      try {
+        const transName = await autoTranslate(formData.nameAr.trim());
+        if (transName) translatedNameEn = transName;
+
+        if (formData.descriptionAr.trim()) {
+          const transDesc = await autoTranslate(formData.descriptionAr.trim());
+          if (transDesc) translatedDescEn = transDesc;
+        }
+      } catch (transErr) {
+        console.warn('Category auto translation warning:', transErr);
+      }
+
+      if (!translatedNameEn) translatedNameEn = formData.nameAr.trim();
+
+      const cleanSlug =
+        formData.slug.trim() ||
+        translatedNameEn
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') ||
+        `cat-${Date.now()}`;
+
+      const payload = {
+        ...formData,
+        nameAr: formData.nameAr.trim(),
+        nameEn: translatedNameEn,
+        slug: cleanSlug,
+        descriptionAr: formData.descriptionAr.trim(),
+        descriptionEn: translatedDescEn,
+      };
+
       const url = editingCategory
         ? `/api/categories/${editingCategory.id}`
         : '/api/categories';
@@ -129,7 +133,7 @@ export default function AdminCategoriesPage() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -194,9 +198,10 @@ export default function AdminCategoriesPage() {
                 type="submit"
                 form="category-form"
                 disabled={saving}
-                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+                className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer flex items-center gap-2"
               >
-                {saving ? 'جاري الحفظ...' : editingCategory ? 'حفظ التعديلات' : 'إنشاء التصنيف'}
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : editingCategory ? 'ترجمة وحفظ التعديلات' : 'ترجمة وحفظ'}</span>
               </button>
             </div>
           </div>
@@ -214,74 +219,19 @@ export default function AdminCategoriesPage() {
             className="bg-white rounded-3xl p-6 sm:p-8 border border-[#DFC27A]/40 shadow-sm space-y-6 text-xs"
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">الاسم بالعربية *</label>
-                  {formData.nameAr.trim() && (
-                    <button
-                      type="button"
-                      onClick={handleTranslateName}
-                      disabled={translating === 'name'}
-                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#98702B]" />
-                      <span>{translating === 'name' ? 'جاري الترجمة...' : 'ترجمة للاسم الإنجليزي'}</span>
-                    </button>
-                  )}
-                </div>
+              <div className="space-y-1.5 sm:col-span-1">
+                <label className="text-black font-black text-xs block">اسم التصنيف بالعربية *</label>
                 <input
                   type="text"
                   required
                   placeholder="مثال: عطور رجالية فاخرة"
                   value={formData.nameAr}
                   onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                  onBlur={() => {
-                    if (formData.nameAr.trim() && !formData.nameEn.trim()) {
-                      handleTranslateName();
-                    }
-                  }}
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">الاسم بالإنجليزية *</label>
-                  <button
-                    type="button"
-                    onClick={handleTranslateName}
-                    disabled={!formData.nameAr.trim() || translating === 'name'}
-                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-[#98702B]" />
-                    <span>{translating === 'name' ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  required
-                  placeholder="Men Perfumes"
-                  value={formData.nameEn}
-                  onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-black font-black text-xs block">المعرف اللطيف (Slug) *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="men-perfumes"
-                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-4 py-2.5 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                  dir="ltr"
-                />
-              </div>
-
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-1">
                 <label className="text-black font-black text-xs block">ترتيب الظهور</label>
                 <input
                   type="number"
@@ -304,54 +254,13 @@ export default function AdminCategoriesPage() {
                 />
               </div>
 
-              <div className="space-y-1.5 sm:col-span-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">الوصف بالعربية</label>
-                  {formData.descriptionAr.trim() && (
-                    <button
-                      type="button"
-                      onClick={handleTranslateDesc}
-                      disabled={translating === 'desc'}
-                      className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#98702B]" />
-                      <span>{translating === 'desc' ? 'جاري الترجمة...' : 'ترجمة للوصف الإنجليزي'}</span>
-                    </button>
-                  )}
-                </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <label className="text-black font-black text-xs block">الوصف بالعربية</label>
                 <textarea
                   rows={3}
                   value={formData.descriptionAr}
                   onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                  onBlur={() => {
-                    if (formData.descriptionAr.trim() && !formData.descriptionEn.trim()) {
-                      handleTranslateDesc();
-                    }
-                  }}
                   placeholder="وصف مختصر للتصنيف ومحتواه العطري..."
-                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-black font-black text-xs block">الوصف بالإنجليزية (Description in English)</label>
-                  <button
-                    type="button"
-                    onClick={handleTranslateDesc}
-                    disabled={!formData.descriptionAr.trim() || translating === 'desc'}
-                    className="text-[11px] font-black text-[#98702B] hover:text-[#C49A45] flex items-center gap-1 disabled:opacity-40 cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-[#98702B]" />
-                    <span>{translating === 'desc' ? 'جاري الترجمة...' : 'ترجمة تلقائية من العربي'}</span>
-                  </button>
-                </div>
-                <textarea
-                  rows={3}
-                  dir="ltr"
-                  value={formData.descriptionEn}
-                  onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
-                  placeholder="Short category description in English..."
                   className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl p-3 text-xs text-black font-bold placeholder-[#777777] focus:outline-none focus:border-[#C49A45] focus:bg-white"
                 />
               </div>
@@ -381,9 +290,10 @@ export default function AdminCategoriesPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="gold-button px-6 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer"
+                className="gold-button px-7 py-2.5 rounded-xl text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 cursor-pointer flex items-center gap-2"
               >
-                {saving ? 'جاري الحفظ...' : editingCategory ? 'حفظ التعديلات' : 'إنشاء التصنيف'}
+                <Sparkles className="w-4 h-4 text-black" />
+                <span>{saving ? 'جارٍ الترجمة والحفظ... ✨' : editingCategory ? 'ترجمة وحفظ التعديلات' : 'ترجمة وحفظ'}</span>
               </button>
             </div>
           </form>
