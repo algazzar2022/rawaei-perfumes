@@ -85,6 +85,14 @@ export async function GET(request: Request) {
         sizes: {
           orderBy: { sizeMl: 'asc' },
         },
+        fragranceNotes: {
+          include: {
+            note: true,
+          },
+          orderBy: {
+            sortOrder: 'asc',
+          },
+        },
       },
       orderBy,
       take: limit,
@@ -132,6 +140,7 @@ export async function POST(request: Request) {
       categoryId,
       images,
       sizes,
+      fragranceNotes,
     } = body;
 
     if (!nameAr || !nameEn || !slug || !price || !categoryId) {
@@ -181,11 +190,26 @@ export async function POST(request: Request) {
             isDefault: Boolean(s.isDefault),
           })),
         },
+        fragranceNotes: {
+          create: (Array.isArray(fragranceNotes) ? fragranceNotes : []).map((fn: any, idx: number) => ({
+            noteId: fn.noteId,
+            type: fn.type,
+            sortOrder: fn.sortOrder !== undefined ? fn.sortOrder : idx,
+          })),
+        },
       },
       include: {
         category: true,
         images: true,
         sizes: true,
+        fragranceNotes: {
+          include: {
+            note: true,
+          },
+          orderBy: {
+            sortOrder: 'asc',
+          },
+        },
       },
     });
 

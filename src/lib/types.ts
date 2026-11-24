@@ -38,6 +38,24 @@ export interface CategoryDto {
   };
 }
 
+export interface FragranceNoteDto {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  image?: string | null;
+  category?: string | null;
+  createdAt?: string | Date;
+}
+
+export interface ProductFragranceNoteDto {
+  id: string;
+  productId: string;
+  noteId: string;
+  note: FragranceNoteDto;
+  type: 'TOP' | 'HEART' | 'BASE';
+  sortOrder: number;
+}
+
 export interface ProductDto {
   id: string;
   nameAr: string;
@@ -66,6 +84,7 @@ export interface ProductDto {
   category?: CategoryDto;
   images: ProductImageDto[];
   sizes: ProductSizeDto[];
+  fragranceNotes?: ProductFragranceNoteDto[];
   createdAt?: string | Date;
 }
 

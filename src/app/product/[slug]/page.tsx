@@ -21,6 +21,10 @@ export default async function ProductPage({
       category: true,
       images: { orderBy: { sortOrder: 'asc' } },
       sizes: { orderBy: { sizeMl: 'asc' } },
+      fragranceNotes: {
+        include: { note: true },
+        orderBy: { sortOrder: 'asc' },
+      },
     },
   });
 
@@ -39,6 +43,10 @@ export default async function ProductPage({
       category: true,
       images: { orderBy: { sortOrder: 'asc' } },
       sizes: { orderBy: { sizeMl: 'asc' } },
+      fragranceNotes: {
+        include: { note: true },
+        orderBy: { sortOrder: 'asc' },
+      },
     },
     take: 4,
   });

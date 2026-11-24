@@ -15,8 +15,9 @@ import {
   Filter,
   ArrowRight,
   ArrowLeft,
+  Droplets,
 } from 'lucide-react';
-import { ProductDto, CategoryDto } from '@/lib/types';
+import { ProductDto, CategoryDto, FragranceNoteDto } from '@/lib/types';
 import { formatPrice } from '@/lib/utils';
 import MediaUploader from '@/components/admin/MediaUploader';
 import { autoTranslate, autoTranslateBatch } from '@/lib/translate';
@@ -43,6 +44,18 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<ProductDto | null>(null);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  // Fragrance Notes Library & Selection State
+  const [availableNotes, setAvailableNotes] = useState<FragranceNoteDto[]>([]);
+  const [selectedTopNotes, setSelectedTopNotes] = useState<string[]>([]);
+  const [selectedHeartNotes, setSelectedHeartNotes] = useState<string[]>([]);
+  const [selectedBaseNotes, setSelectedBaseNotes] = useState<string[]>([]);
+
+  // Quick Note Add Form
+  const [quickAddModalOpen, setQuickAddModalOpen] = useState(false);
+  const [quickAddTier, setQuickAddTier] = useState<'TOP' | 'HEART' | 'BASE'>('TOP');
+  const [quickNoteData, setQuickNoteData] = useState({ nameAr: '', category: 'أخشاب', image: '' });
+  const [quickNoteSaving, setQuickNoteSaving] = useState(false);
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -77,16 +90,19 @@ export default function AdminProductsPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [prodRes, catRes] = await Promise.all([
+      const [prodRes, catRes, notesRes] = await Promise.all([
         fetch('/api/products'),
         fetch('/api/categories'),
+        fetch('/api/fragrance-notes'),
       ]);
 
       const prodData = await prodRes.json();
       const catData = await catRes.json();
+      const notesData = await notesRes.json();
 
       if (prodData.products) setProducts(prodData.products);
       if (catData.categories) setCategories(catData.categories);
+      if (notesData.notes) setAvailableNotes(notesData.notes);
     } catch (err) {
       console.error('Failed to load products/categories', err);
     } finally {
@@ -126,6 +142,9 @@ export default function AdminProductsPage() {
       { sizeMl: 50, price: '650', comparePrice: '850', stock: '20', isDefault: true },
       { sizeMl: 100, price: '950', comparePrice: '1250', stock: '30', isDefault: false },
     ]);
+    setSelectedTopNotes([]);
+    setSelectedHeartNotes([]);
+    setSelectedBaseNotes([]);
     setFormError(null);
     setViewMode('FORM');
   };
@@ -176,6 +195,16 @@ export default function AdminProductsPage() {
           isDefault: true,
         },
       ]);
+    }
+
+    if (p.fragranceNotes && p.fragranceNotes.length > 0) {
+      setSelectedTopNotes(p.fragranceNotes.filter((fn) => fn.type === 'TOP').map((fn) => fn.noteId));
+      setSelectedHeartNotes(p.fragranceNotes.filter((fn) => fn.type === 'HEART').map((fn) => fn.noteId));
+      setSelectedBaseNotes(p.fragranceNotes.filter((fn) => fn.type === 'BASE').map((fn) => fn.noteId));
+    } else {
+      setSelectedTopNotes([]);
+      setSelectedHeartNotes([]);
+      setSelectedBaseNotes([]);
     }
 
     setFormError(null);
@@ -242,6 +271,56 @@ export default function AdminProductsPage() {
     });
   };
 
+  const handleAddNoteToTier = (tier: 'TOP' | 'HEART' | 'BASE', noteId: string) => {
+    if (!noteId) return;
+    if (tier === 'TOP') {
+      if (!selectedTopNotes.includes(noteId)) setSelectedTopNotes([...selectedTopNotes, noteId]);
+    } else if (tier === 'HEART') {
+      if (!selectedHeartNotes.includes(noteId)) setSelectedHeartNotes([...selectedHeartNotes, noteId]);
+    } else if (tier === 'BASE') {
+      if (!selectedBaseNotes.includes(noteId)) setSelectedBaseNotes([...selectedBaseNotes, noteId]);
+    }
+  };
+
+  const handleRemoveNoteFromTier = (tier: 'TOP' | 'HEART' | 'BASE', noteId: string) => {
+    if (tier === 'TOP') {
+      setSelectedTopNotes(selectedTopNotes.filter((id) => id !== noteId));
+    } else if (tier === 'HEART') {
+      setSelectedHeartNotes(selectedHeartNotes.filter((id) => id !== noteId));
+    } else if (tier === 'BASE') {
+      setSelectedBaseNotes(selectedBaseNotes.filter((id) => id !== noteId));
+    }
+  };
+
+  const handleQuickAddNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quickNoteData.nameAr.trim()) return;
+    setQuickNoteSaving(true);
+    try {
+      const res = await fetch('/api/fragrance-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nameAr: quickNoteData.nameAr.trim(),
+          category: quickNoteData.category,
+          image: quickNoteData.image.trim() || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'فشل حفظ النوتة');
+
+      const createdNote: FragranceNoteDto = data.note;
+      setAvailableNotes((prev) => [...prev, createdNote]);
+      handleAddNoteToTier(quickAddTier, createdNote.id);
+      setQuickAddModalOpen(false);
+      setQuickNoteData({ nameAr: '', category: 'أخشاب', image: '' });
+    } catch (err: any) {
+      alert(err.message || 'حدث خطأ أثناء إضافة النوتة');
+    } finally {
+      setQuickNoteSaving(false);
+    }
+  };
+
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -260,21 +339,52 @@ export default function AdminProductsPage() {
         throw new Error('يرجى إضافة حجم زجاجة واحد على الأقل للعطر مع السعر');
       }
 
+      // Derive note names from selected fragrance library notes if selected
+      const topNoteNamesAr = selectedTopNotes
+        .map((id) => availableNotes.find((n) => n.id === id)?.nameAr)
+        .filter(Boolean)
+        .join('، ');
+      const heartNoteNamesAr = selectedHeartNotes
+        .map((id) => availableNotes.find((n) => n.id === id)?.nameAr)
+        .filter(Boolean)
+        .join('، ');
+      const baseNoteNamesAr = selectedBaseNotes
+        .map((id) => availableNotes.find((n) => n.id === id)?.nameAr)
+        .filter(Boolean)
+        .join('، ');
+
+      const topNoteNamesEn = selectedTopNotes
+        .map((id) => availableNotes.find((n) => n.id === id)?.nameEn)
+        .filter(Boolean)
+        .join(', ');
+      const heartNoteNamesEn = selectedHeartNotes
+        .map((id) => availableNotes.find((n) => n.id === id)?.nameEn)
+        .filter(Boolean)
+        .join(', ');
+      const baseNoteNamesEn = selectedBaseNotes
+        .map((id) => availableNotes.find((n) => n.id === id)?.nameEn)
+        .filter(Boolean)
+        .join(', ');
+
+      const effectiveTopAr = topNoteNamesAr || formData.topNotes.trim();
+      const effectiveHeartAr = heartNoteNamesAr || formData.heartNotes.trim();
+      const effectiveBaseAr = baseNoteNamesAr || formData.baseNotes.trim();
+
       // Auto-translate Arabic inputs to English in the background
       let translatedNameEn = formData.nameEn.trim();
       let translatedDescEn = formData.descriptionEn.trim();
-      let translatedTopNotes = formData.topNotes.trim();
-      let translatedHeartNotes = formData.heartNotes.trim();
-      let translatedBaseNotes = formData.baseNotes.trim();
+      let translatedTopNotes = topNoteNamesEn || formData.topNotes.trim();
+      let translatedHeartNotes = heartNoteNamesEn || formData.heartNotes.trim();
+      let translatedBaseNotes = baseNoteNamesEn || formData.baseNotes.trim();
 
       try {
         const textsToTranslate: Record<string, string> = {
           name: formData.nameAr.trim(),
           desc: formData.descriptionAr.trim(),
         };
-        if (formData.topNotes.trim()) textsToTranslate.top = formData.topNotes.trim();
-        if (formData.heartNotes.trim()) textsToTranslate.heart = formData.heartNotes.trim();
-        if (formData.baseNotes.trim()) textsToTranslate.base = formData.baseNotes.trim();
+        if (!topNoteNamesEn && effectiveTopAr) textsToTranslate.top = effectiveTopAr;
+        if (!heartNoteNamesEn && effectiveHeartAr) textsToTranslate.heart = effectiveHeartAr;
+        if (!baseNoteNamesEn && effectiveBaseAr) textsToTranslate.base = effectiveBaseAr;
 
         const transRes = await autoTranslateBatch(textsToTranslate);
         if (transRes.name) translatedNameEn = transRes.name;
@@ -336,6 +446,11 @@ export default function AdminProductsPage() {
           stock: parseInt(s.stock) || 0,
           isDefault: Boolean(s.isDefault),
         })),
+        fragranceNotes: [
+          ...selectedTopNotes.map((noteId, idx) => ({ noteId, type: 'TOP', sortOrder: idx })),
+          ...selectedHeartNotes.map((noteId, idx) => ({ noteId, type: 'HEART', sortOrder: idx })),
+          ...selectedBaseNotes.map((noteId, idx) => ({ noteId, type: 'BASE', sortOrder: idx })),
+        ],
       };
 
       const url = editingProduct
@@ -669,40 +784,282 @@ export default function AdminProductsPage() {
               </div>
 
               {/* Fragrance Pyramid Section */}
-              <div className="sm:col-span-2 border-t border-[#DFC27A]/30 pt-4 space-y-3">
-                <span className="text-black font-black text-sm block">الهرم العطري والمواصفات:</span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-black font-black">الافتتاحية (Top Notes)</label>
-                    <input
-                      type="text"
-                      value={formData.topNotes}
-                      onChange={(e) => setFormData({ ...formData, topNotes: e.target.value })}
-                      placeholder="البرغموت، الهيل..."
-                      className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                    />
+              <div className="sm:col-span-2 border-t-2 border-[#DFC27A]/40 pt-5 space-y-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-base font-black text-black flex items-center gap-2">
+                      <Droplets className="w-5 h-5 text-[#C49A45]" />
+                      <span>الهرم العطري الملكي والنوتات (Fragrance Pyramid)</span>
+                    </h3>
+                    <p className="text-xs font-bold text-neutral-500 mt-0.5">
+                      اختر النوتات العطرية لكل مرحلة من مراحل العطر من المكتبة لعرض صورها وأسمائها بأسلوب ملكي فاخر
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {/* Tier 1: TOP NOTES */}
+                  <div className="bg-[#FAF8F5] border border-[#DFC27A]/50 rounded-2xl p-4 flex flex-col justify-between space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between border-b border-[#DFC27A]/30 pb-2 mb-3">
+                        <div>
+                          <span className="text-xs font-black text-black block">1. الافتتاحية (Top Notes)</span>
+                          <span className="text-[10px] font-bold text-[#98702B]">أول 15 دقيقة من الرش</span>
+                        </div>
+                        <span className="text-xs font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                          {selectedTopNotes.length} نوتات
+                        </span>
+                      </div>
+
+                      {/* Selected Notes Badges */}
+                      <div className="min-h-[80px] flex flex-wrap gap-2 items-start mb-3">
+                        {selectedTopNotes.length === 0 ? (
+                          <p className="text-[11px] font-bold text-neutral-400 py-3 text-center w-full">
+                            لم يتم اختيار نوتات للافتتاحية بعد
+                          </p>
+                        ) : (
+                          selectedTopNotes.map((noteId) => {
+                            const note = availableNotes.find((n) => n.id === noteId);
+                            if (!note) return null;
+                            return (
+                              <div
+                                key={note.id}
+                                className="flex items-center gap-2 bg-white border border-[#DFC27A]/60 rounded-full pl-2 pr-1 py-1 shadow-xs"
+                              >
+                                <div className="relative w-7 h-7 rounded-full overflow-hidden bg-[#FAF7F2] border border-[#DFC27A] flex-shrink-0 flex items-center justify-center">
+                                  {note.image ? (
+                                    <Image src={note.image} alt={note.nameAr} fill className="object-cover" sizes="28px" />
+                                  ) : (
+                                    <Droplets className="w-3.5 h-3.5 text-[#C49A45]" />
+                                  )}
+                                </div>
+                                <span className="text-xs font-black text-black">{note.nameAr}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveNoteFromTier('TOP', note.id)}
+                                  className="w-4 h-4 rounded-full bg-neutral-100 hover:bg-red-500 hover:text-white text-neutral-500 flex items-center justify-center text-[10px] font-bold transition-colors cursor-pointer"
+                                  title="إزالة النوتة"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Selector Controls */}
+                    <div className="space-y-2 pt-2 border-t border-[#DFC27A]/20">
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleAddNoteToTier('TOP', e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        defaultValue=""
+                        className="w-full bg-white border border-[#DFC27A]/60 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                      >
+                        <option value="">+ اختر نوتة من المكتبة للافتتاحية...</option>
+                        {availableNotes
+                          .filter((n) => !selectedTopNotes.includes(n.id))
+                          .map((n) => (
+                            <option key={n.id} value={n.id}>
+                              {n.nameAr} ({n.category || 'نوتة'})
+                            </option>
+                          ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuickAddTier('TOP');
+                          setQuickNoteData({ nameAr: '', category: 'حمضيات', image: '' });
+                          setQuickAddModalOpen(true);
+                        }}
+                        className="w-full py-1.5 px-3 rounded-xl border border-dashed border-[#C49A45] hover:bg-amber-50 text-[11px] font-black text-[#98702B] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>إضافة نوتة جديدة غير موجودة بالمكتبة</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-black font-black">قلب العطر (Heart Notes)</label>
-                    <input
-                      type="text"
-                      value={formData.heartNotes}
-                      onChange={(e) => setFormData({ ...formData, heartNotes: e.target.value })}
-                      placeholder="الورد الدمشقي، اللافندر..."
-                      className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                    />
+                  {/* Tier 2: HEART NOTES */}
+                  <div className="bg-[#FAF8F5] border border-[#DFC27A]/50 rounded-2xl p-4 flex flex-col justify-between space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between border-b border-[#DFC27A]/30 pb-2 mb-3">
+                        <div>
+                          <span className="text-xs font-black text-black block">2. قلب العطر (Heart Notes)</span>
+                          <span className="text-[10px] font-bold text-[#98702B]">جوهر وهوية العطر (2-4 ساعات)</span>
+                        </div>
+                        <span className="text-xs font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                          {selectedHeartNotes.length} نوتات
+                        </span>
+                      </div>
+
+                      {/* Selected Notes Badges */}
+                      <div className="min-h-[80px] flex flex-wrap gap-2 items-start mb-3">
+                        {selectedHeartNotes.length === 0 ? (
+                          <p className="text-[11px] font-bold text-neutral-400 py-3 text-center w-full">
+                            لم يتم اختيار نوتات لقلب العطر بعد
+                          </p>
+                        ) : (
+                          selectedHeartNotes.map((noteId) => {
+                            const note = availableNotes.find((n) => n.id === noteId);
+                            if (!note) return null;
+                            return (
+                              <div
+                                key={note.id}
+                                className="flex items-center gap-2 bg-white border border-[#DFC27A]/60 rounded-full pl-2 pr-1 py-1 shadow-xs"
+                              >
+                                <div className="relative w-7 h-7 rounded-full overflow-hidden bg-[#FAF7F2] border border-[#DFC27A] flex-shrink-0 flex items-center justify-center">
+                                  {note.image ? (
+                                    <Image src={note.image} alt={note.nameAr} fill className="object-cover" sizes="28px" />
+                                  ) : (
+                                    <Droplets className="w-3.5 h-3.5 text-[#C49A45]" />
+                                  )}
+                                </div>
+                                <span className="text-xs font-black text-black">{note.nameAr}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveNoteFromTier('HEART', note.id)}
+                                  className="w-4 h-4 rounded-full bg-neutral-100 hover:bg-red-500 hover:text-white text-neutral-500 flex items-center justify-center text-[10px] font-bold transition-colors cursor-pointer"
+                                  title="إزالة النوتة"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Selector Controls */}
+                    <div className="space-y-2 pt-2 border-t border-[#DFC27A]/20">
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleAddNoteToTier('HEART', e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        defaultValue=""
+                        className="w-full bg-white border border-[#DFC27A]/60 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                      >
+                        <option value="">+ اختر نوتة من المكتبة لقلب العطر...</option>
+                        {availableNotes
+                          .filter((n) => !selectedHeartNotes.includes(n.id))
+                          .map((n) => (
+                            <option key={n.id} value={n.id}>
+                              {n.nameAr} ({n.category || 'نوتة'})
+                            </option>
+                          ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuickAddTier('HEART');
+                          setQuickNoteData({ nameAr: '', category: 'زهور', image: '' });
+                          setQuickAddModalOpen(true);
+                        }}
+                        className="w-full py-1.5 px-3 rounded-xl border border-dashed border-[#C49A45] hover:bg-amber-50 text-[11px] font-black text-[#98702B] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>إضافة نوتة جديدة غير موجودة بالمكتبة</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-black font-black">القاعدة (Base Notes)</label>
-                    <input
-                      type="text"
-                      value={formData.baseNotes}
-                      onChange={(e) => setFormData({ ...formData, baseNotes: e.target.value })}
-                      placeholder="خشب العود، العنبر، المسك..."
-                      className="w-full bg-[#FAF8F5] border border-[#DFC27A]/40 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45] focus:bg-white"
-                    />
+                  {/* Tier 3: BASE NOTES */}
+                  <div className="bg-[#FAF8F5] border border-[#DFC27A]/50 rounded-2xl p-4 flex flex-col justify-between space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between border-b border-[#DFC27A]/30 pb-2 mb-3">
+                        <div>
+                          <span className="text-xs font-black text-black block">3. قاعدة العطر (Base Notes)</span>
+                          <span className="text-[10px] font-bold text-[#98702B]">عمق وأصالة وثبات (+12 ساعة)</span>
+                        </div>
+                        <span className="text-xs font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                          {selectedBaseNotes.length} نوتات
+                        </span>
+                      </div>
+
+                      {/* Selected Notes Badges */}
+                      <div className="min-h-[80px] flex flex-wrap gap-2 items-start mb-3">
+                        {selectedBaseNotes.length === 0 ? (
+                          <p className="text-[11px] font-bold text-neutral-400 py-3 text-center w-full">
+                            لم يتم اختيار نوتات للقاعدة بعد
+                          </p>
+                        ) : (
+                          selectedBaseNotes.map((noteId) => {
+                            const note = availableNotes.find((n) => n.id === noteId);
+                            if (!note) return null;
+                            return (
+                              <div
+                                key={note.id}
+                                className="flex items-center gap-2 bg-white border border-[#DFC27A]/60 rounded-full pl-2 pr-1 py-1 shadow-xs"
+                              >
+                                <div className="relative w-7 h-7 rounded-full overflow-hidden bg-[#FAF7F2] border border-[#DFC27A] flex-shrink-0 flex items-center justify-center">
+                                  {note.image ? (
+                                    <Image src={note.image} alt={note.nameAr} fill className="object-cover" sizes="28px" />
+                                  ) : (
+                                    <Droplets className="w-3.5 h-3.5 text-[#C49A45]" />
+                                  )}
+                                </div>
+                                <span className="text-xs font-black text-black">{note.nameAr}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveNoteFromTier('BASE', note.id)}
+                                  className="w-4 h-4 rounded-full bg-neutral-100 hover:bg-red-500 hover:text-white text-neutral-500 flex items-center justify-center text-[10px] font-bold transition-colors cursor-pointer"
+                                  title="إزالة النوتة"
+                                >
+                                  ×
+                                </button>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Selector Controls */}
+                    <div className="space-y-2 pt-2 border-t border-[#DFC27A]/20">
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleAddNoteToTier('BASE', e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                        defaultValue=""
+                        className="w-full bg-white border border-[#DFC27A]/60 rounded-xl px-3 py-2 text-xs text-black font-bold focus:outline-none focus:border-[#C49A45]"
+                      >
+                        <option value="">+ اختر نوتة من المكتبة لقاعدة العطر...</option>
+                        {availableNotes
+                          .filter((n) => !selectedBaseNotes.includes(n.id))
+                          .map((n) => (
+                            <option key={n.id} value={n.id}>
+                              {n.nameAr} ({n.category || 'نوتة'})
+                            </option>
+                          ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuickAddTier('BASE');
+                          setQuickNoteData({ nameAr: '', category: 'أخشاب', image: '' });
+                          setQuickAddModalOpen(true);
+                        }}
+                        className="w-full py-1.5 px-3 rounded-xl border border-dashed border-[#C49A45] hover:bg-amber-50 text-[11px] font-black text-[#98702B] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>إضافة نوتة جديدة غير موجودة بالمكتبة</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -933,6 +1290,118 @@ export default function AdminProductsPage() {
             </div>
           </div>
         </>
+      )}
+
+      {/* Quick Add Note to Library (Light Luxury Modal) */}
+      {quickAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl border-2 border-[#C49A45] shadow-2xl p-6 sm:p-8 w-full max-w-lg space-y-5 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between border-b border-[#DFC27A]/30 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-[#C49A45]">
+                  <Droplets className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-black">إضافة نوتة عطرية جديدة للمكتبة</h4>
+                  <p className="text-[11px] font-bold text-[#98702B]">
+                    سيتم إضافتها تلقائياً إلى{' '}
+                    {quickAddTier === 'TOP'
+                      ? 'الافتتاحية'
+                      : quickAddTier === 'HEART'
+                      ? 'قلب العطر'
+                      : 'قاعدة العطر'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setQuickAddModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-600 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleQuickAddNote} className="space-y-4">
+              <div>
+                <label className="block text-xs font-black text-black mb-1.5">
+                  اسم النوتة بالعربية <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="مثال: لبان حوجري، مسك أبيض ملكي..."
+                  value={quickNoteData.nameAr}
+                  onChange={(e) => setQuickNoteData({ ...quickNoteData, nameAr: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/50 rounded-xl px-3.5 py-2.5 text-xs font-bold text-black focus:outline-none focus:border-[#C49A45]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-black mb-1.5">
+                  التصنيف <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={quickNoteData.category}
+                  onChange={(e) => setQuickNoteData({ ...quickNoteData, category: e.target.value })}
+                  className="w-full bg-[#FAF8F5] border border-[#DFC27A]/50 rounded-xl px-3.5 py-2.5 text-xs font-bold text-black focus:outline-none focus:border-[#C49A45]"
+                >
+                  {['أخشاب', 'عنبر ومسك', 'زهور', 'حمضيات', 'توابل وبخور', 'جلود', 'فواكه ومذاقات', 'أخرى'].map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black text-black mb-1.5">
+                  صورة النوتة العطرية
+                </label>
+                <div className="flex items-center gap-4 p-3 rounded-2xl bg-[#FAF8F5] border border-stone-200">
+                  <div className="relative w-16 h-16 rounded-full border-2 border-[#C49A45] shadow-xs overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
+                    {quickNoteData.image ? (
+                      <Image
+                        src={quickNoteData.image}
+                        alt="صورة النوتة"
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    ) : (
+                      <Droplets className="w-6 h-6 text-stone-300" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <MediaUploader
+                      label="رفع صورة النوتة العطرية"
+                      value={quickNoteData.image}
+                      onChange={(url) => setQuickNoteData({ ...quickNoteData, image: url })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => setQuickAddModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-neutral-300 text-xs font-bold text-neutral-700 hover:bg-neutral-50"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  disabled={quickNoteSaving}
+                  className="px-6 py-2 rounded-xl gold-button text-xs font-black text-black shadow-md hover:brightness-105 disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{quickNoteSaving ? 'جاري الحفظ...' : 'حفظ وإضافة للهرم العطري'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -21,6 +21,14 @@ export async function GET(
         sizes: {
           orderBy: { sizeMl: 'asc' },
         },
+        fragranceNotes: {
+          include: {
+            note: true,
+          },
+          orderBy: {
+            sortOrder: 'asc',
+          },
+        },
       },
     });
 
@@ -75,6 +83,7 @@ export async function PUT(
       categoryId,
       images,
       sizes,
+      fragranceNotes,
     } = body;
 
     const updated = await prisma.product.update({
@@ -137,6 +146,24 @@ export async function PUT(
       }
     }
 
+    // Update fragrance notes if provided
+    if (fragranceNotes && Array.isArray(fragranceNotes)) {
+      await prisma.productFragranceNote.deleteMany({ where: { productId: id } });
+      for (let i = 0; i < fragranceNotes.length; i++) {
+        const fn = fragranceNotes[i];
+        if (fn.noteId && fn.type) {
+          await prisma.productFragranceNote.create({
+            data: {
+              productId: id,
+              noteId: fn.noteId,
+              type: fn.type,
+              sortOrder: fn.sortOrder !== undefined ? fn.sortOrder : i,
+            },
+          });
+        }
+      }
+    }
+
     if (isFeatured !== undefined) {
       if (Boolean(isFeatured)) {
         await prisma.featuredProduct.upsert({
@@ -149,7 +176,20 @@ export async function PUT(
       }
     }
 
-    return NextResponse.json({ success: true, product: updated });
+    const fullUpdatedProduct = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        images: { orderBy: { sortOrder: 'asc' } },
+        sizes: { orderBy: { sizeMl: 'asc' } },
+        fragranceNotes: {
+          include: { note: true },
+          orderBy: { sortOrder: 'asc' },
+        },
+      },
+    });
+
+    return NextResponse.json({ success: true, product: fullUpdatedProduct || updated });
   } catch (error: any) {
     console.error('Product update error:', error);
     return NextResponse.json(

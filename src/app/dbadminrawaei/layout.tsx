@@ -26,6 +26,7 @@ import {
   X,
   Compass,
   Video,
+  Droplets,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -88,6 +89,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { label: 'لوحة الإحصائيات (Dashboard)', href: '/dbadminrawaei', icon: LayoutDashboard },
     { label: 'إدارة المنتجات (Products)', href: '/dbadminrawaei/products', icon: Package },
+    { label: 'مكتبة النوتات العطرية (Notes)', href: '/dbadminrawaei/fragrance-notes', icon: Droplets },
     { label: 'إدارة التصنيفات (Categories)', href: '/dbadminrawaei/categories', icon: Layers },
     { label: 'أقسام العطور (Him/Her/Unisex)', href: '/dbadminrawaei/gender-sections', icon: Compass },
     { label: 'البانرات والسلايدر والفيديو', href: '/dbadminrawaei/banners', icon: Sliders },
