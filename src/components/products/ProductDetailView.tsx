@@ -499,38 +499,6 @@ export default function ProductDetailView({ product, relatedProducts }: DetailPr
                 {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
               </button>
             </div>
-
-            {/* Store Guarantee & Trust Badges (Balances column height perfectly) */}
-            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-[#C49A45]/20 text-xs font-bold text-neutral-800">
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white border border-[#DFC27A]/35 shadow-xs">
-                <Truck className="w-5 h-5 text-[#C49A45] flex-shrink-0" />
-                <div>
-                  <span className="text-black font-black block">{t('شحن سريع ومجاني', 'Fast Shipping')}</span>
-                  <span className="text-[11px] text-neutral-500 font-normal">{t('توصيل لباب المنزل', 'Doorstep delivery')}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white border border-[#DFC27A]/35 shadow-xs">
-                <ShieldCheck className="w-5 h-5 text-[#C49A45] flex-shrink-0" />
-                <div>
-                  <span className="text-black font-black block">{t('عطر أصلي 100%', '100% Authentic')}</span>
-                  <span className="text-[11px] text-neutral-500 font-normal">{t('تركيز وزيوت فاخرة', 'Pure luxury oils')}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white border border-[#DFC27A]/35 shadow-xs">
-                <Check className="w-5 h-5 text-[#C49A45] flex-shrink-0" />
-                <div>
-                  <span className="text-black font-black block">{t('معاينة قبل الاستلام', 'Inspect on Delivery')}</span>
-                  <span className="text-[11px] text-neutral-500 font-normal">{t('حق المعاينة متاح', 'Inspection allowed')}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white border border-[#DFC27A]/35 shadow-xs">
-                <Sparkles className="w-5 h-5 text-[#C49A45] flex-shrink-0" />
-                <div>
-                  <span className="text-black font-black block">{t('تغليف إهداء راقي', 'Luxury Gift Packaging')}</span>
-                  <span className="text-[11px] text-neutral-500 font-normal">{t('صندوق ملكي مميز', 'Royal unboxing')}</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
